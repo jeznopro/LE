@@ -1,0 +1,47 @@
+{
+  "title": "Từ Vựng Công Nghệ & Lập Trình (IT)",
+  "description": "Bộ từ vựng chuyên ngành công nghệ thông tin và phát triển phần mềm.",
+  "emoji": "💻",
+  "cards": [
+    {
+      "front": "Algorithm",
+      "back": "Thuật toán, quy trình xử lý dữ liệu từng bước",
+      "phonetic": "/ˈæl.ɡə.rɪ.ðəm/",
+      "partOfSpeech": "noun",
+      "example": "The search engine uses a sophisticated ranking algorithm.",
+      "hint": "Quy tắc giải quyết bài toán"
+    },
+    {
+      "front": "Deployment",
+      "back": "Sự triển khai ứng dụng lên máy chủ/môi trường thực tế",
+      "phonetic": "/dɪˈplɔɪ.mənt/",
+      "partOfSpeech": "noun",
+      "example": "The deployment to the production server went smoothly.",
+      "hint": "Đưa code lên server chạy"
+    },
+    {
+      "front": "Scalability",
+      "back": "Khả năng mở rộng hệ thống khi lượng người dùng tăng",
+      "phonetic": "/ˌskeɪ.ləˈbɪl.ə.t̬i/",
+      "partOfSpeech": "noun",
+      "example": "Cloud computing offers high scalability for growing startups.",
+      "hint": "Scale to lớn hơn mà không bị sập"
+    },
+    {
+      "front": "Vulnerability",
+      "back": "Lỗ hổng bảo mật, điểm yếu an ninh mạng",
+      "phonetic": "/ˌvʌl.nɚ.əˈbɪl.ə.t̬i/",
+      "partOfSpeech": "noun",
+      "example": "The security patch fixed a critical vulnerability in the system.",
+      "hint": "Điểm yếu hacker có thể khai thác"
+    },
+    {
+      "front": "Asynchronous",
+      "back": "Bất đồng bộ (xử lý không chặn luồng)",
+      "phonetic": "/eɪˈsɪŋ.krə.nəs/",
+      "partOfSpeech": "adjective",
+      "example": "JavaScript uses asynchronous functions like async/await.",
+      "hint": "Không phải chờ nhau theo thứ tự tuần tự"
+    }
+  ]
+}

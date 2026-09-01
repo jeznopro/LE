@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+}
+
+/* Custom animations & kawaii effects */
+@keyframes mochi-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+}
+
+@keyframes mochi-pulse-slow {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes mochi-wobble {
+  0%, 100% { transform: translateX(0%); }
+  15% { transform: translateX(-8px) rotate(-4deg); }
+  30% { transform: translateX(6px) rotate(4deg); }
+  45% { transform: translateX(-4px) rotate(-2deg); }
+  60% { transform: translateX(2px) rotate(1deg); }
+  75% { transform: translateX(-1px) rotate(-0.5deg); }
+}
+
+@keyframes bg-scroll {
+  0% { background-position: 0 0; }
+  100% { background-position: 50px 50px; }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-mochi-float {
+  animation: mochi-float 3.5s ease-in-out infinite;
+}
+
+.animate-mochi-pulse {
+  animation: mochi-pulse-slow 2.5s ease-in-out infinite;
+}
+
+.animate-mochi-wobble {
+  animation: mochi-wobble 0.6s ease-in-out;
+}
+
+/* Animated backgrounds */
+.bg-animated-dots {
+  background-image: radial-gradient(rgba(100, 116, 139, 0.15) 2px, transparent 2px);
+  background-size: 30px 30px;
+  animation: bg-scroll 4s linear infinite;
+}
+
+.dark .bg-animated-dots {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+}
+
+.bg-animated-gradient {
+  background: linear-gradient(-45deg, #fef2f2, #eff6ff, #fdf4ff, #fffbeb);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+.dark .bg-animated-gradient {
+  background: linear-gradient(-45deg, #0f172a, #1e1b4b, #172554, #312e81);
+  background-size: 400% 400%;
+  animation: gradient-shift 15s ease infinite;
+}
+
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f7;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
