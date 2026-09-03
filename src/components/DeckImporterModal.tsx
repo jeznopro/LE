@@ -267,14 +267,14 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
                   rows={7}
                   value={pastedContent}
                   onChange={(e) => setPastedContent(e.target.value)}
-                  placeholder={`Dán các cột bảng của bạn vào đây (phân cách bằng Tab hoặc Phẩy):\n#\tWord\tIPA\tType\tMeaning\tExample\tVietnamese\tImage URL\tRelated words\n1\tclassroom\t/ 'klɑ:s.ru:m/\tnoun\tphòng học, lớp học\tThe students entered the classroom quietly.\tHọc sinh bước vào...\thttps://...\tclassmate`}
+                  placeholder={`Dán các cột bảng của bạn vào đây (hỗ trợ cả 7 cột hoặc 9 cột, có hoặc không có cột #):\nWord\tIPA\tType\tMeaning\tExample\tVietnamese\tImage URL\nclassroom\t/ 'klɑ:s.ru:m/\tnoun\tphòng học, lớp học\tThe students entered the classroom quietly.\tHọc sinh bước vào...\thttps://images.unsplash.com/...`}
                   className="w-full p-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-mono focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-100 transition-all placeholder:text-slate-400"
                 />
 
                 <div className="p-3 bg-amber-50/80 dark:bg-slate-800/60 rounded-xl border border-amber-200/80 dark:border-slate-700 text-xs text-amber-900 dark:text-amber-200 flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>
-                    Hệ thống tự động nhận dạng các cột <strong>Word, IPA, Type, Meaning, Example, Vietnamese, Image URL, Related words</strong>!
+                    Hệ thống <strong>tự động nhận diện linh hoạt</strong>: Word, IPA, Type, Meaning, Example, Vietnamese, Image URL (bảng 7 cột, 8 cột hoặc 9 cột, có hoặc không có cột # đều nhận diện chuẩn 100%)!
                   </span>
                 </div>
 
@@ -289,7 +289,7 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
                   ) : (
                     <ArrowRight className="w-4 h-4" />
                   )}
-                  <span>Phân Tích & Xem Trước Dữ Liệu</span>
+                  <span>⚡ Phân Tích & Xem Trước Dữ Liệu</span>
                 </button>
               </div>
             )}
