@@ -572,13 +572,20 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             {/* Card Content: Front vs Back */}
             {!isFlipped ? (
               /* FRONT */
-              <div className="my-auto space-y-5 w-full">
+              <div className="my-auto space-y-4 w-full">
                 {imageUrl ? (
-                  <div className="max-w-xs mx-auto rounded-2xl overflow-hidden shadow-sm border border-slate-100 dark:border-slate-700">
-                    <img src={imageUrl} alt="Card visual" className="w-full h-56 object-cover" />
+                  <div className="max-w-xs mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
+                    <img
+                      src={imageUrl}
+                      alt={currentCard.front}
+                      className="w-full h-48 sm:h-52 object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                      }}
+                    />
                   </div>
                 ) : (
-                  <div className="w-56 h-48 mx-auto rounded-3xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-amber-50 dark:bg-slate-800 flex items-center justify-center p-2">
+                  <div className="w-56 h-44 mx-auto rounded-3xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-amber-50 dark:bg-slate-800 flex items-center justify-center p-2">
                     <img
                       src="/we_bare_bears.png"
                       alt="We Bare Bears Stack"
@@ -587,9 +594,28 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                   </div>
                 )}
 
+                {/* Main Word & IPA on Front */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-center gap-2 flex-wrap">
+                    <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                      {currentCard.front}
+                    </h1>
+                    {currentCard.partOfSpeech && (
+                      <span className="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                        {currentCard.partOfSpeech}
+                      </span>
+                    )}
+                  </div>
+                  {currentCard.phonetic && (
+                    <div className="text-base font-mono text-amber-600 dark:text-amber-300 font-bold">
+                      {currentCard.phonetic}
+                    </div>
+                  )}
+                </div>
+
                 {/* Example sentence with underlined bold target word (Crisp white in Dark Mode) */}
                 {currentCard.example && (
-                  <p className="text-base sm:text-lg font-semibold max-w-md mx-auto leading-relaxed px-4 text-slate-800 dark:text-slate-100">
+                  <p className="text-sm sm:text-base font-semibold max-w-md mx-auto leading-relaxed px-4 text-slate-700 dark:text-slate-200 italic">
                     {renderHighlightedExample(currentCard.example, currentCard.front)}
                   </p>
                 )}
@@ -597,22 +623,29 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             ) : (
               /* BACK */
               <div className="my-auto space-y-3 w-full animate-fadeIn">
-                <h1 className="text-4xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
-                  {currentCard.front}
-                </h1>
+                <div className="flex items-center justify-center gap-2 flex-wrap">
+                  <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                    {currentCard.front}
+                  </h1>
+                  {currentCard.partOfSpeech && (
+                    <span className="text-xs font-black uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
+                      {currentCard.partOfSpeech}
+                    </span>
+                  )}
+                </div>
 
                 {currentCard.phonetic && (
-                  <div className="text-lg sm:text-xl font-mono text-amber-600 dark:text-amber-300 font-bold">
+                  <div className="text-base sm:text-lg font-mono text-amber-600 dark:text-amber-300 font-bold">
                     {currentCard.phonetic}
                   </div>
                 )}
 
-                <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 pt-2">
-                  {currentCard.back} {currentCard.partOfSpeech && <span className="text-slate-500 dark:text-slate-400 text-lg font-bold">({currentCard.partOfSpeech})</span>}
+                <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 pt-1">
+                  👉 {currentCard.back}
                 </div>
 
                 {currentCard.exampleMeaning && (
-                  <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 italic max-w-md mx-auto pt-2">
+                  <div className="text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 italic max-w-md mx-auto pt-1">
                     &ldquo;{currentCard.exampleMeaning}&rdquo;
                   </div>
                 )}
