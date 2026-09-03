@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { soundManager } from '../utils/sounds';
-import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { supabase } from '../utils/supabase';
 import { cloudSync } from '../utils/cloudSync';
 import {
-  User,
   LogIn,
   UserPlus,
   X,
   Check,
-  Sparkles,
   LogOut,
   ShieldCheck,
   Cloud,
@@ -45,19 +43,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   currentUser,
   onUserChange,
 }) => {
-  const [tab, setTab] = useState<'cloud-login' | 'cloud-register' | 'local'>('cloud-login');
+  const [tab, setTab] = useState<'cloud-login' | 'cloud-register'>('cloud-login');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('/gojo.png');
-  const [existingUsers, setExistingUsers] = useState<UserAccount[]>(storage.getUsers());
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    setExistingUsers(storage.getUsers());
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -169,7 +162,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         if (cloudCards && cloudCards.length > 0) {
           storage.saveCards(cloudCards);
         } else {
-          // If no cards on cloud yet, upload current local cards
           cloudSync.saveAllCards(data.user.id, storage.getCards());
         }
 
@@ -209,43 +201,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     }
   };
 
-  // Local Offline Profile
-  const handleLocalRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username.trim()) {
-      setError('Vui lòng nhập tên tài khoản của bạn');
-      return;
-    }
-
-    soundManager.playCorrect();
-    const newUser = storage.register(username, selectedAvatar, email);
-    setExistingUsers(storage.getUsers());
-    onUserChange(newUser);
-    onClose();
-  };
-
-  const handleSelectUser = (userId: string) => {
-    soundManager.playClick();
-    const logged = storage.login(userId);
-    if (logged) {
-      onUserChange(logged);
-      onClose();
-    }
-  };
-
   const handleLogout = async () => {
     soundManager.playClick();
     await supabase.auth.signOut();
     storage.logout();
     onUserChange(null);
-    onClose();
-  };
-
-  const handleQuickGuest = () => {
-    soundManager.playVictory();
-    const guestUser = storage.register('Học Viên Mới', '/gojo.png');
-    setExistingUsers(storage.getUsers());
-    onUserChange(guestUser);
     onClose();
   };
 
@@ -327,7 +287,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           </div>
         ) : (
-          /* Not logged in: Show Cloud & Local tabs */
+          /* Not logged in: Show Cloud Login & Register */
           <div className="space-y-4">
             {/* Tabs */}
             <div className="flex bg-slate-100 dark:bg-slate-700/60 p-1 rounded-2xl">
@@ -361,22 +321,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>Tạo Tài Khoản</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setTab('local');
-                  setError('');
-                }}
-                className={`flex-1 py-2 text-xs font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                  tab === 'local'
-                    ? 'bg-white dark:bg-slate-800 shadow-xs text-blue-600 dark:text-blue-400'
-                    : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Offline</span>
               </button>
             </div>
 
@@ -564,73 +508,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <span>Tạo Tài Khoản & Lưu Lên Đám Mây</span>
                 </button>
               </form>
-            )}
-
-            {/* TAB 3: LOCAL OFFLINE / GUEST */}
-            {tab === 'local' && (
-              <div className="space-y-4">
-                <form onSubmit={handleLocalRegister} className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-black uppercase text-slate-500 mb-1">
-                      Tên người học (Offline): *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      placeholder="Ví dụ: Triết Offline..."
-                      className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-amber-500"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-black text-xs rounded-xl shadow-xs transition-all cursor-pointer"
-                  >
-                    Tạo Hồ Sơ Offline Trên Máy
-                  </button>
-                </form>
-
-                {existingUsers.length > 0 && (
-                  <div className="pt-2 border-t border-slate-200 dark:border-slate-700 space-y-2">
-                    <label className="text-xs font-black uppercase text-slate-400">
-                      Hồ sơ đã lưu trên máy ({existingUsers.length}):
-                    </label>
-                    <div className="space-y-1.5 max-h-40 overflow-y-auto">
-                      {existingUsers.map((user) => (
-                        <button
-                          key={user.id}
-                          onClick={() => handleSelectUser(user.id)}
-                          className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 flex items-center justify-between text-left transition-colors cursor-pointer"
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <div className="w-8 h-8 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
-                              {user.avatar.startsWith('/') ? (
-                                <img src={user.avatar} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-base">{user.avatar}</span>
-                              )}
-                            </div>
-                            <span className="text-xs font-bold">{user.username}</span>
-                          </div>
-                          <span className="text-[11px] text-amber-600 font-bold">Chọn</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="text-center pt-2">
-                  <button
-                    type="button"
-                    onClick={handleQuickGuest}
-                    className="text-xs font-bold text-slate-400 hover:text-amber-600 transition-colors inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    <Sparkles className="w-3.5 h-3.5" /> Vào nhanh với tư cách Khách
-                  </button>
-                </div>
-              </div>
             )}
           </div>
         )}

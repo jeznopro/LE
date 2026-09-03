@@ -2,16 +2,12 @@ import React, { useState } from 'react';
 import { UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { soundManager } from '../utils/sounds';
-import { supabase, isSupabaseConfigured } from '../utils/supabase';
+import { supabase } from '../utils/supabase';
 import { cloudSync } from '../utils/cloudSync';
 import {
-  User,
   LogIn,
   UserPlus,
-  Sparkles,
   Check,
-  ArrowRight,
-  BookOpen,
   Brain,
   Headphones,
   Cloud,
@@ -38,12 +34,11 @@ interface WelcomeLoginScreenProps {
 }
 
 export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginSuccess }) => {
-  const [tab, setTab] = useState<'cloud-login' | 'cloud-register' | 'offline'>('cloud-login');
+  const [tab, setTab] = useState<'cloud-login' | 'cloud-register'>('cloud-login');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState('/gojo.png');
-  const [existingUsers, setExistingUsers] = useState<UserAccount[]>(storage.getUsers());
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -180,53 +175,26 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
     }
   };
 
-  // Offline Local Register
-  const handleOfflineRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!username.trim()) {
-      setError('Vui lòng nhập tên của bạn');
-      return;
-    }
-
-    soundManager.playCorrect();
-    const newUser = storage.register(username, selectedAvatar, email);
-    onLoginSuccess(newUser);
-  };
-
-  const handleSelectLocalUser = (userId: string) => {
-    soundManager.playCorrect();
-    const logged = storage.login(userId);
-    if (logged) {
-      onLoginSuccess(logged);
-    }
-  };
-
-  const handleQuickGuest = () => {
-    soundManager.playVictory();
-    const guestUser = storage.register('Học Viên Mới', '/gojo.png');
-    onLoginSuccess(guestUser);
-  };
-
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-linear-to-b from-[#FFF9E6] via-[#F8F9FE] to-[#EFF2FE] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-100 relative overflow-hidden selection:bg-amber-300">
+    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-linear-to-b from-[#FFF9E6] via-[#F8F9FE] to-[#EFF2FE] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-100 relative overflow-hidden selection:bg-blue-300">
       
       {/* Ambient background glow */}
       <div className="absolute top-0 -left-40 w-96 h-96 bg-purple-400/20 dark:bg-purple-900/30 rounded-full blur-3xl pointer-events-none animate-pulse" />
       <div className="absolute top-1/2 -right-40 w-96 h-96 bg-cyan-400/20 dark:bg-cyan-900/30 rounded-full blur-3xl pointer-events-none animate-pulse [animation-delay:2s]" />
-      <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-amber-400/20 dark:bg-amber-900/30 rounded-full blur-3xl pointer-events-none animate-pulse [animation-delay:4s]" />
+      <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-blue-400/20 dark:bg-blue-900/30 rounded-full blur-3xl pointer-events-none animate-pulse [animation-delay:4s]" />
 
       <div className="w-full max-w-xl mx-auto space-y-6 relative z-10 animate-scaleUp">
         
         {/* Top Hero Brand & Gojo Mascot */}
         <div className="text-center space-y-3">
           <div className="relative inline-block group">
-            <div className="absolute inset-0 bg-cyan-400/30 dark:bg-cyan-400/40 rounded-full blur-xl scale-125 animate-pulse" />
+            <div className="absolute inset-0 bg-blue-400/30 dark:bg-blue-400/40 rounded-full blur-xl scale-125 animate-pulse" />
             <img
               src="/gojo.png"
               alt="Gojo Satoru App Mascot"
               className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-white dark:border-slate-800 shadow-xl relative z-10 mx-auto transition-transform hover:scale-105 animate-mochi-float"
             />
-            <span className="absolute -bottom-2 right-1/2 translate-x-8 bg-blue-500 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs border border-white z-20">
+            <span className="absolute -bottom-2 right-1/2 translate-x-8 bg-blue-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs border border-white z-20">
               CLOUD
             </span>
           </div>
@@ -280,23 +248,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
               }`}
             >
               <UserPlus className="w-4 h-4" />
-              <span>Tạo Tài Khoản</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setTab('offline');
-                setError('');
-              }}
-              className={`flex-1 py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                tab === 'offline'
-                  ? 'bg-white dark:bg-slate-700 shadow-xs text-amber-600 dark:text-amber-400'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Offline</span>
+              <span>Tạo Tài Khoản Mới</span>
             </button>
           </div>
 
@@ -486,60 +438,6 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             </form>
           )}
 
-          {/* TAB 3: OFFLINE / GUEST */}
-          {tab === 'offline' && (
-            <div className="space-y-4">
-              <form onSubmit={handleOfflineRegister} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                    Tên học viên (Offline): *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Ví dụ: Triết Offline..."
-                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-slate-800 dark:text-slate-100 transition-all"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-black text-sm rounded-2xl shadow-md transition-all cursor-pointer"
-                >
-                  Vào Học Offline (Chỉ Lưu Trên Máy Này)
-                </button>
-              </form>
-
-              {existingUsers.length > 0 && (
-                <div className="space-y-2 max-h-48 overflow-y-auto pt-2 border-t border-slate-200 dark:border-slate-700">
-                  <div className="text-xs font-bold text-slate-400">Các hồ sơ offline cũ:</div>
-                  {existingUsers.map((u) => (
-                    <button
-                      key={u.id}
-                      onClick={() => handleSelectLocalUser(u.id)}
-                      className="w-full p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-between text-left transition-colors cursor-pointer"
-                    >
-                      <span className="text-xs font-bold">{u.username}</span>
-                      <span className="text-[11px] text-amber-600 font-bold">Chọn</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Quick guest footer */}
-          <div className="text-center pt-2">
-            <button
-              type="button"
-              onClick={handleQuickGuest}
-              className="text-xs font-bold text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors inline-flex items-center gap-1.5 cursor-pointer"
-            >
-              <Sparkles className="w-3.5 h-3.5" /> Vào nhanh với tư cách Khách
-            </button>
-          </div>
         </div>
 
         {/* Mini Feature Highlights */}
