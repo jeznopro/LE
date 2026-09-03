@@ -446,6 +446,8 @@ export async function parseAnkiApkg(file: File): Promise<ParsedDeckResult[]> {
 
 /**
  * Import and parse CSV, TSV, or TXT format
+ * Supports standard format AND 9-column format:
+ * # | Word | IPA | Type | Meaning | Example | Vietnamese | Image URL | Related words
  */
 export async function parseTextOrCsv(content: string, fileName: string): Promise<ParsedDeckResult> {
   const lines = content.split(/\r?\n/).filter((line) => line.trim().length > 0);
@@ -465,45 +467,133 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
     delimiter = '|';
   }
 
+  const parseLineParts = (line: string): string[] => {
+    if (delimiter === ',') {
+      return parseCsvLine(line);
+    }
+    return line.split(delimiter).map((s) => s.trim().replace(/^["']|["']$/g, ''));
+  };
+
+  // Inspect first line to check if it's a Header row
+  let startIndex = 0;
+  let colWord = -1;
+  let colIPA = -1;
+  let colType = -1;
+  let colMeaning = -1;
+  let colExample = -1;
+  let colVietnamese = -1;
+  let colImage = -1;
+  let colRelated = -1;
+
+  const firstParts = parseLineParts(lines[0]);
+  const normHeaders = firstParts.map((h) => h.toLowerCase().trim().replace(/^#|\W/g, ''));
+
+  // Check if header contains keywords like word, ipa, meaning, etc.
+  const hasWordHeader = normHeaders.some((h) => ['word', 'front', 'term', 'tu', 'tuvung'].includes(h));
+  const hasMeaningHeader = normHeaders.some((h) => ['meaning', 'back', 'nghia', 'dinhnghia', 'vietnamese', 'dich'].includes(h));
+
+  if (hasWordHeader || hasMeaningHeader || lines[0].toLowerCase().includes('word') || lines[0].toLowerCase().includes('meaning')) {
+    startIndex = 1; // Skip header row
+    normHeaders.forEach((h, idx) => {
+      if (['word', 'front', 'term', 'tu', 'tuvung'].includes(h)) colWord = idx;
+      else if (['ipa', 'phonetic', 'phienam', 'pronunciation'].includes(h)) colIPA = idx;
+      else if (['type', 'pos', 'partofspeech', 'tuloai', 'loaitu'].includes(h)) colType = idx;
+      else if (['meaning', 'back', 'nghia', 'dinhnghia', 'definition'].includes(h)) colMeaning = idx;
+      else if (['example', 'vividu', 'cauvidu', 'sentence', 'sentences'].includes(h)) colExample = idx;
+      else if (['vietnamese', 'nghiavidu', 'dichvidu', 'examplemeaning'].includes(h)) colVietnamese = idx;
+      else if (['image', 'imageurl', 'img', 'anh', 'linkanh', 'picture'].includes(h)) colImage = idx;
+      else if (['related', 'relatedwords', 'tulienquan', 'tudongnghia', 'synonyms', 'collocations'].includes(h)) colRelated = idx;
+    });
+
+    // If "Meaning" was not assigned but "Vietnamese" is present and no colMeaning, colMeaning could be Vietnamese
+    if (colMeaning === -1 && colVietnamese !== -1) {
+      colMeaning = colVietnamese;
+      colVietnamese = -1;
+    }
+  }
+
   const cardsList: Omit<Card, 'id' | 'deckId'>[] = [];
 
-  for (let i = 0; i < lines.length; i++) {
+  for (let i = startIndex; i < lines.length; i++) {
     const rawLine = lines[i].trim();
-    if (!rawLine || rawLine.startsWith('#')) continue;
+    if (!rawLine) continue;
 
-    let parts: string[] = [];
-    if (delimiter === ',') {
-      parts = parseCsvLine(rawLine);
-    } else {
-      parts = rawLine.split(delimiter).map((s) => s.trim().replace(/^["']|["']$/g, ''));
+    const parts = parseLineParts(rawLine);
+    if (parts.length === 0) continue;
+
+    let front = '';
+    let back = '';
+    let phonetic: string | undefined;
+    let partOfSpeech: string | undefined;
+    let example: string | undefined;
+    let exampleMeaning: string | undefined;
+    let image: string | undefined;
+    let relatedWords: string | undefined;
+
+    if (colWord !== -1 || colMeaning !== -1) {
+      // Header-based mapping
+      front = colWord !== -1 && parts[colWord] ? cleanHtml(parts[colWord]) : '';
+      back = colMeaning !== -1 && parts[colMeaning] ? cleanHtml(parts[colMeaning]) : '';
+      if (colIPA !== -1 && parts[colIPA]) phonetic = cleanHtml(parts[colIPA]);
+      if (colType !== -1 && parts[colType]) partOfSpeech = cleanHtml(parts[colType]);
+      if (colExample !== -1 && parts[colExample]) example = cleanHtml(parts[colExample]);
+      if (colVietnamese !== -1 && parts[colVietnamese]) exampleMeaning = cleanHtml(parts[colVietnamese]);
+      if (colImage !== -1 && parts[colImage]) image = parts[colImage].trim();
+      if (colRelated !== -1 && parts[colRelated]) relatedWords = cleanHtml(parts[colRelated]);
+    } else if (parts.length >= 8) {
+      // Automatic detection for 8 or 9-column format
+      // Format 9 cols: [#] [Word] [IPA] [Type] [Meaning] [Example] [Vietnamese] [Image URL] [Related words]
+      const offset = /^\d+$/.test(parts[0].trim()) ? 1 : 0;
+      front = cleanHtml(parts[offset]);
+      phonetic = parts[offset + 1] ? cleanHtml(parts[offset + 1]) : undefined;
+      partOfSpeech = parts[offset + 2] ? cleanHtml(parts[offset + 2]) : undefined;
+      back = cleanHtml(parts[offset + 3] || '');
+      example = parts[offset + 4] ? cleanHtml(parts[offset + 4]) : undefined;
+      exampleMeaning = parts[offset + 5] ? cleanHtml(parts[offset + 5]) : undefined;
+      image = parts[offset + 6] ? parts[offset + 6].trim() : undefined;
+      relatedWords = parts[offset + 7] ? cleanHtml(parts[offset + 7]) : undefined;
+    } else if (parts.length >= 2) {
+      // Fallback standard 2-4 columns
+      front = cleanHtml(parts[0]);
+      back = cleanHtml(parts[1]);
+      if (parts.length >= 3) {
+        if (parts[2].includes('/') || parts[2].startsWith('[') || parts[2].endsWith(']')) {
+          phonetic = cleanHtml(parts[2]);
+        } else {
+          example = cleanHtml(parts[2]);
+        }
+      }
+      if (parts.length >= 4) {
+        example = cleanHtml(parts[3]);
+      }
     }
 
-    if (parts.length >= 2) {
-      const front = cleanHtml(parts[0]);
-      const back = cleanHtml(parts[1]);
-      const phonetic = parts.length >= 3 && parts[2].includes('/') ? cleanHtml(parts[2]) : undefined;
-      const example = parts.length >= 4 ? cleanHtml(parts[3]) : (parts.length >= 3 && !phonetic ? cleanHtml(parts[2]) : undefined);
+    // Clean star icons commonly found in Excel lists like "classroom ⭐"
+    front = front.replace(/[\u2B50\u2605\u2606]/g, '').trim();
 
-      if (front && back) {
-        cardsList.push({
-          front,
-          back,
-          phonetic,
-          example,
-          level: 0,
-          interval: 0,
-          easeFactor: 2.5,
-          repetitions: 0,
-          lapses: 0,
-          nextReview: Date.now(),
-          createdAt: Date.now(),
-        });
-      }
+    if (front && back) {
+      cardsList.push({
+        front,
+        back,
+        phonetic: phonetic && phonetic.trim() ? phonetic : undefined,
+        partOfSpeech: partOfSpeech && partOfSpeech.trim() ? partOfSpeech : undefined,
+        example: example && example.trim() ? example : undefined,
+        exampleMeaning: exampleMeaning && exampleMeaning.trim() ? exampleMeaning : undefined,
+        image: image && image.startsWith('http') ? image : undefined,
+        relatedWords: relatedWords && relatedWords.trim() ? relatedWords : undefined,
+        level: 0,
+        interval: 0,
+        easeFactor: 2.5,
+        repetitions: 0,
+        lapses: 0,
+        nextReview: Date.now(),
+        createdAt: Date.now(),
+      });
     }
   }
 
   if (cardsList.length === 0) {
-    throw new Error('Không thể nhận diện các cột Front/Back trong file text/csv. Vui lòng kiểm tra định dạng phân cách giữa các từ.');
+    throw new Error('Không thể nhận diện các cột Word/Meaning trong file text/csv/tsv. Vui lòng kiểm tra tiêu đề hoặc định dạng các cột.');
   }
 
   const deckTitle = fileName.replace(/\.[^/.]+$/, '');

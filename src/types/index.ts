@@ -10,7 +10,8 @@ export interface Card {
   phonetic?: string;      // e.g. /əˈkɒmplɪʃ/
   example?: string;       // Example sentence
   exampleMeaning?: string;// Vietnamese translation of example
-  partOfSpeech?: string;  // noun, verb, adj, etc.
+  partOfSpeech?: string;  // noun, verb, adj, etc. (Type)
+  relatedWords?: string;  // Synonyms, related words, collocations
   hint?: string;          // Mnemonic or hint
   image?: string;         // URL or base64 data
   tags?: string[];        // Category tags

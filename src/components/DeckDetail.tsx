@@ -269,6 +269,26 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                       )}
                     </div>
                   )}
+
+                  {card.image && (
+                    <div className="mt-2.5 rounded-xl overflow-hidden max-h-36 border border-slate-200 dark:border-slate-700 bg-slate-100">
+                      <img
+                        src={card.image}
+                        alt={card.front}
+                        loading="lazy"
+                        className="w-full h-full object-cover max-h-36 hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLElement).style.display = 'none';
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  {card.relatedWords && (
+                    <div className="mt-2 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 px-2.5 py-1 rounded-xl border border-purple-200 dark:border-purple-800">
+                      🔗 <span className="font-bold">Từ liên quan:</span> {card.relatedWords}
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">

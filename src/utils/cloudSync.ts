@@ -21,6 +21,8 @@ export const cloudSync = {
         phonetic: row.phonetic,
         example: row.example,
         exampleMeaning: row.example_meaning,
+        partOfSpeech: row.part_of_speech,
+        relatedWords: row.related_words,
         image: row.image,
         level: (row.level ?? 0) as MemoryLevel,
         interval: Number(row.interval || 0),
@@ -40,16 +42,18 @@ export const cloudSync = {
   async saveSingleCard(userId: string, card: Card): Promise<boolean> {
     if (!isSupabaseConfigured || !userId) return false;
     try {
-      const payload = {
+      const payload: any = {
         id: card.id,
         user_id: userId,
         deck_id: card.deckId,
         front: card.front,
         back: card.back,
         phonetic: card.phonetic,
+        part_of_speech: card.partOfSpeech,
         example: card.example,
         example_meaning: card.exampleMeaning,
         image: card.image,
+        related_words: card.relatedWords,
         level: card.level ?? 0,
         interval: card.interval ?? 0,
         repetitions: card.repetitions ?? 0,
@@ -78,9 +82,11 @@ export const cloudSync = {
         front: c.front,
         back: c.back,
         phonetic: c.phonetic,
+        part_of_speech: c.partOfSpeech,
         example: c.example,
         example_meaning: c.exampleMeaning,
         image: c.image,
+        related_words: c.relatedWords,
         level: c.level ?? 0,
         interval: c.interval ?? 0,
         repetitions: c.repetitions ?? 0,

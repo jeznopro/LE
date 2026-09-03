@@ -616,6 +616,12 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                     &ldquo;{currentCard.exampleMeaning}&rdquo;
                   </div>
                 )}
+
+                {currentCard.relatedWords && (
+                  <div className="text-xs sm:text-sm font-semibold text-purple-600 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 px-3 py-1.5 rounded-xl border border-purple-200 dark:border-purple-800 max-w-md mx-auto mt-2">
+                    🔗 <span className="font-bold">Từ liên quan:</span> {currentCard.relatedWords}
+                  </div>
+                )}
               </div>
             )}
           </div>
