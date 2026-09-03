@@ -440,9 +440,24 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
                           </span>
                         )}
                       </div>
-                      {c.image && (
-                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                          📷 Có ảnh
+                      {c.image ? (
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <img
+                            src={c.image}
+                            alt="preview"
+                            referrerPolicy="no-referrer"
+                            className="w-10 h-10 rounded-lg object-cover border border-emerald-300 dark:border-emerald-700 shadow-xs"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLElement).style.display = 'none';
+                            }}
+                          />
+                          <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                            📷 Có ảnh
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full">
+                          🐻 Dùng ảnh gấu
                         </span>
                       )}
                     </div>

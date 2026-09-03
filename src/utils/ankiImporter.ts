@@ -151,16 +151,41 @@ const parseAnkiMediaMap = (mediaBuf: Uint8Array): Record<string, string> => {
 
 /**
  * Import Excel (.xlsx, .xls) files
- * Reads sheets and converts them to ParsedDeckResult
+ * Reads sheets, extracts cell values, hyperlinks, and formulas, and converts them to ParsedDeckResult
  */
 export async function parseExcelFile(file: File): Promise<ParsedDeckResult[]> {
   const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  const workbook = XLSX.read(arrayBuffer, { type: 'array', cellFormula: true, cellHTML: true });
   const results: ParsedDeckResult[] = [];
   const fileNameNoExt = file.name.replace(/\.[^/.]+$/, '');
 
   for (const sheetName of workbook.SheetNames) {
     const worksheet = workbook.Sheets[sheetName];
+    if (!worksheet || !worksheet['!ref']) continue;
+
+    // Scan all cells for hyperlinks (cell.l.Target) or formulas (=HYPERLINK, =IMAGE)
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cellAddress = XLSX.utils.encode_cell({ r: R, c: C });
+        const cell = worksheet[cellAddress];
+        if (cell) {
+          // If cell has a hyperlink target (e.g. pasted or inserted link in Excel)
+          if (cell.l && cell.l.Target && cell.l.Target.startsWith('http')) {
+            cell.v = cell.l.Target;
+            cell.w = cell.l.Target;
+          } else if (cell.f && (cell.f.includes('http://') || cell.f.includes('https://'))) {
+            // Formula like =HYPERLINK("https://...", ...) or =IMAGE("https://...")
+            const match = cell.f.match(/(https?:\/\/[^\s"'>)]+)/i);
+            if (match) {
+              cell.v = match[1];
+              cell.w = match[1];
+            }
+          }
+        }
+      }
+    }
+
     // Convert to TSV string
     const tsvData = XLSX.utils.sheet_to_csv(worksheet, { FS: '\t' });
     if (!tsvData || !tsvData.trim()) continue;
@@ -519,21 +544,32 @@ function extractImageUrl(raw?: string): string | undefined {
 
   // HTML <img src="...">
   const imgMatch = str.match(/<img[^>]+src=["']([^"']+)["']/i);
-  if (imgMatch) return imgMatch[1].trim();
+  if (imgMatch) str = imgMatch[1].trim();
 
   // Markdown ![...](url)
   const mdMatch = str.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
-  if (mdMatch) return mdMatch[1].trim();
+  if (mdMatch) str = mdMatch[1].trim();
 
   // HTML <a href="url">
   const aMatch = str.match(/<a[^>]+href=["']([^"']+)["']/i);
-  if (aMatch) return aMatch[1].trim();
+  if (aMatch) str = aMatch[1].trim();
 
   // Direct http:// or https:// URL anywhere in the cell
   const httpMatch = str.match(/(https?:\/\/[^\s"'>)]+)/i);
-  if (httpMatch) return httpMatch[1].trim();
+  if (httpMatch) str = httpMatch[1].trim();
 
-  if (str.startsWith('data:image') || str.startsWith('/')) {
+  // Convert Google Drive share link to direct image link
+  const gdriveMatch = str.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i) || str.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/i);
+  if (gdriveMatch) {
+    return `https://drive.google.com/uc?export=view&id=${gdriveMatch[1]}`;
+  }
+
+  // Convert Dropbox share link
+  if (str.includes('dropbox.com')) {
+    return str.replace(/\?dl=0$/, '?raw=1').replace(/&dl=0$/, '&raw=1');
+  }
+
+  if (str.startsWith('http://') || str.startsWith('https://') || str.startsWith('data:image') || str.startsWith('/')) {
     return str;
   }
 
