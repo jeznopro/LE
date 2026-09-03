@@ -1,6 +1,7 @@
 import JSZip from 'jszip';
 import initSqlJs from 'sql.js';
 import { decompress } from 'fzstd';
+import * as XLSX from 'xlsx';
 import { Card, Deck } from '../types';
 import { saveMediaBatch } from './mediaStore';
 
@@ -149,21 +150,57 @@ const parseAnkiMediaMap = (mediaBuf: Uint8Array): Record<string, string> => {
 };
 
 /**
- * Main importer for .apkg and .csv/.txt files
+ * Import Excel (.xlsx, .xls) files
+ * Reads sheets and converts them to ParsedDeckResult
+ */
+export async function parseExcelFile(file: File): Promise<ParsedDeckResult[]> {
+  const arrayBuffer = await file.arrayBuffer();
+  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  const results: ParsedDeckResult[] = [];
+  const fileNameNoExt = file.name.replace(/\.[^/.]+$/, '');
+
+  for (const sheetName of workbook.SheetNames) {
+    const worksheet = workbook.Sheets[sheetName];
+    // Convert to TSV string
+    const tsvData = XLSX.utils.sheet_to_csv(worksheet, { FS: '\t' });
+    if (!tsvData || !tsvData.trim()) continue;
+
+    try {
+      const sheetTitle = workbook.SheetNames.length > 1 ? `${fileNameNoExt} - ${sheetName}` : fileNameNoExt;
+      const parsed = await parseTextOrCsv(tsvData, sheetTitle);
+      if (parsed && parsed.cards.length > 0) {
+        results.push(parsed);
+      }
+    } catch (e) {
+      console.warn(`Could not parse sheet ${sheetName}:`, e);
+    }
+  }
+
+  if (results.length === 0) {
+    throw new Error('File Excel không có dữ liệu hoặc không nhận diện được các cột từ vựng (cần cột Word/Meaning)!');
+  }
+
+  return results;
+}
+
+/**
+ * Main importer for .apkg, .xlsx/.xls, and .csv/.txt files
  */
 export const parseDeckFile = async (file: File): Promise<ParsedDeckResult[]> => {
   const ext = file.name.split('.').pop()?.toLowerCase();
 
   if (ext === 'apkg') {
     return parseAnkiApkg(file);
-  } else if (ext === 'csv' || ext === 'txt') {
+  } else if (ext === 'xlsx' || ext === 'xls') {
+    return parseExcelFile(file);
+  } else if (ext === 'csv' || ext === 'tsv' || ext === 'txt') {
     const text = await file.text();
     return [await parseTextOrCsv(text, file.name)];
   } else if (ext === 'json') {
     const text = await file.text();
     return [parseJsonDeck(text, file.name)];
   } else {
-    throw new Error('Unsupported file format');
+    throw new Error('Định dạng không được hỗ trợ! Vui lòng chọn file .xlsx, .xls, .apkg, .csv, .tsv, .txt, hoặc .json');
   }
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Card, Deck } from '../types';
-import { parseAnkiApkg, parseTextOrCsv, parseJsonDeck, ParsedDeckResult } from '../utils/ankiImporter';
+import { parseAnkiApkg, parseTextOrCsv, parseJsonDeck, parseExcelFile, ParsedDeckResult } from '../utils/ankiImporter';
 import { soundManager } from '../utils/sounds';
 import {
   UploadCloud,
@@ -27,7 +27,7 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
   onImportComplete,
   existingDecks: _existingDecks,
 }) => {
-  const [importMode, setImportMode] = useState<'file' | 'paste'>('paste');
+  const [importMode, setImportMode] = useState<'file' | 'paste'>('file');
   const [pastedContent, setPastedContent] = useState('');
   const [isDragging, setIsDragging] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -51,7 +51,9 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
       const fileName = file.name.toLowerCase();
       let results: ParsedDeckResult[] = [];
 
-      if (fileName.endsWith('.apkg')) {
+      if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        results = await parseExcelFile(file);
+      } else if (fileName.endsWith('.apkg')) {
         const apkgResults = await parseAnkiApkg(file);
         if (!apkgResults || apkgResults.length === 0) {
           throw new Error('Không tìm thấy nội dung trong file Anki .apkg');
@@ -64,7 +66,7 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
         const text = await file.text();
         results = [await parseTextOrCsv(text, file.name)];
       } else {
-        throw new Error('Định dạng không được hỗ trợ! Vui lòng chọn file .apkg, .csv, .tsv, .txt, hoặc .json');
+        throw new Error('Định dạng không được hỗ trợ! Vui lòng chọn file Excel (.xlsx, .xls), Anki (.apkg), hoặc (.csv, .tsv, .txt, .json)');
       }
 
       setParsedResults(results);
@@ -236,12 +238,12 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
                 }}
                 className={`flex-1 py-2 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   importMode === 'file'
-                    ? 'bg-white dark:bg-slate-700 shadow-xs text-amber-600 dark:text-amber-400'
+                    ? 'bg-white dark:bg-slate-700 shadow-xs text-emerald-600 dark:text-emerald-400'
                     : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
                 }`}
               >
                 <FileSpreadsheet className="w-4 h-4" />
-                <span>Chọn File (.apkg, .csv, .tsv, .json)</span>
+                <span>Kéo Thả File Excel (.xlsx, .xls) & Anki</span>
               </button>
             </div>
 
@@ -297,28 +299,28 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
               <div
                 className={`border-2 border-dashed rounded-3xl p-8 text-center transition-all cursor-pointer ${
                   isDragging
-                    ? 'border-amber-500 bg-amber-50 dark:bg-amber-950/20'
-                    : 'border-slate-300 dark:border-slate-700 hover:border-amber-400 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800/60'
+                    ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-950/20'
+                    : 'border-slate-300 dark:border-slate-700 hover:border-emerald-400 bg-slate-50/50 dark:bg-slate-800/40 hover:bg-slate-50 dark:hover:bg-slate-800/60'
                 }`}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <div className="w-14 h-14 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center mx-auto mb-3">
-                  <UploadCloud className="w-7 h-7 text-amber-600 dark:text-amber-400" />
+                <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-900/40 flex items-center justify-center mx-auto mb-3">
+                  <UploadCloud className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                 </div>
                 <h3 className="text-base font-black text-slate-800 dark:text-slate-100 mb-1">
-                  Kéo thả file vào đây hoặc bấm để chọn tệp
+                  Kéo thả file Excel (.xlsx, .xls) hoặc bấm để chọn tệp
                 </h3>
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                  Hỗ trợ file xuất Anki <strong className="text-slate-700 dark:text-slate-200">.apkg</strong>, file bảng tính <strong className="text-slate-700 dark:text-slate-200">.csv, .tsv, .txt, .json</strong>
+                  Hỗ trợ file Excel <strong className="text-emerald-600 dark:text-emerald-400 font-bold">.xlsx, .xls</strong>, Anki <strong className="text-slate-700 dark:text-slate-200">.apkg</strong>, file bảng tính <strong className="text-slate-700 dark:text-slate-200">.csv, .tsv, .txt, .json</strong>
                 </p>
                 <input
                   ref={fileInputRef}
                   type="file"
                   className="hidden"
-                  accept=".apkg,.csv,.tsv,.txt,.json"
+                  accept=".xlsx,.xls,.apkg,.csv,.tsv,.txt,.json"
                   onChange={(e) => {
                     if (e.target.files && e.target.files.length > 0) {
                       handleFileProcess(e.target.files[0]);
