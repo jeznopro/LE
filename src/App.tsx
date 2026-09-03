@@ -23,6 +23,8 @@ import { YouTubeBackground } from './components/YouTubeBackground';
 import { AuthModal } from './components/AuthModal';
 import { WelcomeLoginScreen } from './components/WelcomeLoginScreen';
 import { GeminiFloatingWindow } from './components/GeminiFloatingWindow';
+import { supabase, isSupabaseConfigured } from './utils/supabase';
+import { cloudSync } from './utils/cloudSync';
 import { Heart } from 'lucide-react';
 
 type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-speaking' | 'study-mochi' | 'ai-chat';
@@ -72,14 +74,110 @@ export function App() {
     soundManager.setEnabled(loadedSettings.soundEffects);
   }, []);
 
+  // Listen to Supabase Cloud Authentication (like Facebook / Google)
+  useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
+    // Check existing cloud session on boot
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) {
+        const user = session.user;
+        const userAcc: UserAccount = {
+          id: user.id,
+          username: user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Học Viên',
+          avatar: user.user_metadata?.avatar || user.user_metadata?.avatar_url || '/gojo.png',
+          email: user.email,
+          createdAt: new Date(user.created_at).getTime(),
+        };
+        setCurrentUser(userAcc);
+        storage.setCurrentUser(userAcc);
+
+        // Sync user cards from cloud
+        const cloudCards = await cloudSync.fetchUserCards(user.id);
+        if (cloudCards && cloudCards.length > 0) {
+          setCards(cloudCards);
+          storage.saveCards(cloudCards);
+        } else {
+          // New cloud user: seed initial cards to cloud
+          const currentCards = storage.getCards();
+          cloudSync.saveAllCards(user.id, currentCards);
+        }
+
+        const cloudStats = await cloudSync.fetchUserStats(user.id);
+        if (cloudStats) {
+          setStats(cloudStats);
+          storage.saveStats(cloudStats);
+        } else {
+          cloudSync.saveUserStats(user.id, storage.getStats());
+        }
+
+        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
+        if (cloudDecks && cloudDecks.length > 0) {
+          setDecks(cloudDecks);
+          storage.saveDecks(cloudDecks);
+        } else {
+          cloudSync.saveAllDecks(user.id, storage.getDecks());
+        }
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session?.user) {
+        const user = session.user;
+        const userAcc: UserAccount = {
+          id: user.id,
+          username: user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Học Viên',
+          avatar: user.user_metadata?.avatar || user.user_metadata?.avatar_url || '/gojo.png',
+          email: user.email,
+          createdAt: new Date(user.created_at).getTime(),
+        };
+        setCurrentUser(userAcc);
+        storage.setCurrentUser(userAcc);
+
+        const cloudCards = await cloudSync.fetchUserCards(user.id);
+        if (cloudCards && cloudCards.length > 0) {
+          setCards(cloudCards);
+          storage.saveCards(cloudCards);
+        } else {
+          cloudSync.saveAllCards(user.id, storage.getCards());
+        }
+
+        const cloudStats = await cloudSync.fetchUserStats(user.id);
+        if (cloudStats) {
+          setStats(cloudStats);
+          storage.saveStats(cloudStats);
+        }
+
+        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
+        if (cloudDecks && cloudDecks.length > 0) {
+          setDecks(cloudDecks);
+          storage.saveDecks(cloudDecks);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        setCurrentUser(null);
+        storage.setCurrentUser(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
   const updateDecks = (newDecks: Deck[]) => {
     setDecks(newDecks);
     storage.saveDecks(newDecks);
+    if (currentUser) {
+      cloudSync.saveAllDecks(currentUser.id, newDecks);
+    }
   };
 
   const updateCards = (newCards: Card[]) => {
     setCards(newCards);
     storage.saveCards(newCards);
+    if (currentUser) {
+      cloudSync.saveAllCards(currentUser.id, newCards);
+    }
   };
 
   const updateSettings = (newSettings: UserSettings) => {
@@ -157,6 +255,9 @@ export function App() {
 
     const newStats = storage.recordReview(xpGained, updatedSessionCards.length);
     setStats(newStats);
+    if (currentUser) {
+      cloudSync.saveUserStats(currentUser.id, newStats);
+    }
     setCurrentView('dashboard');
   };
 
@@ -164,6 +265,9 @@ export function App() {
   const handleFinishMiniStudy = (xpGained: number) => {
     const newStats = storage.recordReview(xpGained, studyCards.length);
     setStats(newStats);
+    if (currentUser) {
+      cloudSync.saveUserStats(currentUser.id, newStats);
+    }
     setCurrentView('dashboard');
   };
 
@@ -441,7 +545,12 @@ export function App() {
             settings={settings}
             onCardReviewed={(updatedCard) => {
               setCards((prev) => prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)));
-              setStats(storage.getStats());
+              const currentStats = storage.getStats();
+              setStats(currentStats);
+              if (currentUser) {
+                cloudSync.saveSingleCard(currentUser.id, updatedCard);
+                cloudSync.saveUserStats(currentUser.id, currentStats);
+              }
             }}
             onFinishSession={handleFinishFlashcard}
             onExit={() => setCurrentView('dashboard')}
