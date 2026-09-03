@@ -506,37 +506,7 @@ export async function parseAnkiApkg(file: File): Promise<ParsedDeckResult[]> {
   return parsedDecks.sort((a, b) => a.deckTitle.localeCompare(b.deckTitle));
 }
 
-/**
- * Import and parse CSV, TSV, or TXT format
- * Supports standard format AND 9-column format:
- * # | Word | IPA | Type | Meaning | Example | Vietnamese | Image URL | Related words
- */
-export async function parseTextOrCsv(content: string, fileName: string): Promise<ParsedDeckResult> {
-  const lines = content.split(/\r?\n/).filter((line) => line.trim().length > 0);
-  if (lines.length === 0) {
-    throw new Error('File không có nội dung!');
-  }
-
-  const firstFew = lines.slice(0, 5).join('\n');
-  let delimiter = '\t';
-  if (firstFew.includes('\t')) {
-    delimiter = '\t';
-  } else if ((firstFew.match(/;/g) || []).length > (firstFew.match(/,/g) || []).length) {
-    delimiter = ';';
-  } else if (firstFew.includes(',')) {
-    delimiter = ',';
-  } else if (firstFew.includes('|')) {
-    delimiter = '|';
-  }
-
-  const parseLineParts = (line: string): string[] => {
-    if (delimiter === ',') {
-      return parseCsvLine(line);
-    }
-    return line.split(delimiter).map((s) => s.trim().replace(/^["']|["']$/g, ''));
-  };
-
-function extractImageUrl(raw?: string): string | undefined {
+export function extractImageUrl(raw?: string): string | undefined {
   if (!raw) return undefined;
   let str = raw.trim();
   if (!str) return undefined;
@@ -581,8 +551,107 @@ function extractImageUrl(raw?: string): string | undefined {
   return undefined;
 }
 
-  // Inspect first line to check if it's a Header row
-  let startIndex = 0;
+/**
+ * Quote-aware CSV / TSV row parser
+ * Handles multiline cells inside quotes without breaking lines
+ */
+function parseRowsRespectingQuotes(content: string, delimiter: string): string[][] {
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentCell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    const nextChar = content[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentCell += '"';
+        i++; // skip escaped quote
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === delimiter && !inQuotes) {
+      currentRow.push(currentCell.trim());
+      currentCell = '';
+    } else if ((char === '\r' || char === '\n') && !inQuotes) {
+      if (char === '\r' && nextChar === '\n') {
+        i++; // skip \n
+      }
+      currentRow.push(currentCell.trim());
+      currentCell = '';
+      if (currentRow.some((c) => c.length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+    } else {
+      currentCell += char;
+    }
+  }
+
+  if (currentCell.length > 0 || currentRow.length > 0) {
+    currentRow.push(currentCell.trim());
+    if (currentRow.some((c) => c.length > 0)) {
+      rows.push(currentRow);
+    }
+  }
+
+  return rows;
+}
+
+const KNOWN_PARTS_OF_SPEECH = [
+  'noun', 'verb', 'adjective', 'adverb', 'preposition', 'conjunction', 'pronoun', 'interjection',
+  'n', 'v', 'adj', 'adv', 'prep', 'conj', 'pron', 'phrase', 'idiom', 'collocation', 'phrasal verb',
+  'danh từ', 'động từ', 'tính từ', 'trạng từ', 'phó từ', 'giới từ', 'liên từ', 'thành ngữ', 'cụm từ'
+];
+
+/**
+ * Import and parse CSV, TSV, TXT or pasted table format
+ * Automatically recognizes ANY column arrangement:
+ * # | Word | IPA | Type | Meaning | Example | Vietnamese | Image URL | Related words
+ */
+export async function parseTextOrCsv(content: string, fileName: string): Promise<ParsedDeckResult> {
+  if (!content || !content.trim()) {
+    throw new Error('Dữ liệu không có nội dung!');
+  }
+
+  // Detect delimiter
+  const preview = content.slice(0, 3000);
+  let delimiter = '\t';
+  if (preview.includes('\t')) {
+    delimiter = '\t';
+  } else if ((preview.match(/;/g) || []).length > (preview.match(/,/g) || []).length) {
+    delimiter = ';';
+  } else if (preview.includes(',')) {
+    delimiter = ',';
+  } else if (preview.includes('|')) {
+    delimiter = '|';
+  }
+
+  // Parse rows with quote support
+  const rawRows = parseRowsRespectingQuotes(content, delimiter);
+  if (rawRows.length === 0) {
+    throw new Error('Không thể đọc dữ liệu từ tệp/bảng dán!');
+  }
+
+  // Clean all cells
+  const rows = rawRows.map((row) =>
+    row.map((cell) =>
+      cleanHtml(cell)
+        .replace(/^["']|["']$/g, '')
+        .replace(/[\r\n]+/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim()
+    )
+  ).filter((row) => row.some((c) => c.length > 0));
+
+  if (rows.length === 0) {
+    throw new Error('Dữ liệu rỗng!');
+  }
+
+  // Scan first 5 rows to locate Header row
+  let headerRowIndex = -1;
   let colWord = -1;
   let colIPA = -1;
   let colType = -1;
@@ -592,41 +661,38 @@ function extractImageUrl(raw?: string): string | undefined {
   let colImage = -1;
   let colRelated = -1;
 
-  const firstParts = parseLineParts(lines[0]);
-  const normHeaders = firstParts.map((h) => h.toLowerCase().trim().replace(/^#|\W/g, ''));
+  for (let r = 0; r < Math.min(5, rows.length); r++) {
+    const normHeaders = rows[r].map((h) => h.toLowerCase().trim().replace(/^#|\W/g, ''));
+    const hasWord = normHeaders.some((h) => ['word', 'front', 'term', 'tu', 'tuvung'].includes(h) || h.includes('word'));
+    const hasMeaning = normHeaders.some((h) => ['meaning', 'back', 'nghia', 'dinhnghia', 'vietnamese', 'dich'].includes(h) || h.includes('meaning') || h.includes('nghia'));
 
-  // Check if header contains keywords like word, ipa, meaning, etc.
-  const hasWordHeader = normHeaders.some((h) => ['word', 'front', 'term', 'tu', 'tuvung'].includes(h));
-  const hasMeaningHeader = normHeaders.some((h) => ['meaning', 'back', 'nghia', 'dinhnghia', 'vietnamese', 'dich'].includes(h));
+    if (hasWord || hasMeaning) {
+      headerRowIndex = r;
+      normHeaders.forEach((h, idx) => {
+        if (['word', 'front', 'term', 'tu', 'tuvung'].includes(h) || h.includes('word') || h.includes('tuvung')) colWord = idx;
+        else if (['ipa', 'phonetic', 'phienam', 'pronunciation'].includes(h) || h.includes('ipa') || h.includes('phienam')) colIPA = idx;
+        else if (['type', 'pos', 'partofspeech', 'tuloai', 'loaitu'].includes(h) || h.includes('type') || h.includes('tuloai') || h.includes('pos')) colType = idx;
+        else if (['meaning', 'back', 'nghia', 'dinhnghia', 'definition'].includes(h) || h.includes('meaning') || h.includes('nghia')) colMeaning = idx;
+        else if (['example', 'vividu', 'cauvidu', 'sentence', 'sentences'].includes(h) || h.includes('example') || h.includes('vidu')) colExample = idx;
+        else if (['vietnamese', 'nghiavidu', 'dichvidu', 'examplemeaning', 'dich'].includes(h) || h.includes('vietnamese') || h.includes('dich')) colVietnamese = idx;
+        else if (['image', 'imageurl', 'img', 'anh', 'linkanh', 'picture', 'photo'].includes(h) || h.includes('image') || h.includes('img') || h.includes('anh') || h.includes('pic') || h.includes('photo')) colImage = idx;
+        else if (['related', 'relatedwords', 'tulienquan', 'tudongnghia', 'synonyms', 'collocations'].includes(h) || h.includes('related') || h.includes('lienquan') || h.includes('dongnghia')) colRelated = idx;
+      });
 
-  if (hasWordHeader || hasMeaningHeader || lines[0].toLowerCase().includes('word') || lines[0].toLowerCase().includes('meaning')) {
-    startIndex = 1; // Skip header row
-    normHeaders.forEach((h, idx) => {
-      if (['word', 'front', 'term', 'tu', 'tuvung'].includes(h) || h.includes('word') || h.includes('tuvung')) colWord = idx;
-      else if (['ipa', 'phonetic', 'phienam', 'pronunciation'].includes(h) || h.includes('ipa') || h.includes('phienam')) colIPA = idx;
-      else if (['type', 'pos', 'partofspeech', 'tuloai', 'loaitu'].includes(h) || h.includes('type') || h.includes('tuloai') || h.includes('pos')) colType = idx;
-      else if (['meaning', 'back', 'nghia', 'dinhnghia', 'definition'].includes(h) || h.includes('meaning') || h.includes('nghia')) colMeaning = idx;
-      else if (['example', 'vividu', 'cauvidu', 'sentence', 'sentences'].includes(h) || h.includes('example') || h.includes('vidu')) colExample = idx;
-      else if (['vietnamese', 'nghiavidu', 'dichvidu', 'examplemeaning', 'dich'].includes(h) || h.includes('vietnamese') || h.includes('dich')) colVietnamese = idx;
-      else if (['image', 'imageurl', 'img', 'anh', 'linkanh', 'picture', 'photo'].includes(h) || h.includes('image') || h.includes('img') || h.includes('anh') || h.includes('pic') || h.includes('photo')) colImage = idx;
-      else if (['related', 'relatedwords', 'tulienquan', 'tudongnghia', 'synonyms', 'collocations'].includes(h) || h.includes('related') || h.includes('lienquan') || h.includes('dongnghia')) colRelated = idx;
-    });
-
-    // If "Meaning" was not assigned but "Vietnamese" is present and no colMeaning, colMeaning could be Vietnamese
-    if (colMeaning === -1 && colVietnamese !== -1) {
-      colMeaning = colVietnamese;
-      colVietnamese = -1;
+      if (colMeaning === -1 && colVietnamese !== -1) {
+        colMeaning = colVietnamese;
+        colVietnamese = -1;
+      }
+      break;
     }
   }
 
+  const startRow = headerRowIndex !== -1 ? headerRowIndex + 1 : 0;
   const cardsList: Omit<Card, 'id' | 'deckId'>[] = [];
 
-  for (let i = startIndex; i < lines.length; i++) {
-    const rawLine = lines[i].trim();
-    if (!rawLine) continue;
-
-    const parts = parseLineParts(rawLine);
-    if (parts.length === 0) continue;
+  for (let i = startRow; i < rows.length; i++) {
+    const parts = rows[i];
+    if (parts.length === 0 || !parts.some((p) => p.length > 0)) continue;
 
     let front = '';
     let back = '';
@@ -637,41 +703,94 @@ function extractImageUrl(raw?: string): string | undefined {
     let image: string | undefined;
     let relatedWords: string | undefined;
 
-    if (colWord !== -1 || colMeaning !== -1) {
-      // Header-based mapping
-      front = colWord !== -1 && parts[colWord] ? cleanHtml(parts[colWord]) : '';
-      back = colMeaning !== -1 && parts[colMeaning] ? cleanHtml(parts[colMeaning]) : '';
-      if (colIPA !== -1 && parts[colIPA]) phonetic = cleanHtml(parts[colIPA]);
-      if (colType !== -1 && parts[colType]) partOfSpeech = cleanHtml(parts[colType]);
-      if (colExample !== -1 && parts[colExample]) example = cleanHtml(parts[colExample]);
-      if (colVietnamese !== -1 && parts[colVietnamese]) exampleMeaning = cleanHtml(parts[colVietnamese]);
+    // 1. Initial mapping from Header columns if headers exist
+    if (headerRowIndex !== -1) {
+      if (colWord !== -1 && parts[colWord]) front = parts[colWord];
+      if (colMeaning !== -1 && parts[colMeaning]) back = parts[colMeaning];
+      if (colIPA !== -1 && parts[colIPA]) phonetic = parts[colIPA];
+      if (colType !== -1 && parts[colType]) partOfSpeech = parts[colType];
+      if (colExample !== -1 && parts[colExample]) example = parts[colExample];
+      if (colVietnamese !== -1 && parts[colVietnamese]) exampleMeaning = parts[colVietnamese];
       if (colImage !== -1 && parts[colImage]) image = extractImageUrl(parts[colImage]);
-      if (colRelated !== -1 && parts[colRelated]) relatedWords = cleanHtml(parts[colRelated]);
-    } else if (parts.length >= 8) {
-      // Automatic detection for 8 or 9-column format
-      // Format 9 cols: [#] [Word] [IPA] [Type] [Meaning] [Example] [Vietnamese] [Image URL] [Related words]
-      const offset = /^\d+$/.test(parts[0].trim()) ? 1 : 0;
-      front = cleanHtml(parts[offset]);
-      phonetic = parts[offset + 1] ? cleanHtml(parts[offset + 1]) : undefined;
-      partOfSpeech = parts[offset + 2] ? cleanHtml(parts[offset + 2]) : undefined;
-      back = cleanHtml(parts[offset + 3] || '');
-      example = parts[offset + 4] ? cleanHtml(parts[offset + 4]) : undefined;
-      exampleMeaning = parts[offset + 5] ? cleanHtml(parts[offset + 5]) : undefined;
-      image = parts[offset + 6] ? extractImageUrl(parts[offset + 6]) : undefined;
-      relatedWords = parts[offset + 7] ? cleanHtml(parts[offset + 7]) : undefined;
-    } else if (parts.length >= 2) {
-      // Fallback standard 2-4 columns
-      front = cleanHtml(parts[0]);
-      back = cleanHtml(parts[1]);
-      if (parts.length >= 3) {
-        if (parts[2].includes('/') || parts[2].startsWith('[') || parts[2].endsWith(']')) {
-          phonetic = cleanHtml(parts[2]);
-        } else {
-          example = cleanHtml(parts[2]);
+      if (colRelated !== -1 && parts[colRelated]) relatedWords = parts[colRelated];
+    }
+
+    // 2. Intelligent Fallback / Content-Based Auto-Detection
+    // Find image in ANY column if missing
+    if (!image) {
+      for (const cell of parts) {
+        const found = extractImageUrl(cell);
+        if (found) {
+          image = found;
+          break;
         }
       }
-      if (parts.length >= 4) {
-        example = cleanHtml(parts[3]);
+    }
+
+    // Find phonetic in ANY column if missing
+    if (!phonetic) {
+      for (const cell of parts) {
+        if (/^\/[^\/]+\/$/.test(cell) || /^\[[^\]]+\]$/.test(cell) || /[əɑɪʊæʌɒʃʒθðŋːˈˌ]/.test(cell)) {
+          phonetic = cell;
+          break;
+        }
+      }
+    }
+
+    // Find part of speech in ANY column if missing
+    if (!partOfSpeech) {
+      for (const cell of parts) {
+        const clean = cell.toLowerCase().replace(/[().,]/g, '').trim();
+        if (KNOWN_PARTS_OF_SPEECH.includes(clean)) {
+          partOfSpeech = cell;
+          break;
+        }
+      }
+    }
+
+    // If front or back is still missing, detect by content
+    if (!front || !back) {
+      // Filter out cells already assigned to other fields or pure numbers (#)
+      const remainingCells = parts.filter((c) => {
+        if (!c || /^\d{1,4}$/.test(c)) return false;
+        if (image && c.includes(image)) return false;
+        if (phonetic && c === phonetic) return false;
+        if (partOfSpeech && c === partOfSpeech) return false;
+        return true;
+      });
+
+      const isVietnamese = (s: string) => /[àáảãạăằắẳẵặâầấẩẫậèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵđ]/i.test(s);
+
+      // Candidate for front: first English word/phrase (short, <= 50 chars)
+      if (!front) {
+        const engWordCandidate = remainingCells.find((c) => !isVietnamese(c) && c.length <= 50 && c.split(/\s+/).length <= 4);
+        if (engWordCandidate) front = engWordCandidate;
+        else if (remainingCells.length > 0) front = remainingCells[0];
+      }
+
+      // Candidate for back: Vietnamese definition
+      if (!back) {
+        const vnMeaningCandidate = remainingCells.find((c) => c !== front && isVietnamese(c) && c.length <= 100);
+        if (vnMeaningCandidate) back = vnMeaningCandidate;
+        else if (remainingCells.length > 1) back = remainingCells[1];
+      }
+
+      // Candidate for example (English sentence)
+      if (!example) {
+        const exCandidate = remainingCells.find((c) => c !== front && c !== back && !isVietnamese(c) && c.length > 20);
+        if (exCandidate) example = exCandidate;
+      }
+
+      // Candidate for example meaning (Vietnamese sentence)
+      if (!exampleMeaning) {
+        const exVnCandidate = remainingCells.find((c) => c !== front && c !== back && isVietnamese(c) && c.length > 25);
+        if (exVnCandidate) exampleMeaning = exVnCandidate;
+      }
+
+      // Candidate for related words
+      if (!relatedWords) {
+        const relCandidate = remainingCells.find((c) => c !== front && c !== back && c !== example && c !== exampleMeaning);
+        if (relCandidate) relatedWords = relCandidate;
       }
     }
 
@@ -700,14 +819,14 @@ function extractImageUrl(raw?: string): string | undefined {
   }
 
   if (cardsList.length === 0) {
-    throw new Error('Không thể nhận diện các cột Word/Meaning trong file text/csv/tsv. Vui lòng kiểm tra tiêu đề hoặc định dạng các cột.');
+    throw new Error('Không thể nhận diện các cột từ vựng trong file/bảng. Vui lòng kiểm tra lại dữ liệu!');
   }
 
   const deckTitle = fileName.replace(/\.[^/.]+$/, '');
 
   return {
     deckTitle: deckTitle || 'Danh Sách Từ Mới',
-    description: `Nhập từ tệp ${fileName} (${cardsList.length} từ)`,
+    description: `Nhập từ ${fileName} (${cardsList.length} từ)`,
     cards: cardsList,
     totalCards: cardsList.length,
   };
