@@ -1,12 +1,13 @@
 import React from 'react';
 import { UserStats, UserSettings, UserAccount } from '../types';
-import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User } from 'lucide-react';
+import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User, MessageSquare } from 'lucide-react';
 
 interface NavbarProps {
   stats: UserStats;
   settings: UserSettings;
   currentUser: UserAccount | null;
   onOpenAuth: () => void;
+  onOpenAIChat: () => void;
   onOpenStats: () => void;
   onOpenSettings: () => void;
   onToggleSound: () => void;
@@ -22,6 +23,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   settings,
   currentUser,
   onOpenAuth,
+  onOpenAIChat,
   onOpenStats,
   onOpenSettings,
   onToggleSound,
@@ -60,7 +62,17 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Gamification Stats */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Gemini AI Conversation Button */}
+          <button
+            onClick={onOpenAIChat}
+            title="Trò chuyện và luyện tiếng Anh cùng Google Gemini AI"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-xs rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer ring-2 ring-blue-400/40"
+          >
+            <Sparkles className="w-3.5 h-3.5 fill-blue-200" />
+            <span>💎 Chat Gemini AI</span>
+          </button>
+
           {/* Streak */}
           <div
             onClick={onOpenStats}

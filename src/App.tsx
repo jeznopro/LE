@@ -10,6 +10,9 @@ import { DeckDetail } from './components/DeckDetail';
 import { FlashcardStudy } from './components/FlashcardStudy';
 import { QuizStudy } from './components/QuizStudy';
 import { TypingStudy } from './components/TypingStudy';
+import { SpeakingStudy } from './components/SpeakingStudy';
+import { AIConversation } from './components/AIConversation';
+import { MochiStudyView } from './components/MochiStudyView';
 import { DeckImporterModal } from './components/DeckImporterModal';
 import { DeckModal } from './components/DeckModal';
 import { AddCardModal } from './components/AddCardModal';
@@ -18,9 +21,11 @@ import { SettingsModal } from './components/SettingsModal';
 import { AnimatedBackground } from './components/AnimatedBackground';
 import { YouTubeBackground } from './components/YouTubeBackground';
 import { AuthModal } from './components/AuthModal';
+import { WelcomeLoginScreen } from './components/WelcomeLoginScreen';
+import { GeminiFloatingWindow } from './components/GeminiFloatingWindow';
 import { Heart } from 'lucide-react';
 
-type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing';
+type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-speaking' | 'study-mochi' | 'ai-chat';
 
 export function App() {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -28,6 +33,7 @@ export function App() {
   const [stats, setStats] = useState<UserStats>(storage.getStats());
   const [settings, setSettings] = useState<UserSettings>(storage.getSettings());
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(storage.getCurrentUser());
+  const [isGeminiWindowOpen, setIsGeminiWindowOpen] = useState(false);
 
   // Views & Navigation
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
@@ -111,9 +117,11 @@ export function App() {
     setStudyDeckTitle(deck.title);
     setActiveDeckId(deckId);
 
-    if (mode === 'flashcard') setCurrentView('study-flashcard');
+    if (mode === 'mochi') setCurrentView('study-mochi');
+    else if (mode === 'flashcard') setCurrentView('study-flashcard');
     else if (mode === 'quiz') setCurrentView('study-quiz');
     else if (mode === 'typing') setCurrentView('study-typing');
+    else if (mode === 'speaking') setCurrentView('study-speaking');
   };
 
   // Golden time: Review all due cards across all decks
@@ -131,13 +139,14 @@ export function App() {
   // Review cards by specific memory level
   const handleReviewLevel = (level: MemoryLevel) => {
     soundManager.playClick();
-    const lvlCards = cards.filter((c) => (c.level || 1) === level);
+    // Only get cards that actually belong to this level (exclude unlearned cards with level === 0 or undefined)
+    const lvlCards = cards.filter((c) => c.level === level);
     if (lvlCards.length === 0) return;
 
     setStudyCards(lvlCards);
     setStudyDeckTitle(`Ôn Tập Cấp Độ ${level}`);
     setActiveDeckId(null);
-    setCurrentView('study-flashcard');
+    setCurrentView('study-mochi');
   };
 
   // Finish flashcard study session
@@ -151,7 +160,7 @@ export function App() {
     setCurrentView('dashboard');
   };
 
-  // Finish quiz / typing study
+  // Finish quiz / typing / speaking study
   const handleFinishMiniStudy = (xpGained: number) => {
     const newStats = storage.recordReview(xpGained, studyCards.length);
     setStats(newStats);
@@ -240,6 +249,11 @@ export function App() {
     soundManager.playVictory();
   };
 
+  // If user is not logged in, show the prominent full-screen Welcome / Login screen!
+  if (!currentUser) {
+    return <WelcomeLoginScreen onLoginSuccess={(user) => setCurrentUser(user)} />;
+  }
+
   const activeDeck = decks.find((d) => d.id === activeDeckId);
 
   return (
@@ -256,6 +270,10 @@ export function App() {
         settings={settings}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAIChat={() => {
+          soundManager.playClick();
+          setIsGeminiWindowOpen(true);
+        }}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onToggleSound={() => {
@@ -277,10 +295,10 @@ export function App() {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
         {/* VIEW 1: Dashboard */}
         {currentView === 'dashboard' && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="space-y-6 animate-fadeIn">
             {/* Golden Time Widget */}
             <GoldenTimeWidget
               cards={cards}
@@ -288,7 +306,46 @@ export function App() {
               onReviewLevel={handleReviewLevel}
             />
 
-            {/* Deck List Section */}
+            {/* Gemini AI Interactive Partner Banner */}
+            <div
+              onClick={() => {
+                soundManager.playClick();
+                setIsGeminiWindowOpen(true);
+              }}
+              className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white rounded-3xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col sm:flex-row items-center justify-between gap-4 border border-blue-400/40 relative overflow-hidden group hover:scale-[1.01]"
+            >
+              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform" />
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center text-3xl shrink-0 shadow-sm group-hover:rotate-6 transition-transform">
+                  💎
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg sm:text-xl font-black tracking-tight text-white">
+                      Trò Chuyện Cùng Google Gemini AI
+                    </h3>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 border border-white/40 text-blue-100">
+                      2.5 Flash
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-blue-100/90 font-medium mt-1 max-w-xl leading-relaxed">
+                    Liên kết tài khoản Gemini của bạn để hỏi đáp ngữ pháp, tra từ vựng hoặc luyện giao tiếp phản xạ tiếng Anh 1-1 không giới hạn!
+                  </p>
+                </div>
+              </div>
+
+              <div className="relative z-10 w-full sm:w-auto">
+                <button
+                  type="button"
+                  className="w-full sm:w-auto px-6 py-3 bg-white text-blue-700 hover:bg-blue-50 font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Mở Phòng Chat Gemini</span>
+                  <span>➔</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Deck Library */}
             <DeckList
               decks={decks}
               cards={cards}
@@ -364,6 +421,44 @@ export function App() {
             onExit={() => setCurrentView('dashboard')}
           />
         )}
+
+        {/* VIEW 6: Speaking AI Study */}
+        {currentView === 'study-speaking' && (
+          <SpeakingStudy
+            cards={studyCards}
+            deckTitle={studyDeckTitle}
+            settings={settings}
+            onFinishSession={handleFinishMiniStudy}
+            onExit={() => setCurrentView('dashboard')}
+          />
+        )}
+
+        {/* VIEW 7: Authentic We Bare Bears Study Experience */}
+        {currentView === 'study-mochi' && (
+          <MochiStudyView
+            cards={studyCards}
+            deckTitle={studyDeckTitle}
+            settings={settings}
+            onCardReviewed={(updatedCard) => {
+              setCards((prev) => prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)));
+              setStats(storage.getStats());
+            }}
+            onFinishSession={handleFinishFlashcard}
+            onExit={() => setCurrentView('dashboard')}
+          />
+        )}
+
+        {/* VIEW 8: AI English Conversation Room */}
+        {currentView === 'ai-chat' && (
+          <AIConversation
+            settings={settings}
+            onExit={() => setCurrentView('dashboard')}
+            onRewardXP={(gained) => {
+              const newStats = storage.recordReview(gained, 1);
+              setStats(newStats);
+            }}
+          />
+        )}
       </main>
 
       {/* Footer */}
@@ -430,6 +525,29 @@ export function App() {
         onClose={() => setIsAuthOpen(false)}
         currentUser={currentUser}
         onUserChange={(user) => setCurrentUser(user)}
+      />
+
+      {/* Floating Gemini AI Web Window Button */}
+      {!isGeminiWindowOpen && (
+        <button
+          type="button"
+          onClick={() => {
+            soundManager.playClick();
+            setIsGeminiWindowOpen(true);
+          }}
+          title="Mở Cửa Sổ Google Gemini Web"
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-xs sm:text-sm rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer ring-4 ring-blue-400/40 animate-mochi-float"
+        >
+          <span className="text-xl">💎</span>
+          <span>Cửa Sổ Gemini Web</span>
+        </button>
+      )}
+
+      {/* Floating Gemini Window Component */}
+      <GeminiFloatingWindow
+        isOpen={isGeminiWindowOpen}
+        onClose={() => setIsGeminiWindowOpen(false)}
+        settings={settings}
       />
     </div>
   );

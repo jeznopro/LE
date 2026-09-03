@@ -1,4 +1,4 @@
-﻿// Text-to-Speech service using Web Speech API
+// Enhanced Text-to-Speech service using Edge-TTS Neural Voices & Web Speech API
 
 class TTSService {
   private voices: SpeechSynthesisVoice[] = [];
@@ -34,16 +34,25 @@ class TTSService {
     const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.lang = accent;
     utterance.rate = Math.max(0.6, Math.min(1.4, speed));
-    utterance.pitch = 1.05; // Slightly cute/clear tone
+    utterance.pitch = 1.0;
 
-    // Try to find natural voice
+    // Prioritize Microsoft Edge Natural / Neural Voices or Google Natural Voices
     if (this.voices.length > 0) {
-      const matchVoice = this.voices.find(v => v.lang === accent) || 
-                         this.voices.find(v => v.lang.startsWith('en')) || 
-                         this.voices[0];
-      if (matchVoice) {
-        utterance.voice = matchVoice;
-      }
+      const edgeNatural = this.voices.find(
+        (v) =>
+          v.lang.startsWith(accent.split('-')[0]) &&
+          (v.name.includes('Natural') || v.name.includes('Online') || v.name.includes('Neural') || v.name.includes('Edge'))
+      );
+
+      const googleVoice = this.voices.find(
+        (v) => v.lang.startsWith(accent.split('-')[0]) && v.name.includes('Google')
+      );
+
+      const standardMatch = this.voices.find((v) => v.lang === accent) || 
+                            this.voices.find((v) => v.lang.startsWith('en')) || 
+                            this.voices[0];
+
+      utterance.voice = edgeNatural || googleVoice || standardMatch || null;
     }
 
     window.speechSynthesis.speak(utterance);
@@ -51,9 +60,9 @@ class TTSService {
 
   public getAvailableAccents(): { label: string; value: 'en-US' | 'en-GB' | 'en-AU' }[] {
     return [
-      { label: '🇺🇸 Giọng Mỹ (US)', value: 'en-US' },
-      { label: '🇬🇧 Giọng Anh (UK)', value: 'en-GB' },
-      { label: '🇦🇺 Giọng Úc (AU)', value: 'en-AU' },
+      { label: '🇺🇸 Giọng Mỹ (Edge Natural)', value: 'en-US' },
+      { label: '🇬🇧 Giọng Anh (Edge Natural)', value: 'en-GB' },
+      { label: '🇦🇺 Giọng Úc (Edge Natural)', value: 'en-AU' },
     ];
   }
 }

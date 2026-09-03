@@ -91,12 +91,12 @@ export const YouTubeBackground: React.FC<YouTubeBackgroundProps> = ({
       {/* 1. Fullscreen Video Background Layer */}
       {isEnabled && videoId && (
         <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-          <div className="absolute inset-0 w-full h-full scale-125 sm:scale-110 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 w-full h-full scale-135 sm:scale-125 flex items-center justify-center pointer-events-none">
             <iframe
               title="YouTube Background Wallpaper"
               src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${
                 isMuted ? 1 : 0
-              }&controls=0&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1`}
+              }&controls=0&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&cc_load_policy=0&cc_lang_pref=none&hl=en`}
               className="w-screen h-[56.25vw] min-h-screen min-w-[177.77vh] object-cover pointer-events-none border-0"
               allow="autoplay; encrypted-media"
             />

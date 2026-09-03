@@ -46,7 +46,7 @@ export interface DeckStats {
   levelCounts: Record<MemoryLevel, number>;
 }
 
-export type StudyMode = 'flashcard' | 'quiz' | 'typing' | 'listen';
+export type StudyMode = 'flashcard' | 'quiz' | 'typing' | 'listen' | 'speaking' | 'mochi';
 
 export interface StudySessionState {
   deckId: string;
@@ -94,4 +94,88 @@ export interface UserSettings {
   youtubeBackgroundEnabled?: boolean;
   youtubeBackgroundOpacity?: number; // 0.1 to 0.9
   youtubeBackgroundMuted?: boolean;
+  geminiApiKey?: string;
 }
+
+export interface AnswerEvaluation {
+  estimatedBand: string;
+  score: number;
+  fluencyFeedback: string;
+  vocabFeedback: string;
+  grammarFeedback: string;
+  summary: string;
+}
+
+export interface AIChatMessage {
+  id: string;
+  sender: 'user' | 'ai';
+  text: string;
+  translation?: string;
+  correction?: string;
+  tip?: string;
+  evaluation?: AnswerEvaluation;
+  timestamp: number;
+}
+
+export interface ConversationScenario {
+  id: string;
+  title: string;
+  topic: string;
+  category?: 'ielts-part-1' | 'ielts-part-2' | 'ielts-part-3' | 'daily' | 'business';
+  description: string;
+  icon: string;
+  level: string;
+  initialAIMessage: string;
+  initialTranslation: string;
+  suggestedPrompts: string[];
+  cueCardPrompt?: string;
+  keyVocab?: string[];
+}
+
+export interface IELTSSpeakingQuestion {
+  question: string;
+  sampleAnswer: string;
+  keyVocab: string[];
+  tips?: string;
+}
+
+export interface RoadmapNode {
+  id: string;
+  title: string;
+  subtitle?: string;
+  icon: string;
+  chapterId: string;
+  part: 'Part 1' | 'Part 2' | 'Part 3';
+  targetBand: string; // e.g. 'Band 6.5 - 8.0+'
+  cueCardPrompt?: string; // For Part 2
+  questions?: IELTSSpeakingQuestion[];
+  type: 'lesson' | 'chest' | 'speaking-challenge' | 'boss';
+  cards: Card[];
+  stars: number; // 0 to 3
+  isUnlocked: boolean;
+  isCompleted: boolean;
+  xpReward: number;
+}
+
+export interface RoadmapChapter {
+  id: string;
+  title: string;
+  subtitle: string;
+  part: 'Part 1' | 'Part 2' | 'Part 3';
+  band: string;
+  color: string;
+  nodes: RoadmapNode[];
+}
+
+export interface SpeakingRoadmapProfile {
+  id: string;
+  name: string;
+  description: string;
+  category: 'ielts' | 'business' | 'daily' | 'custom';
+  icon: string;
+  targetBand: string;
+  chapters: RoadmapChapter[];
+  isCustom?: boolean;
+}
+
+

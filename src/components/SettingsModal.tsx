@@ -193,6 +193,58 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               )}
             </div>
+
+            {/* Google Gemini AI API Key Integration */}
+            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700/60 dark:to-slate-700/60 border border-amber-300/80 dark:border-amber-600/50 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🤖</span>
+                  <div>
+                    <h3 className="text-xs font-black text-amber-950 dark:text-amber-200">
+                      Tích Hợp Trí Tuệ Nhân Tạo Google Gemini (Miễn Phí)
+                    </h3>
+                    <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80">
+                      Kích hoạt mô hình Gemini 2.0 Flash để Giám khảo Gojo trò chuyện như người thật
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1">
+                  Gemini API Key:
+                </label>
+                <input
+                  type="password"
+                  value={settings.geminiApiKey || ''}
+                  onChange={(e) =>
+                    onSaveSettings({ ...settings, geminiApiKey: e.target.value.trim() })
+                  }
+                  placeholder="Dán mã API Key dạng AIzaSy... vào đây"
+                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-amber-300/70 dark:border-slate-600 rounded-xl text-xs font-mono font-semibold focus:outline-none focus:border-amber-500"
+                />
+              </div>
+
+              <div className="flex items-center justify-between pt-1">
+                <a
+                  href="https://aistudio.google.com/apikey"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1"
+                >
+                  <span>👉 Lấy API Key miễn phí (Google AI Studio) ↗</span>
+                </a>
+                {settings.geminiApiKey?.trim() ? (
+                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 rounded-lg text-[10px] font-black">
+                    ✓ Đã Kích Hoạt Real AI
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-slate-400">
+                    Đang dùng AI mô phỏng
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Reset button */}

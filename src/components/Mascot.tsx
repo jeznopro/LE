@@ -43,21 +43,21 @@ export const Mascot: React.FC<MascotProps> = ({
       onClick={onClick}
     >
       {message && (
-        <div className="relative mb-2 px-3.5 py-1.5 bg-white dark:bg-slate-800 border-2 border-[#FED770] rounded-2xl shadow-md text-xs sm:text-sm font-extrabold text-[#5B3E06] dark:text-amber-300 animate-mochi-pulse max-w-[220px] text-center z-10">
+        <div className="relative mb-2 px-3.5 py-1.5 bg-white dark:bg-slate-800 border-2 border-amber-300 dark:border-amber-500 rounded-2xl shadow-md text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-100 animate-mochi-pulse max-w-[220px] text-center z-10">
           {message}
-          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-6 border-x-transparent border-t-6 border-t-[#FED770]"></div>
+          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-x-6 border-x-transparent border-t-6 border-t-amber-300 dark:border-t-amber-500"></div>
         </div>
       )}
 
       <div className={`relative ${sizeMap[size]} transition-transform duration-300 hover:scale-110 group`}>
-        {/* Soft Blue Glowing Aura around Gojo */}
-        <div className="absolute inset-0 bg-cyan-400/20 dark:bg-cyan-400/30 rounded-3xl blur-md scale-110 animate-pulse pointer-events-none" />
+        {/* Soft Warm Glowing Aura around We Bare Bears */}
+        <div className="absolute inset-0 bg-amber-400/20 dark:bg-amber-400/30 rounded-3xl blur-md scale-110 animate-pulse pointer-events-none" />
         
-        {/* Gojo Chibi Avatar */}
+        {/* We Bare Bears Avatar */}
         <img
-          src="/gojo.png"
-          alt="Gojo Satoru Mascot"
-          className={`w-full h-full object-cover rounded-3xl drop-shadow-md border-2 border-cyan-200 dark:border-cyan-500/40 relative z-10 transition-all ${getAnimation()}`}
+          src="/we_bare_bears.png"
+          alt="We Bare Bears Mascot"
+          className={`w-full h-full object-contain rounded-3xl drop-shadow-md border-2 border-amber-200 dark:border-amber-500/40 relative z-10 transition-all bg-amber-50 dark:bg-slate-800 p-1 ${getAnimation()}`}
         />
 
         {/* Dynamic Badge/Mood Indicator */}

@@ -20,9 +20,9 @@ export const StatsModal: React.FC<StatsModalProps> = ({
   if (!isOpen) return null;
 
   const totalCards = cards.length;
-  const levelCounts: Record<number, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+  const levelCounts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
   cards.forEach((c) => {
-    const lvl = c.level || 1;
+    const lvl = c.level ?? 0;
     levelCounts[lvl] = (levelCounts[lvl] || 0) + 1;
   });
 

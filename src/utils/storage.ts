@@ -22,6 +22,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   youtubeBackgroundEnabled: false,
   youtubeBackgroundOpacity: 0.35,
   youtubeBackgroundMuted: true,
+  geminiApiKey: 'AIzaSyDhC-KbOgI_m6W-TW7n4-tXeKkwbue57iM',
 };
 
 // All stats reset cleanly to 0
@@ -70,6 +71,18 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
   },
 
+  updateSingleCard(updatedCard: Card) {
+    const allCards = this.getCards();
+    const idx = allCards.findIndex((c) => c.id === updatedCard.id);
+    if (idx !== -1) {
+      allCards[idx] = updatedCard;
+    } else {
+      allCards.push(updatedCard);
+    }
+    this.saveCards(allCards);
+    return allCards;
+  },
+
   getStats(): UserStats {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.STATS);
@@ -94,7 +107,11 @@ export const storage = {
         this.saveSettings(DEFAULT_SETTINGS);
         return DEFAULT_SETTINGS;
       }
-      return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
+      const parsed = JSON.parse(data);
+      if (!parsed.geminiApiKey) {
+        parsed.geminiApiKey = DEFAULT_SETTINGS.geminiApiKey;
+      }
+      return { ...DEFAULT_SETTINGS, ...parsed };
     } catch {
       return DEFAULT_SETTINGS;
     }
