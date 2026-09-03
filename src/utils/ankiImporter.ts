@@ -511,6 +511,40 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
     return line.split(delimiter).map((s) => s.trim().replace(/^["']|["']$/g, ''));
   };
 
+function extractImageUrl(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  let str = raw.trim();
+  if (!str) return undefined;
+  str = str.replace(/^["']|["']$/g, '').trim();
+
+  // HTML <img src="...">
+  const imgMatch = str.match(/<img[^>]+src=["']([^"']+)["']/i);
+  if (imgMatch) return imgMatch[1].trim();
+
+  // Markdown ![...](url)
+  const mdMatch = str.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/i);
+  if (mdMatch) return mdMatch[1].trim();
+
+  // HTML <a href="url">
+  const aMatch = str.match(/<a[^>]+href=["']([^"']+)["']/i);
+  if (aMatch) return aMatch[1].trim();
+
+  // Direct http:// or https:// URL anywhere in the cell
+  const httpMatch = str.match(/(https?:\/\/[^\s"'>)]+)/i);
+  if (httpMatch) return httpMatch[1].trim();
+
+  if (str.startsWith('data:image') || str.startsWith('/')) {
+    return str;
+  }
+
+  // Local media filename from Anki package
+  if (/\.(png|jpe?g|gif|webp|svg|bmp)$/i.test(str)) {
+    return str;
+  }
+
+  return undefined;
+}
+
   // Inspect first line to check if it's a Header row
   let startIndex = 0;
   let colWord = -1;
@@ -532,14 +566,14 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
   if (hasWordHeader || hasMeaningHeader || lines[0].toLowerCase().includes('word') || lines[0].toLowerCase().includes('meaning')) {
     startIndex = 1; // Skip header row
     normHeaders.forEach((h, idx) => {
-      if (['word', 'front', 'term', 'tu', 'tuvung'].includes(h)) colWord = idx;
-      else if (['ipa', 'phonetic', 'phienam', 'pronunciation'].includes(h)) colIPA = idx;
-      else if (['type', 'pos', 'partofspeech', 'tuloai', 'loaitu'].includes(h)) colType = idx;
-      else if (['meaning', 'back', 'nghia', 'dinhnghia', 'definition'].includes(h)) colMeaning = idx;
-      else if (['example', 'vividu', 'cauvidu', 'sentence', 'sentences'].includes(h)) colExample = idx;
-      else if (['vietnamese', 'nghiavidu', 'dichvidu', 'examplemeaning'].includes(h)) colVietnamese = idx;
-      else if (['image', 'imageurl', 'img', 'anh', 'linkanh', 'picture'].includes(h)) colImage = idx;
-      else if (['related', 'relatedwords', 'tulienquan', 'tudongnghia', 'synonyms', 'collocations'].includes(h)) colRelated = idx;
+      if (['word', 'front', 'term', 'tu', 'tuvung'].includes(h) || h.includes('word') || h.includes('tuvung')) colWord = idx;
+      else if (['ipa', 'phonetic', 'phienam', 'pronunciation'].includes(h) || h.includes('ipa') || h.includes('phienam')) colIPA = idx;
+      else if (['type', 'pos', 'partofspeech', 'tuloai', 'loaitu'].includes(h) || h.includes('type') || h.includes('tuloai') || h.includes('pos')) colType = idx;
+      else if (['meaning', 'back', 'nghia', 'dinhnghia', 'definition'].includes(h) || h.includes('meaning') || h.includes('nghia')) colMeaning = idx;
+      else if (['example', 'vividu', 'cauvidu', 'sentence', 'sentences'].includes(h) || h.includes('example') || h.includes('vidu')) colExample = idx;
+      else if (['vietnamese', 'nghiavidu', 'dichvidu', 'examplemeaning', 'dich'].includes(h) || h.includes('vietnamese') || h.includes('dich')) colVietnamese = idx;
+      else if (['image', 'imageurl', 'img', 'anh', 'linkanh', 'picture', 'photo'].includes(h) || h.includes('image') || h.includes('img') || h.includes('anh') || h.includes('pic') || h.includes('photo')) colImage = idx;
+      else if (['related', 'relatedwords', 'tulienquan', 'tudongnghia', 'synonyms', 'collocations'].includes(h) || h.includes('related') || h.includes('lienquan') || h.includes('dongnghia')) colRelated = idx;
     });
 
     // If "Meaning" was not assigned but "Vietnamese" is present and no colMeaning, colMeaning could be Vietnamese
@@ -575,7 +609,7 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
       if (colType !== -1 && parts[colType]) partOfSpeech = cleanHtml(parts[colType]);
       if (colExample !== -1 && parts[colExample]) example = cleanHtml(parts[colExample]);
       if (colVietnamese !== -1 && parts[colVietnamese]) exampleMeaning = cleanHtml(parts[colVietnamese]);
-      if (colImage !== -1 && parts[colImage]) image = parts[colImage].trim();
+      if (colImage !== -1 && parts[colImage]) image = extractImageUrl(parts[colImage]);
       if (colRelated !== -1 && parts[colRelated]) relatedWords = cleanHtml(parts[colRelated]);
     } else if (parts.length >= 8) {
       // Automatic detection for 8 or 9-column format
@@ -587,7 +621,7 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
       back = cleanHtml(parts[offset + 3] || '');
       example = parts[offset + 4] ? cleanHtml(parts[offset + 4]) : undefined;
       exampleMeaning = parts[offset + 5] ? cleanHtml(parts[offset + 5]) : undefined;
-      image = parts[offset + 6] ? parts[offset + 6].trim() : undefined;
+      image = parts[offset + 6] ? extractImageUrl(parts[offset + 6]) : undefined;
       relatedWords = parts[offset + 7] ? cleanHtml(parts[offset + 7]) : undefined;
     } else if (parts.length >= 2) {
       // Fallback standard 2-4 columns
@@ -616,7 +650,7 @@ export async function parseTextOrCsv(content: string, fileName: string): Promise
         partOfSpeech: partOfSpeech && partOfSpeech.trim() ? partOfSpeech : undefined,
         example: example && example.trim() ? example : undefined,
         exampleMeaning: exampleMeaning && exampleMeaning.trim() ? exampleMeaning : undefined,
-        image: image && image.startsWith('http') ? image : undefined,
+        image: extractImageUrl(image),
         relatedWords: relatedWords && relatedWords.trim() ? relatedWords : undefined,
         level: 0,
         interval: 0,

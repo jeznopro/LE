@@ -10,18 +10,37 @@ export const useMediaUrl = (filename?: string) => {
       return;
     }
 
+    const trimmed = filename.trim();
+
+    // 1. Direct Web URLs, Data URLs, or absolute/relative web paths
+    if (
+      trimmed.startsWith('http://') ||
+      trimmed.startsWith('https://') ||
+      trimmed.startsWith('data:') ||
+      trimmed.startsWith('blob:') ||
+      trimmed.startsWith('/') ||
+      trimmed.startsWith('./')
+    ) {
+      setUrl(trimmed);
+      return;
+    }
+
+    // 2. Local media files extracted from Anki .apkg (stored in IndexedDB)
     let isMounted = true;
     let objectUrl: string | undefined;
 
     const loadMedia = async () => {
       try {
-        const blob = await getMediaBlob(filename);
+        const blob = await getMediaBlob(trimmed);
         if (blob && isMounted) {
           objectUrl = URL.createObjectURL(blob);
           setUrl(objectUrl);
+        } else if (isMounted) {
+          setUrl(undefined);
         }
       } catch (err) {
         console.error('Failed to load media:', err);
+        if (isMounted) setUrl(undefined);
       }
     };
 
