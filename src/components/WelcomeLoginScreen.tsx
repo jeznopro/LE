@@ -57,28 +57,10 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       const cleanEmail = email.trim();
       const cleanPassword = password.trim();
 
-      // Check if user has a mapped alias on this device
-      const savedAliases = JSON.parse(localStorage.getItem('user_gmail_aliases') || '{}');
-      const aliasCandidate = savedAliases[cleanEmail.toLowerCase()];
-
-      // 1. Try with alias first if known, else with cleanEmail
-      let activeEmail = aliasCandidate || cleanEmail;
-      let { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: activeEmail,
+      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
         password: cleanPassword,
       });
-
-      // 2. If failed and we tried alias, retry with cleanEmail (or vice-versa)
-      if (signInErr && activeEmail !== cleanEmail) {
-        const retryRes = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password: cleanPassword,
-        });
-        if (retryRes.data?.user) {
-          data = retryRes.data;
-          signInErr = null;
-        }
-      }
 
       if (signInErr) {
         setError(signInErr.message === 'Invalid login credentials' ? 'Email hoặc mật khẩu không chính xác.' : signInErr.message);
@@ -96,7 +78,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           id: user.id,
           username: displayName,
           avatar: userAvatar,
-          email: user.user_metadata?.original_email || user.email,
+          email: user.email,
           createdAt: new Date(user.created_at).getTime(),
         };
 
@@ -126,7 +108,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
     }
   };
 
-  // Cloud Supabase Register (Supports reusing Gmail for multiple accounts!)
+  // Cloud Supabase Register (Strict 1-Email = 1-Account)
   const handleCloudRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -146,23 +128,20 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       const cleanPassword = password.trim();
       const displayName = username.trim() || cleanEmail.split('@')[0];
 
-      // 1. First try regular sign up
-      let targetSignUpEmail = cleanEmail;
-      let { data, error: signUpErr } = await supabase.auth.signUp({
-        email: targetSignUpEmail,
+      const { data, error: signUpErr } = await supabase.auth.signUp({
+        email: cleanEmail,
         password: cleanPassword,
         options: {
           data: {
             username: displayName,
             avatar: selectedAvatar,
-            original_email: cleanEmail,
           },
         },
       });
 
-      // 2. If email already registered -> Seamless Multi-Account / Auto-Login logic!
+      // If email already registered:
       if (signUpErr && (signUpErr.message.includes('already registered') || signUpErr.message.includes('already exists'))) {
-        // A. Check if user typed the existing password -> Log in immediately!
+        // Try auto sign-in if the user typed the same password
         const { data: directSignIn, error: directSignInErr } = await supabase.auth.signInWithPassword({
           email: cleanEmail,
           password: cleanPassword,
@@ -182,32 +161,9 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           return;
         }
 
-        // B. User wants a NEW account with the SAME Gmail -> Auto-generate Gmail alias!
-        const [localPart, domainPart] = cleanEmail.split('@');
-        const aliasTag = Math.floor(1000 + Math.random() * 9000);
-        targetSignUpEmail = `${localPart}+${aliasTag}@${domainPart}`;
-
-        const aliasRes = await supabase.auth.signUp({
-          email: targetSignUpEmail,
-          password: cleanPassword,
-          options: {
-            data: {
-              username: displayName,
-              avatar: selectedAvatar,
-              original_email: cleanEmail,
-            },
-          },
-        });
-
-        data = aliasRes.data;
-        signUpErr = aliasRes.error;
-
-        if (data?.user) {
-          // Store alias locally so this device logs in seamlessly with the original email
-          const savedAliases = JSON.parse(localStorage.getItem('user_gmail_aliases') || '{}');
-          savedAliases[cleanEmail.toLowerCase()] = targetSignUpEmail;
-          localStorage.setItem('user_gmail_aliases', JSON.stringify(savedAliases));
-        }
+        setError('Email này đã được đăng ký tài khoản rồi! Vui lòng chuyển sang tab Đăng Nhập.');
+        setLoading(false);
+        return;
       }
 
       if (signUpErr) {
@@ -456,10 +412,6 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                     className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
                   />
                 </div>
-                <p className="mt-1.5 text-[11px] font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1">
-                  <span>💡</span>
-                  <span>Bạn có thể dùng lại Gmail cũ để tạo thêm nhiều tài khoản học viên mới!</span>
-                </p>
               </div>
 
               <div>
