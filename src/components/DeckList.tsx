@@ -216,7 +216,7 @@ export const DeckList: React.FC<DeckListProps> = ({
                               <span className="px-2.5 py-0.5 rounded-lg bg-amber-50 dark:bg-amber-950/70 text-amber-800 dark:text-amber-300 font-extrabold text-[11px] border border-amber-200 dark:border-amber-800/70 flex items-center gap-1">
                                 <span>📚</span> {totalDecks} bộ thẻ
                               </span>
-                              <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-750 text-slate-700 dark:text-slate-300 font-extrabold text-[11px] border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                              <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-extrabold text-[11px] border border-slate-200 dark:border-slate-700 flex items-center gap-1">
                                 <span>🏷️</span> {totalCards} từ vựng
                               </span>
                             </div>
@@ -239,7 +239,7 @@ export const DeckList: React.FC<DeckListProps> = ({
                     </div>
 
                     {/* Bottom Action Indicator */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-750 flex items-center justify-between text-xs font-black text-amber-600 dark:text-amber-400 group-hover:text-orange-600">
+                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs font-black text-amber-600 dark:text-amber-400 group-hover:text-orange-600">
                       <span>Mở Thư Mục Khám Phá</span>
                       <span className="group-hover:translate-x-1.5 transition-transform font-bold text-sm">
                         ➔

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { soundManager } from '../utils/sounds';
@@ -215,26 +215,26 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
             {/* Quick Switch to Other Profiles */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-500">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-500 dark:text-slate-400">
                 <span>Chuyển Sang Hồ Sơ Khác Trên Máy Này:</span>
                 <button
                   onClick={() => setMode('create-profile')}
-                  className="text-rose-500 hover:text-rose-600 font-extrabold flex items-center gap-1 cursor-pointer"
+                  className="text-rose-500 hover:text-rose-400 font-extrabold flex items-center gap-1 cursor-pointer"
                 >
                   <UserPlus className="w-3.5 h-3.5" /> + Thêm Hồ Sơ
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+              <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1">
                 {users
                   .filter((u) => u.id !== currentUser?.id)
                   .map((u) => (
                     <button
                       key={u.id}
                       onClick={() => handleSwitchUser(u)}
-                      className="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-750 hover:border-rose-400 flex items-center gap-2 text-left transition-all hover:scale-[1.02] cursor-pointer"
+                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-rose-400 dark:hover:border-rose-400 flex items-center gap-2.5 text-left transition-all hover:scale-[1.02] cursor-pointer"
                     >
-                      <div className="w-8 h-8 rounded-lg overflow-hidden bg-white shrink-0 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shrink-0 flex items-center justify-center border border-slate-200 dark:border-slate-600 shadow-2xs">
                         {u.avatar.startsWith('.') || u.avatar.startsWith('/') || u.avatar.startsWith('http') ? (
                           <img
                             src={u.avatar.startsWith('/') ? '.' + u.avatar : u.avatar}
@@ -245,10 +245,15 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                             }}
                           />
                         ) : (
-                          <span className="text-base">{u.avatar || '👤'}</span>
+                          <span className="text-xl">{u.avatar || '👤'}</span>
                         )}
                       </div>
-                      <div className="truncate text-xs font-bold">{u.username}</div>
+                      <div className="min-w-0">
+                        <div className="truncate text-xs font-extrabold text-slate-800 dark:text-slate-100">{u.username}</div>
+                        <div className="text-[10px] text-slate-400 dark:text-slate-400">
+                          {storage.getCardsForUser(u.id).length} từ vựng
+                        </div>
+                      </div>
                     </button>
                   ))}
 
@@ -315,7 +320,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Ví dụ: Triết, Bé Bắp, IELTS 8.0..."
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-semibold focus:outline-hidden focus:border-rose-500"
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 text-slate-800 dark:text-slate-100"
               />
             </div>
 

@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { soundManager } from '../utils/sounds';
@@ -172,7 +172,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       </div>
 
       {/* Main Card Container */}
-      <div className="w-full max-w-xl bg-white/95 dark:bg-slate-850/95 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 backdrop-blur-xl p-6 sm:p-8 z-10 animate-scaleUp">
+      <div className="w-full max-w-xl bg-white/95 dark:bg-slate-900/95 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 backdrop-blur-xl p-6 sm:p-8 z-10 animate-scaleUp">
         {/* VIEW 1: Profile Selector (When profiles already exist) */}
         {!isCreating && users.length > 0 && (
           <div className="space-y-6">
@@ -217,7 +217,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                     </button>
 
                     {/* Avatar with glow */}
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white dark:border-slate-700 flex items-center justify-center mb-2.5 group-hover:border-rose-400 transition-colors">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-md border-2 border-white dark:border-slate-700 flex items-center justify-center mb-2.5 group-hover:border-rose-400 transition-colors">
                       {u.avatar.startsWith('.') || u.avatar.startsWith('/') || u.avatar.startsWith('http') ? (
                         <img
                           src={u.avatar.startsWith('/') ? '.' + u.avatar : u.avatar}
