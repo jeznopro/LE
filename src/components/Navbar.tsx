@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="flex items-center gap-2.5 cursor-pointer group select-none"
         >
           <img 
-            src="/gojo.png" 
+            src="./gojo.png" 
             alt="Gojo Satoru Icon" 
             className="w-10 h-10 rounded-2xl object-cover shadow-xs group-hover:scale-105 transition-transform border border-amber-200" 
           />
@@ -152,10 +152,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               {currentUser ? (
                 <>
                   <div className="w-6 h-6 rounded-lg overflow-hidden flex items-center justify-center bg-white shadow-2xs">
-                    {currentUser.avatar.startsWith('/') ? (
+                    {currentUser.avatar && (currentUser.avatar.startsWith('http') || currentUser.avatar.startsWith('data:')) ? (
                       <img src={currentUser.avatar} alt="avatar" className="w-full h-full object-cover" />
+                    ) : currentUser.avatar && (currentUser.avatar.includes('.png') || currentUser.avatar.includes('.jpg') || currentUser.avatar.includes('.jpeg')) ? (
+                      <img
+                        src={currentUser.avatar.startsWith('/') ? '.' + currentUser.avatar : currentUser.avatar}
+                        alt="avatar"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
                     ) : (
-                      <span className="text-sm">{currentUser.avatar}</span>
+                      <span className="text-sm">{currentUser.avatar || '👤'}</span>
                     )}
                   </div>
                   <span className="text-xs font-bold text-slate-700 dark:text-slate-200 hidden lg:inline max-w-[90px] truncate">

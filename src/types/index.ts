@@ -66,6 +66,7 @@ export interface UserAccount {
   username: string;
   avatar: string; // Avatar URL or preset emoji
   email?: string;
+  pin?: string;   // Optional 4-digit PIN for private local profile
   createdAt: number;
 }
 

@@ -74,69 +74,21 @@ export function App() {
     soundManager.setEnabled(loadedSettings.soundEffects);
   }, []);
 
-  // Listen to Supabase Cloud Authentication (like Facebook / Google)
+  // Synchronize decks, cards, and stats whenever currentUser switches profile
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
-
-    // Check existing cloud session on boot
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        const user = session.user;
-        const userAcc: UserAccount = {
-          id: user.id,
-          username: user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Học Viên',
-          avatar: user.user_metadata?.avatar || user.user_metadata?.avatar_url || '/gojo.png',
-          email: user.email,
-          createdAt: new Date(user.created_at).getTime(),
-        };
-        setCurrentUser(userAcc);
-        storage.setCurrentUser(userAcc);
-
-        // Load user decks, cards, and stats strictly from this local machine
-        const userDecks = storage.getDecksForUser(user.id);
-        const userCards = storage.getCardsForUser(user.id);
-        const userStats = storage.getStatsForUser(user.id);
-
-        setDecks(userDecks);
-        setCards(userCards);
-        setStats(userStats);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const user = session.user;
-        const userAcc: UserAccount = {
-          id: user.id,
-          username: user.user_metadata?.username || user.user_metadata?.full_name || user.email?.split('@')[0] || 'Học Viên',
-          avatar: user.user_metadata?.avatar || user.user_metadata?.avatar_url || '/gojo.png',
-          email: user.email,
-          createdAt: new Date(user.created_at).getTime(),
-        };
-        setCurrentUser(userAcc);
-        storage.setCurrentUser(userAcc);
-
-        // Load user decks, cards, and stats strictly from this local machine
-        const userDecks = storage.getDecksForUser(user.id);
-        const userCards = storage.getCardsForUser(user.id);
-        const userStats = storage.getStatsForUser(user.id);
-
-        setDecks(userDecks);
-        setCards(userCards);
-        setStats(userStats);
-      } else if (event === 'SIGNED_OUT') {
-        setCurrentUser(null);
-        storage.setCurrentUser(null);
-        setDecks([]);
-        setCards([]);
-        setStats(storage.resetStatsToZero());
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+    if (currentUser) {
+      const userDecks = storage.getDecksForUser(currentUser.id);
+      const userCards = storage.getCardsForUser(currentUser.id);
+      const userStats = storage.getStatsForUser(currentUser.id);
+      setDecks(userDecks);
+      setCards(userCards);
+      setStats(userStats);
+    } else {
+      setDecks([]);
+      setCards([]);
+      setStats(storage.resetStatsToZero());
+    }
+  }, [currentUser?.id]);
 
   const updateDecks = (newDecks: Deck[]) => {
     setDecks(newDecks);

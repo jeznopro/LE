@@ -223,19 +223,95 @@ export const storage = {
     }
   },
 
-  register(username: string, avatar: string, email?: string): UserAccount {
+  register(username: string, avatar: string, email?: string, pin?: string): UserAccount {
     const users = this.getUsers();
     const newUser: UserAccount = {
       id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       username: username.trim(),
-      avatar: avatar || '/gojo.png',
+      avatar: avatar || './gojo.png',
       email: email?.trim(),
+      pin: pin?.trim(),
       createdAt: Date.now(),
     };
     users.push(newUser);
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    // Fresh 0 cards, 0 decks, 0 stats for new profile
+    this.saveCardsForUser(newUser.id, []);
+    this.saveDecksForUser(newUser.id, []);
+    this.saveStatsForUser(newUser.id, this.resetStatsToZero());
+
     this.setCurrentUser(newUser);
     return newUser;
+  },
+
+  createProfile(username: string, avatar: string, pin?: string): UserAccount {
+    return this.register(username, avatar, undefined, pin);
+  },
+
+  deleteProfile(userId: string) {
+    let users = this.getUsers();
+    users = users.filter((u) => u.id !== userId);
+    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+    // Remove user specific data from local storage
+    localStorage.removeItem(`mochi_user_decks_${userId}`);
+    localStorage.removeItem(`mochi_user_cards_${userId}`);
+    localStorage.removeItem(`mochi_user_stats_${userId}`);
+
+    const current = this.getCurrentUser();
+    if (current && current.id === userId) {
+      this.setCurrentUser(null);
+    }
+  },
+
+  exportUserData(userId: string): string {
+    const users = this.getUsers();
+    const user = users.find((u) => u.id === userId) || this.getCurrentUser();
+    const decks = this.getDecksForUser(userId);
+    const cards = this.getCardsForUser(userId);
+    const stats = this.getStatsForUser(userId);
+    const payload = {
+      app: 'Mochi Anki - Learning English',
+      version: 1,
+      exportedAt: Date.now(),
+      user,
+      decks,
+      cards,
+      stats,
+    };
+    return JSON.stringify(payload, null, 2);
+  },
+
+  importUserData(jsonString: string): UserAccount | null {
+    try {
+      const data = JSON.parse(jsonString);
+      if (!data || (!data.cards && !data.decks)) {
+        throw new Error('Định dạng file không hợp lệ');
+      }
+      const rawUser = data.user || {};
+      const newUserId = `user-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+      const importedUser: UserAccount = {
+        id: newUserId,
+        username: rawUser.username ? `${rawUser.username} (Sao Lưu)` : 'Học Viên Mới',
+        avatar: rawUser.avatar || './gojo.png',
+        createdAt: Date.now(),
+      };
+
+      const users = this.getUsers();
+      users.push(importedUser);
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+
+      this.saveDecksForUser(newUserId, data.decks || []);
+      this.saveCardsForUser(newUserId, data.cards || []);
+      this.saveStatsForUser(newUserId, data.stats || this.resetStatsToZero());
+
+      this.setCurrentUser(importedUser);
+      return importedUser;
+    } catch (e) {
+      console.error('Import error:', e);
+      return null;
+    }
   },
 
   login(userId: string): UserAccount | null {

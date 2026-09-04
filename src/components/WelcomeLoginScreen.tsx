@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { UserAccount } from '../types';
 import { storage } from '../utils/storage';
 import { soundManager } from '../utils/sounds';
-import { supabase } from '../utils/supabase';
-import { cloudSync } from '../utils/cloudSync';
+import { INITIAL_CARDS, INITIAL_DECKS } from '../data/sampleDecks';
 import {
-  LogIn,
   UserPlus,
   Check,
   Brain,
   Headphones,
-  Cloud,
-  Mail,
+  Upload,
   Lock,
-  RefreshCw,
+  Trash2,
+  Sparkles,
+  ArrowRight,
+  ShieldCheck,
   Laptop,
+  Users,
+  KeyRound,
+  FileUp,
 } from 'lucide-react';
 
 const AVATAR_OPTIONS = [
-  { id: 'gojo', label: 'Gojo Satoru', src: '/gojo.png', isImg: true },
+  { id: 'gojo', label: 'Gojo Satoru', src: './gojo.png', isImg: true },
   { id: 'ninja', label: 'Ninja', emoji: '🥷' },
   { id: 'samurai', label: 'Samurai', emoji: '⚔️' },
   { id: 'wizard', label: 'Phù Thủy', emoji: '🧙‍♂️' },
@@ -35,483 +38,479 @@ interface WelcomeLoginScreenProps {
 }
 
 export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginSuccess }) => {
-  const [tab, setTab] = useState<'cloud-login' | 'cloud-register'>('cloud-login');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('/gojo.png');
+  const [users, setUsers] = useState<UserAccount[]>(() => storage.getUsers());
+  const [isCreating, setIsCreating] = useState<boolean>(() => storage.getUsers().length === 0);
+  const [newUsername, setNewUsername] = useState('');
+  const [selectedAvatar, setSelectedAvatar] = useState('./gojo.png');
+  const [newPin, setNewPin] = useState('');
+  const [seedSampleCards, setSeedSampleCards] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  // Cloud Supabase Login
-  const handleCloudLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  // PIN prompt modal state
+  const [pinTargetUser, setPinTargetUser] = useState<UserAccount | null>(null);
+  const [enteredPin, setEnteredPin] = useState('');
+  const [pinError, setPinError] = useState('');
 
-    if (!email.trim() || !password.trim()) {
-      setError('Vui lòng nhập đầy đủ Email và Mật khẩu.');
-      return;
-    }
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-    setLoading(true);
-    try {
-      const cleanEmail = email.trim();
-      const cleanPassword = password.trim();
-
-      const { data, error: signInErr } = await supabase.auth.signInWithPassword({
-        email: cleanEmail,
-        password: cleanPassword,
-      });
-
-      if (signInErr) {
-        setError(signInErr.message === 'Invalid login credentials' ? 'Email hoặc mật khẩu không chính xác.' : signInErr.message);
-        setLoading(false);
-        return;
-      }
-
-      if (data.user) {
-        soundManager.playVictory();
-        const user = data.user;
-        const displayName = user.user_metadata?.username || user.email?.split('@')[0] || 'Học Viên';
-        const userAvatar = user.user_metadata?.avatar || '/gojo.png';
-
-        const userAcc: UserAccount = {
-          id: user.id,
-          username: displayName,
-          avatar: userAvatar,
-          email: user.email,
-          createdAt: new Date(user.created_at).getTime(),
-        };
-
-        storage.setCurrentUser(userAcc);
-        onLoginSuccess(userAcc);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập thất bại.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Cloud Supabase Register (Strict 1-Email = 1-Account)
-  const handleCloudRegister = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!email.trim() || !password.trim()) {
-      setError('Vui lòng nhập đầy đủ Email và Mật khẩu.');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Mật khẩu cần ít nhất 6 ký tự.');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const cleanEmail = email.trim();
-      const cleanPassword = password.trim();
-      const displayName = username.trim() || cleanEmail.split('@')[0];
-
-      const { data, error: signUpErr } = await supabase.auth.signUp({
-        email: cleanEmail,
-        password: cleanPassword,
-        options: {
-          data: {
-            username: displayName,
-            avatar: selectedAvatar,
-          },
-        },
-      });
-
-      // 1. If Supabase returns explicit 'already registered' error
-      if (signUpErr && (signUpErr.message.toLowerCase().includes('already registered') || signUpErr.message.toLowerCase().includes('already exists'))) {
-        setError('Email này đã được đăng ký tài khoản rồi! Mỗi Gmail chỉ được tạo duy nhất 1 tài khoản. Vui lòng chuyển sang tab Đăng Nhập.');
-        setLoading(false);
-        return;
-      }
-
-      if (signUpErr) {
-        setError(signUpErr.message);
-        setLoading(false);
-        return;
-      }
-
-      // 2. If Supabase returns user with empty identities (email enumeration protection for already registered users)
-      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
-        setError('Email này đã được đăng ký tài khoản rồi! Mỗi Gmail chỉ được tạo duy nhất 1 tài khoản. Vui lòng chuyển sang tab Đăng Nhập.');
-        setLoading(false);
-        return;
-      }
-
-      if (data.user) {
-        soundManager.playVictory();
-        const newAcc: UserAccount = {
-          id: data.user.id,
-          username: displayName,
-          avatar: selectedAvatar,
-          email: cleanEmail,
-          createdAt: Date.now(),
-        };
-
-        // New account starts completely fresh and empty on this machine
-        storage.saveCardsForUser(data.user.id, []);
-        storage.saveDecksForUser(data.user.id, []);
-        storage.saveStatsForUser(data.user.id, storage.resetStatsToZero());
-
-        storage.setCurrentUser(newAcc);
-        onLoginSuccess(newAcc);
-      }
-    } catch (err: any) {
-      setError(err.message || 'Đăng ký thất bại.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Google 1-Click OAuth
-  const handleGoogleLogin = async () => {
-    setError('');
+  // Handle select profile
+  const handleSelectUser = (user: UserAccount) => {
     soundManager.playClick();
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) setError(error.message);
-    } catch (err: any) {
-      setError(err.message || 'Đăng nhập Google thất bại');
+    if (user.pin) {
+      setPinTargetUser(user);
+      setEnteredPin('');
+      setPinError('');
+      return;
+    }
+    soundManager.playVictory();
+    storage.setCurrentUser(user);
+    onLoginSuccess(user);
+  };
+
+  // Submit PIN for protected profile
+  const handleVerifyPin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pinTargetUser) return;
+    if (pinTargetUser.pin !== enteredPin.trim()) {
+      setPinError('Mã PIN không chính xác. Vui lòng thử lại!');
+      return;
+    }
+    soundManager.playVictory();
+    storage.setCurrentUser(pinTargetUser);
+    onLoginSuccess(pinTargetUser);
+  };
+
+  // Create new local profile
+  const handleCreateProfile = (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    const trimmedName = newUsername.trim();
+    if (!trimmedName) {
+      setError('Vui lòng nhập tên người học hoặc biệt danh.');
+      return;
+    }
+
+    soundManager.playVictory();
+    const newUser = storage.createProfile(trimmedName, selectedAvatar, newPin.trim() || undefined);
+
+    if (seedSampleCards) {
+      storage.saveDecksForUser(newUser.id, INITIAL_DECKS);
+      storage.saveCardsForUser(newUser.id, INITIAL_CARDS);
+    }
+
+    const updatedUsers = storage.getUsers();
+    setUsers(updatedUsers);
+    onLoginSuccess(newUser);
+  };
+
+  // Delete profile
+  const handleDeleteUser = (e: React.MouseEvent, user: UserAccount) => {
+    e.stopPropagation();
+    soundManager.playClick();
+    if (window.confirm(`Bạn có chắc chắn muốn xóa hồ sơ "${user.username}" và toàn bộ dữ liệu thẻ trên máy này?`)) {
+      storage.deleteProfile(user.id);
+      const updated = storage.getUsers();
+      setUsers(updated);
+      if (updated.length === 0) {
+        setIsCreating(true);
+      }
     }
   };
 
-  // Offline / Local PC Login (100% Offline, saves locally on PC)
-  const handleOfflineGuestLogin = () => {
-    soundManager.playVictory();
-    const guestUser: UserAccount = {
-      id: 'local_pc_user',
-      username: username.trim() || 'Học Viên Cục Bộ',
-      avatar: selectedAvatar || '/gojo.png',
-      createdAt: Date.now(),
+  // Import JSON backup
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const jsonStr = event.target?.result as string;
+        const importedUser = storage.importUserData(jsonStr);
+        if (importedUser) {
+          soundManager.playVictory();
+          setUsers(storage.getUsers());
+          onLoginSuccess(importedUser);
+        } else {
+          setError('File sao lưu không đúng định dạng Mochi Anki JSON.');
+        }
+      } catch (err: any) {
+        setError('Không thể đọc file sao lưu: ' + err.message);
+      }
     };
-    storage.setCurrentUser(guestUser);
-    onLoginSuccess(guestUser);
+    reader.readAsText(file);
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8 bg-linear-to-b from-[#FFF9E6] via-[#F8F9FE] to-[#EFF2FE] dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 text-slate-800 dark:text-slate-100 relative overflow-hidden selection:bg-blue-300">
-      
-      {/* Ambient background glow */}
-      <div className="absolute top-0 -left-40 w-96 h-96 bg-purple-400/20 dark:bg-purple-900/30 rounded-full blur-3xl pointer-events-none animate-pulse" />
-      <div className="absolute top-1/2 -right-40 w-96 h-96 bg-cyan-400/20 dark:bg-cyan-900/30 rounded-full blur-3xl pointer-events-none animate-pulse [animation-delay:2s]" />
-      <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-blue-400/20 dark:bg-blue-900/30 rounded-full blur-3xl pointer-events-none animate-pulse [animation-delay:4s]" />
+    <div className="min-h-screen bg-animated-gradient flex flex-col items-center justify-center p-4 sm:p-6 select-none relative overflow-hidden">
+      {/* Ambient background glow circles */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-300/30 dark:bg-purple-900/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-amber-300/30 dark:bg-amber-900/20 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-xl mx-auto space-y-6 relative z-10 animate-scaleUp">
-        
-        {/* Top Hero Brand & Gojo Mascot */}
-        <div className="text-center space-y-3">
-          <div className="relative inline-block group">
-            <div className="absolute inset-0 bg-blue-400/30 dark:bg-blue-400/40 rounded-full blur-xl scale-125 animate-pulse" />
-            <img
-              src="/gojo.png"
-              alt="Gojo Satoru App Mascot"
-              className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-white dark:border-slate-800 shadow-xl relative z-10 mx-auto transition-transform hover:scale-105 animate-mochi-float"
-            />
-            <span className="absolute -bottom-2 right-1/2 translate-x-8 bg-blue-600 text-white text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-xs border border-white z-20">
-              CLOUD
-            </span>
-          </div>
-
-          <div>
-            <div className="flex items-center justify-center gap-2">
-              <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[#2E241E] dark:text-white">
-                Learning<span className="text-[#3B82F6]"> English</span>
-              </h1>
-              <span className="text-xs uppercase tracking-wider font-black px-2 py-0.5 rounded-full bg-linear-to-r from-blue-600 to-indigo-600 text-white shadow-xs">
-                PRO
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold mt-1 max-w-md mx-auto">
-              Hệ thống học từ vựng Anki Spaced Repetition đồng bộ đám mây Supabase
-            </p>
-          </div>
+      {/* Brand Header */}
+      <div className="text-center mb-6 z-10 animate-fadeIn">
+        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-md border border-slate-200/80 dark:border-slate-700 mb-3">
+          <img
+            src="./gojo.png"
+            alt="Gojo Logo"
+            className="w-8 h-8 rounded-xl object-cover border border-amber-300"
+            onError={(e) => {
+              e.currentTarget.style.display = 'none';
+            }}
+          />
+          <span className="font-black text-lg tracking-tight text-slate-800 dark:text-white">
+            Learning <span className="text-rose-500">English</span> <span className="text-xs uppercase bg-rose-100 dark:bg-rose-950/60 text-rose-600 px-2 py-0.5 rounded-md font-bold">PRO</span>
+          </span>
         </div>
+        <h1 className="text-2xl sm:text-3xl font-black text-slate-800 dark:text-white tracking-tight">
+          Học Từ Vựng Thông Minh Theo Thời Điểm Vàng
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 font-semibold mt-1">
+          💾 Toàn bộ dữ liệu thẻ & tiến độ học lưu an toàn 100% trên thiết bị của bạn
+        </p>
+      </div>
 
-        {/* Big Auth Box */}
-        <div className="bg-white/95 dark:bg-slate-900/95 rounded-3xl p-6 sm:p-8 shadow-2xl border border-slate-200/80 dark:border-slate-800 backdrop-blur-md space-y-5">
-          
-          {/* Tabs */}
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl">
-            <button
-              type="button"
-              onClick={() => {
-                setTab('cloud-login');
-                setError('');
-              }}
-              className={`flex-1 py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                tab === 'cloud-login'
-                  ? 'bg-white dark:bg-slate-700 shadow-xs text-blue-600 dark:text-blue-400'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <LogIn className="w-4 h-4" />
-              <span>Đăng Nhập</span>
-            </button>
+      {/* Main Card Container */}
+      <div className="w-full max-w-xl bg-white/95 dark:bg-slate-850/95 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 backdrop-blur-xl p-6 sm:p-8 z-10 animate-scaleUp">
+        {/* VIEW 1: Profile Selector (When profiles already exist) */}
+        {!isCreating && users.length > 0 && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-rose-500" />
+                <h2 className="text-lg font-black text-slate-800 dark:text-white">
+                  Chọn Hồ Sơ Học Tập Trên Máy Này
+                </h2>
+              </div>
+              <button
+                onClick={() => {
+                  soundManager.playClick();
+                  setIsCreating(true);
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-xl border border-rose-200 dark:border-rose-900/40 transition-all active:scale-95 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span>+ Thêm Hồ Sơ Mới</span>
+              </button>
+            </div>
 
-            <button
-              type="button"
-              onClick={() => {
-                setTab('cloud-register');
-                setError('');
-              }}
-              className={`flex-1 py-2.5 text-xs sm:text-sm font-black rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                tab === 'cloud-register'
-                  ? 'bg-white dark:bg-slate-700 shadow-xs text-blue-600 dark:text-blue-400'
-                  : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-              }`}
-            >
-              <UserPlus className="w-4 h-4" />
-              <span>Tạo Tài Khoản Mới</span>
-            </button>
+            {/* Profile Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {users.map((u) => {
+                const userCards = storage.getCardsForUser(u.id);
+                const userStats = storage.getStatsForUser(u.id);
+
+                return (
+                  <div
+                    key={u.id}
+                    onClick={() => handleSelectUser(u)}
+                    className="group relative p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/60 hover:border-rose-500 dark:hover:border-rose-400 hover:bg-white dark:hover:bg-slate-800 transition-all hover:scale-[1.03] hover:shadow-lg cursor-pointer flex flex-col items-center text-center select-none"
+                  >
+                    {/* Delete button (hover) */}
+                    <button
+                      onClick={(e) => handleDeleteUser(e, u)}
+                      title="Xóa hồ sơ này khỏi máy"
+                      className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Avatar with glow */}
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white shadow-md border-2 border-white dark:border-slate-700 flex items-center justify-center mb-2.5 group-hover:border-rose-400 transition-colors">
+                      {u.avatar.startsWith('.') || u.avatar.startsWith('/') || u.avatar.startsWith('http') ? (
+                        <img
+                          src={u.avatar.startsWith('/') ? '.' + u.avatar : u.avatar}
+                          alt="avatar"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <span className="text-3xl">{u.avatar || '👤'}</span>
+                      )}
+                    </div>
+
+                    {/* Name */}
+                    <div className="font-extrabold text-sm text-slate-800 dark:text-slate-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 truncate max-w-full">
+                      {u.username}
+                    </div>
+
+                    {/* Card & XP badge */}
+                    <div className="text-[10px] text-slate-400 dark:text-slate-400 mt-1 font-semibold">
+                      {userCards.length} từ • {userStats.streak || 0} ngày 🔥
+                    </div>
+
+                    {u.pin && (
+                      <div className="mt-1.5 flex items-center gap-1 text-[10px] text-amber-500 font-bold">
+                        <Lock className="w-3 h-3" /> Có mã PIN
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom Actions: Backup / Import */}
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition-all cursor-pointer"
+              >
+                <FileUp className="w-4 h-4 text-indigo-500" />
+                <span>Nhập File Sao Lưu (.json)</span>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportFile}
+                className="hidden"
+              />
+
+              <div className="text-[11px] text-slate-400 text-center sm:text-right font-medium">
+                Mỗi người học một hồ sơ riêng biệt • 100% bảo mật
+              </div>
+            </div>
           </div>
+        )}
 
-          {error && (
-            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 text-xs font-bold rounded-2xl animate-shake space-y-2">
-              <div>{error}</div>
-              {error.includes('tab Đăng Nhập') && (
+        {/* VIEW 2: Profile Creator (When creating or no profiles exist) */}
+        {isCreating && (
+          <form onSubmit={handleCreateProfile} className="space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center gap-2">
+                <UserPlus className="w-5 h-5 text-rose-500" />
+                <h2 className="text-lg font-black text-slate-800 dark:text-white">
+                  Tạo Hồ Sơ Học Tập Mới Trên Máy
+                </h2>
+              </div>
+              {users.length > 0 && (
                 <button
                   type="button"
                   onClick={() => {
-                    setTab('cloud-login');
-                    setError('');
+                    soundManager.playClick();
+                    setIsCreating(false);
                   }}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                  className="text-xs font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
                 >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>Chuyển Sang Đăng Nhập Ngay</span>
+                  ← Quay lại
                 </button>
               )}
             </div>
-          )}
 
-          {/* TAB 1: CLOUD LOGIN */}
-          {tab === 'cloud-login' && (
-            <form onSubmit={handleCloudLogin} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                  Email đăng nhập: *
-                </label>
-                <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ban@example.com"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
-                  />
-                </div>
+            {error && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 text-xs font-bold border border-rose-200 dark:border-rose-900">
+                {error}
               </div>
+            )}
 
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                  Mật khẩu: *
-                </label>
-                <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
-                  />
-                </div>
+            {/* Input Name */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider">
+                Tên Người Học / Biệt Danh: *
+              </label>
+              <input
+                type="text"
+                required
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                placeholder="Ví dụ: Triết, Học Viên IELTS, Bé Bắp..."
+                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-slate-800 dark:text-slate-100"
+              />
+            </div>
+
+            {/* Choose Avatar */}
+            <div className="space-y-2">
+              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider">
+                Chọn Ảnh Đại Diện (Avatar):
+              </label>
+              <div className="grid grid-cols-5 gap-2">
+                {AVATAR_OPTIONS.map((av) => {
+                  const isSelected = selectedAvatar === (av.isImg ? av.src : av.emoji);
+                  return (
+                    <button
+                      key={av.id}
+                      type="button"
+                      onClick={() => {
+                        soundManager.playClick();
+                        setSelectedAvatar(av.isImg ? av.src! : av.emoji!);
+                      }}
+                      className={`h-14 rounded-2xl border-2 flex items-center justify-center transition-all hover:scale-105 relative cursor-pointer ${
+                        isSelected
+                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/40 scale-105 shadow-md'
+                          : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800'
+                      }`}
+                    >
+                      {av.isImg ? (
+                        <img
+                          src={av.src}
+                          alt={av.label}
+                          className="w-9 h-9 rounded-xl object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      ) : (
+                        <span className="text-2xl">{av.emoji}</span>
+                      )}
+                      {isSelected && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 rounded-full flex items-center justify-center text-white text-[10px] shadow-xs">
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
+            </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
-                <span>Đăng Nhập Đám Mây & Đồng Bộ</span>
-              </button>
-
-              <div className="relative my-3 text-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200 dark:border-slate-700" />
-                </div>
-                <span className="relative px-3 bg-white dark:bg-slate-900 text-slate-400 text-xs font-bold">
-                  HOẶC
-                </span>
-              </div>
-
-              <button
-                type="button"
-                onClick={handleGoogleLogin}
-                className="w-full py-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-100 font-black text-xs sm:text-sm rounded-2xl border border-slate-300 dark:border-slate-700 flex items-center justify-center gap-2.5 transition-all cursor-pointer shadow-xs hover:scale-[1.01]"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24">
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
-                  />
-                </svg>
-                <span>Đăng Nhập Bằng Google (1-Click)</span>
-              </button>
-            </form>
-          )}
-
-          {/* TAB 2: CLOUD REGISTER */}
-          {tab === 'cloud-register' && (
-            <form onSubmit={handleCloudRegister} className="space-y-4">
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                  Tên hiển thị / Biệt danh: *
-                </label>
+            {/* Optional PIN */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider flex items-center justify-between">
+                <span>Mã PIN 4 Số (Tùy Chọn):</span>
+                <span className="text-[10px] text-slate-400 font-normal">Để bảo mật nếu dùng chung máy tính</span>
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
                 <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Ví dụ: Triết, Hoàng, Satoru..."
-                  className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-bold focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
+                  type="password"
+                  maxLength={6}
+                  value={newPin}
+                  onChange={(e) => setNewPin(e.target.value)}
+                  placeholder="Để trống nếu không cần mã khóa"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 text-slate-800 dark:text-slate-100"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                  Email của bạn: *
-                </label>
-                <div className="relative">
-                  <Mail className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="ban@example.com"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
-                  />
-                </div>
+            {/* Sample Deck Checkbox */}
+            <label className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={seedSampleCards}
+                onChange={(e) => setSeedSampleCards(e.target.checked)}
+                className="mt-0.5 rounded-md accent-rose-500 w-4 h-4"
+              />
+              <div className="text-xs">
+                <span className="font-black text-slate-800 dark:text-slate-100">
+                  Cài đặt sẵn bộ thẻ mẫu (100 Từ Vựng Giao Tiếp Mochi)
+                </span>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Bỏ chọn nếu bạn muốn tạo tài khoản trống 0 từ vựng để tự tạo bộ thẻ riêng của mình.
+                </p>
               </div>
+            </label>
 
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-1.5">
-                  Mật khẩu (ít nhất 6 ký tự): *
-                </label>
-                <div className="relative">
-                  <Lock className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
-                  <input
-                    type="password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    className="w-full pl-11 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-medium focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-800 dark:text-slate-100 transition-all"
-                  />
-                </div>
-              </div>
-
-              {/* Avatar Selection */}
-              <div>
-                <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-2">
-                  Chọn Avatar Nhân Vật Yêu Thích:
-                </label>
-                <div className="grid grid-cols-5 gap-2">
-                  {AVATAR_OPTIONS.map((av) => {
-                    const isSelected = selectedAvatar === (av.isImg ? av.src : av.emoji);
-                    return (
-                      <button
-                        key={av.id}
-                        type="button"
-                        onClick={() => setSelectedAvatar(av.isImg ? av.src! : av.emoji!)}
-                        className={`h-14 rounded-2xl border-2 flex items-center justify-center transition-all hover:scale-105 relative cursor-pointer ${
-                          isSelected
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-950/40 shadow-xs scale-105'
-                            : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {av.isImg ? (
-                          <img src={av.src} alt={av.label} className="w-9 h-9 rounded-xl object-cover" />
-                        ) : (
-                          <span className="text-2xl">{av.emoji}</span>
-                        )}
-                        {isSelected && (
-                          <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-[10px] shadow-xs">
-                            <Check className="w-2.5 h-2.5 stroke-[3]" />
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-sm rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-              >
-                {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Cloud className="w-4 h-4" />}
-                <span>Tạo Tài Khoản & Lưu Lên Đám Mây</span>
-              </button>
-            </form>
-          )}
-
-          {/* OFFLINE LOCAL PC OPTION */}
-          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
+            {/* Submit Button */}
             <button
-              type="button"
-              onClick={handleOfflineGuestLogin}
-              className="w-full py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs hover:scale-[1.01]"
+              type="submit"
+              className="w-full py-3.5 bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-sm rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Laptop className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>💻 Học Offline Ngay (Dữ Liệu Tự Lưu Trên Máy)</span>
+              <span>Hoàn Tất & Bắt Đầu Học Ngay</span>
+              <ArrowRight className="w-4 h-4" />
             </button>
-            <p className="text-[11px] text-slate-400 mt-1.5 font-medium">
-              Không cần tài khoản hay Internet • Toàn bộ từ vựng & tiến độ tự lưu vào ổ cứng máy tính
-            </p>
-          </div>
 
-        </div>
-
-        {/* Mini Feature Highlights */}
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 backdrop-blur-xs">
-            <Brain className="w-5 h-5 text-[#FF6B8B] mx-auto mb-1" />
-            <div className="text-[11px] font-black">Anki SRS 5 Cấp</div>
-            <div className="text-[9px] text-slate-400">Ghi nhớ dài hạn</div>
-          </div>
-          <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 backdrop-blur-xs">
-            <Cloud className="w-5 h-5 text-blue-500 mx-auto mb-1" />
-            <div className="text-[11px] font-black">Supabase Cloud</div>
-            <div className="text-[9px] text-slate-400">Lưu vĩnh viễn</div>
-          </div>
-          <div className="p-3 rounded-2xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/60 dark:border-slate-800 backdrop-blur-xs">
-            <Headphones className="w-5 h-5 text-[#339AF0] mx-auto mb-1" />
-            <div className="text-[11px] font-black">AI & Âm Thanh</div>
-            <div className="text-[9px] text-slate-400">Giao tiếp thông minh</div>
-          </div>
-        </div>
-
+            {/* Import Backup Alternative */}
+            <div className="pt-2 text-center">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center justify-center gap-1 mx-auto cursor-pointer"
+              >
+                <FileUp className="w-3.5 h-3.5" />
+                <span>Hoặc nhập dữ liệu từ file sao lưu (.json) cũ</span>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json"
+                onChange={handleImportFile}
+                className="hidden"
+              />
+            </div>
+          </form>
+        )}
       </div>
+
+      {/* Feature Highlights Footer */}
+      <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-6 max-w-xl w-full text-center z-10 animate-fadeIn">
+        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+          <Brain className="w-5 h-5 text-rose-500 mx-auto mb-1" />
+          <div className="text-xs font-black text-slate-800 dark:text-slate-100">SRS 5 Cấp Độ</div>
+          <div className="text-[10px] text-slate-400">Thời điểm vàng</div>
+        </div>
+        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+          <Laptop className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
+          <div className="text-xs font-black text-slate-800 dark:text-slate-100">Lưu Trữ Cục Bộ</div>
+          <div className="text-[10px] text-slate-400">0đ chi phí máy chủ</div>
+        </div>
+        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+          <ShieldCheck className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
+          <div className="text-xs font-black text-slate-800 dark:text-slate-100">Riêng Tư 100%</div>
+          <div className="text-[10px] text-slate-400">Không lo lộ dữ liệu</div>
+        </div>
+      </div>
+
+      {/* PIN Prompt Modal */}
+      {pinTargetUser && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          onClick={() => setPinTargetUser(null)}
+        >
+          <div
+            className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-scaleUp text-slate-800 dark:text-slate-100"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-amber-100 dark:bg-amber-950/50 text-amber-600 rounded-2xl">
+                <KeyRound className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-black text-base">Nhập Mã PIN Hồ Sơ</h3>
+                <p className="text-xs text-slate-400">Hồ sơ: {pinTargetUser.username}</p>
+              </div>
+            </div>
+
+            {pinError && (
+              <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold">
+                {pinError}
+              </div>
+            )}
+
+            <form onSubmit={handleVerifyPin} className="space-y-4">
+              <input
+                type="password"
+                autoFocus
+                required
+                maxLength={6}
+                value={enteredPin}
+                onChange={(e) => setEnteredPin(e.target.value)}
+                placeholder="Nhập mã PIN..."
+                className="w-full text-center tracking-widest text-xl px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-2xl font-bold focus:outline-hidden focus:border-rose-500"
+              />
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setPinTargetUser(null)}
+                  className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl cursor-pointer"
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 bg-rose-500 text-white font-black text-xs rounded-xl shadow-md cursor-pointer"
+                >
+                  Mở Khóa 🔓
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
