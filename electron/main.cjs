@@ -1,4 +1,4 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, session } = require('electron');
 const path = require('path');
 
 function createWindow() {
@@ -16,6 +16,10 @@ function createWindow() {
     },
     icon: path.join(__dirname, '../public/gojo.png'),
   });
+
+  // Set clean browser User-Agent to prevent YouTube from blocking Electron embeds
+  const cleanUserAgent = win.webContents.userAgent.replace(/Electron\/\S+\s?/, '');
+  win.webContents.setUserAgent(cleanUserAgent);
 
   const isDev = process.env.NODE_ENV === 'development' || process.argv.includes('--dev');
 
@@ -36,6 +40,25 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+  // Modify headers for YouTube iframe embeds to prevent Error 150/153
+  session.defaultSession.webRequest.onBeforeSendHeaders(
+    {
+      urls: [
+        '*://*.youtube.com/*',
+        '*://*.youtube-nocookie.com/*',
+        '*://*.googlevideo.com/*',
+      ],
+    },
+    (details, callback) => {
+      details.requestHeaders['Referer'] = 'https://www.youtube.com/';
+      details.requestHeaders['Origin'] = 'https://www.youtube.com';
+      if (details.requestHeaders['User-Agent']) {
+        details.requestHeaders['User-Agent'] = details.requestHeaders['User-Agent'].replace(/Electron\/\S+\s?/, '');
+      }
+      callback({ cancel: false, requestHeaders: details.requestHeaders });
+    }
+  );
+
   createWindow();
 
   app.on('activate', () => {

@@ -94,11 +94,16 @@ export const YouTubeBackground: React.FC<YouTubeBackgroundProps> = ({
           <div className="absolute inset-0 w-full h-full scale-135 sm:scale-125 flex items-center justify-center pointer-events-none">
             <iframe
               title="YouTube Background Wallpaper"
-              src={`https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&mute=${
+              src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=${
                 isMuted ? 1 : 0
-              }&controls=0&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1&showinfo=0&rel=0&iv_load_policy=3&disablekb=1&modestbranding=1&cc_load_policy=0&cc_lang_pref=none&hl=en`}
+              }&controls=0&loop=1&playlist=${videoId}&playsinline=1&enablejsapi=1&origin=${encodeURIComponent(
+                typeof window !== 'undefined' && window.location.origin.startsWith('http')
+                  ? window.location.origin
+                  : 'https://www.youtube.com'
+              )}`}
               className="w-screen h-[56.25vw] min-h-screen min-w-[177.77vh] object-cover pointer-events-none border-0"
-              allow="autoplay; encrypted-media"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             />
           </div>
 
@@ -116,13 +121,22 @@ export const YouTubeBackground: React.FC<YouTubeBackgroundProps> = ({
       {/* 2. Floating Quick Controls Button (Bottom-Right) */}
       <div className="fixed bottom-5 right-5 z-40 flex items-center gap-2 select-none">
         {isEnabled && (
-          <button
-            onClick={handleToggleMute}
-            title={isMuted ? 'Bật âm thanh video' : 'Tắt âm thanh video'}
-            className="p-3 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl shadow-lg border border-slate-200/80 dark:border-slate-700 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
-          >
-            {isMuted ? <VolumeX className="w-5 h-5 text-rose-500" /> : <Volume2 className="w-5 h-5 text-emerald-500 animate-pulse" />}
-          </button>
+          <>
+            <button
+              onClick={handleToggleMute}
+              title={isMuted ? 'Bật âm thanh video' : 'Tắt âm thanh video'}
+              className="p-3 bg-white/90 dark:bg-slate-800/90 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-2xl shadow-lg border border-slate-200/80 dark:border-slate-700 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+            >
+              {isMuted ? <VolumeX className="w-5 h-5 text-rose-500" /> : <Volume2 className="w-5 h-5 text-emerald-500 animate-pulse" />}
+            </button>
+            <button
+              onClick={handleToggleEnabled}
+              title="Tắt video hình nền (khôi phục giao diện gốc)"
+              className="p-3 bg-white/90 dark:bg-slate-800/90 hover:bg-rose-50 dark:hover:bg-rose-950/50 text-rose-500 rounded-2xl shadow-lg border border-rose-200 dark:border-rose-900/50 backdrop-blur-md transition-all hover:scale-105 active:scale-95"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </>
         )}
 
         <button
@@ -268,6 +282,20 @@ export const YouTubeBackground: React.FC<YouTubeBackgroundProps> = ({
                   <span>Rõ chữ thẻ học (85%)</span>
                 </div>
               </div>
+            )}
+
+            {/* Reset / Disable Video Button */}
+            {isEnabled && (
+              <button
+                type="button"
+                onClick={() => {
+                  onUpdateSettings({ ...settings, youtubeBackgroundEnabled: false });
+                  setIsOpenModal(false);
+                }}
+                className="w-full py-2.5 bg-slate-100 hover:bg-rose-50 dark:bg-slate-700/60 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-2xl border border-rose-200/80 dark:border-rose-900/50 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <X className="w-4 h-4" /> Tắt Nền Video (Dùng Nền Mặc Định Của Ứng Dụng)
+              </button>
             )}
 
             {/* Done Button */}
