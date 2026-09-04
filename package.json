@@ -3,9 +3,15 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "electron/main.cjs",
+  "author": "Mochi Anki",
+  "description": "Phần mềm học từ vựng Anki Spaced Repetition",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "electron:dev": "electron . --dev",
+    "electron:build": "npm run build && electron-builder --win",
+    "electron:dir": "npm run build && electron-builder --win --dir",
     "lint": "oxlint",
     "preview": "vite preview"
   },
@@ -31,10 +37,43 @@
     "@types/sql.js": "^1.4.11",
     "@vitejs/plugin-react": "^6.1.0",
     "autoprefixer": "^10.5.4",
+    "electron": "^44.2.0",
+    "electron-builder": "^26.15.3",
     "oxlint": "^1.79.0",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
     "typescript": "~6.0.2",
     "vite": "^8.2.2"
+  },
+  "build": {
+    "appId": "com.mochianki.learningenglish",
+    "productName": "Mochi Anki",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        },
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Mochi Anki"
+    }
   }
 }

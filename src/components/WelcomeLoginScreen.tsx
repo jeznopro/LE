@@ -14,6 +14,7 @@ import {
   Mail,
   Lock,
   RefreshCw,
+  Laptop,
 } from 'lucide-react';
 
 const AVATAR_OPTIONS = [
@@ -207,6 +208,19 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
     } catch (err: any) {
       setError(err.message || 'Đăng nhập Google thất bại');
     }
+  };
+
+  // Offline / Local PC Login (100% Offline, saves locally on PC)
+  const handleOfflineGuestLogin = () => {
+    soundManager.playVictory();
+    const guestUser: UserAccount = {
+      id: 'local_pc_user',
+      username: username.trim() || 'Học Viên Cục Bộ',
+      avatar: selectedAvatar || '/gojo.png',
+      createdAt: Date.now(),
+    };
+    storage.setCurrentUser(guestUser);
+    onLoginSuccess(guestUser);
   };
 
   return (
@@ -484,6 +498,21 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
               </button>
             </form>
           )}
+
+          {/* OFFLINE LOCAL PC OPTION */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
+            <button
+              type="button"
+              onClick={handleOfflineGuestLogin}
+              className="w-full py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs hover:scale-[1.01]"
+            >
+              <Laptop className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              <span>💻 Học Offline Ngay (Dữ Liệu Tự Lưu Trên Máy)</span>
+            </button>
+            <p className="text-[11px] text-slate-400 mt-1.5 font-medium">
+              Không cần tài khoản hay Internet • Toàn bộ từ vựng & tiến độ tự lưu vào ổ cứng máy tính
+            </p>
+          </div>
 
         </div>
 
