@@ -139,35 +139,22 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
         },
       });
 
-      // If email already registered:
-      if (signUpErr && (signUpErr.message.includes('already registered') || signUpErr.message.includes('already exists'))) {
-        // Try auto sign-in if the user typed the same password
-        const { data: directSignIn, error: directSignInErr } = await supabase.auth.signInWithPassword({
-          email: cleanEmail,
-          password: cleanPassword,
-        });
-
-        if (directSignIn?.user && !directSignInErr) {
-          soundManager.playVictory();
-          const userAcc: UserAccount = {
-            id: directSignIn.user.id,
-            username: displayName,
-            avatar: selectedAvatar,
-            email: cleanEmail,
-            createdAt: Date.now(),
-          };
-          storage.setCurrentUser(userAcc);
-          onLoginSuccess(userAcc);
-          return;
-        }
-
-        setError('Email này đã được đăng ký tài khoản rồi! Vui lòng chuyển sang tab Đăng Nhập.');
+      // 1. If Supabase returns explicit 'already registered' error
+      if (signUpErr && (signUpErr.message.toLowerCase().includes('already registered') || signUpErr.message.toLowerCase().includes('already exists'))) {
+        setError('Email này đã được đăng ký tài khoản rồi! Mỗi Gmail chỉ được tạo duy nhất 1 tài khoản. Vui lòng chuyển sang tab Đăng Nhập.');
         setLoading(false);
         return;
       }
 
       if (signUpErr) {
         setError(signUpErr.message);
+        setLoading(false);
+        return;
+      }
+
+      // 2. If Supabase returns user with empty identities (email enumeration protection for already registered users)
+      if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setError('Email này đã được đăng ký tài khoản rồi! Mỗi Gmail chỉ được tạo duy nhất 1 tài khoản. Vui lòng chuyển sang tab Đăng Nhập.');
         setLoading(false);
         return;
       }
@@ -292,8 +279,21 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           </div>
 
           {error && (
-            <div className="p-3 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 text-xs font-bold rounded-xl animate-shake">
-              {error}
+            <div className="p-3.5 bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-300 text-xs font-bold rounded-2xl animate-shake space-y-2">
+              <div>{error}</div>
+              {error.includes('tab Đăng Nhập') && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTab('cloud-login');
+                    setError('');
+                  }}
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                >
+                  <LogIn className="w-3.5 h-3.5" />
+                  <span>Chuyển Sang Đăng Nhập Ngay</span>
+                </button>
+              )}
             </div>
           )}
 
