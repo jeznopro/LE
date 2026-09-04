@@ -28,6 +28,8 @@ import {
   Check,
   ChevronDown,
   Wand2,
+  ArrowLeft,
+  MessageSquare,
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -35,12 +37,16 @@ interface RoadmapViewProps {
   settings: UserSettings;
   onStartStudy: (cards: Card[], title: string, mode: StudyMode, nodeId?: string) => void;
   onRewardXP: (xp: number) => void;
+  onBack?: () => void;
+  onSwitchToAIChat?: () => void;
 }
 
 export const RoadmapView: React.FC<RoadmapViewProps> = ({
   settings,
   onStartStudy,
   onRewardXP,
+  onBack,
+  onSwitchToAIChat,
 }) => {
   const [activeProfile, setActiveProfile] = useState<SpeakingRoadmapProfile>(getActiveRoadmapProfile());
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -158,8 +164,38 @@ export const RoadmapView: React.FC<RoadmapViewProps> = ({
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-8 pb-20 animate-fadeIn">
+    <div className="w-full max-w-3xl mx-auto space-y-6 pb-20 animate-fadeIn">
       
+      {/* Navigation Header & Speaking Mode Switcher */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xs backdrop-blur-md">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Quay lại Trang Chủ</span>
+          </button>
+        )}
+
+        {/* View Switcher: Roadmap vs AI Speaking Room */}
+        <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+          <button
+            className="px-3.5 py-1.5 bg-linear-to-r from-amber-500 to-orange-500 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5"
+          >
+            <span>🗺️ Bản Đồ Lộ Trình Part 1, 2, 3</span>
+          </button>
+          {onSwitchToAIChat && (
+            <button
+              onClick={onSwitchToAIChat}
+              className="px-3.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700"
+            >
+              <span>🎙️ Phòng Thi AI 1-1 (10 Unit)</span>
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Top Header Card with Roadmap Profile Switcher & AI Creator */}
       <div className="bg-white/95 dark:bg-slate-900/90 rounded-3xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-sm backdrop-blur-md space-y-4 sticky top-16 z-20">
         

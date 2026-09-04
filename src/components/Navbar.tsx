@@ -1,6 +1,6 @@
 import React from 'react';
 import { UserStats, UserSettings, UserAccount } from '../types';
-import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User, MessageSquare } from 'lucide-react';
+import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User, Mic } from 'lucide-react';
 
 interface NavbarProps {
   stats: UserStats;
@@ -8,6 +8,7 @@ interface NavbarProps {
   currentUser: UserAccount | null;
   onOpenAuth: () => void;
   onOpenAIChat: () => void;
+  onOpenSpeaking: () => void;
   onOpenStats: () => void;
   onOpenSettings: () => void;
   onToggleSound: () => void;
@@ -24,6 +25,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onOpenAuth,
   onOpenAIChat,
+  onOpenSpeaking,
   onOpenStats,
   onOpenSettings,
   onToggleSound,
@@ -31,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenImporter,
   onOpenNewDeck: _onOpenNewDeck,
   onGoHome,
-  currentView: _currentView,
+  currentView,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-[#F0EDF5] dark:border-slate-800 shadow-xs px-4 sm:px-8 py-3 transition-colors duration-300">
@@ -48,14 +50,14 @@ export const Navbar: React.FC<NavbarProps> = ({
           />
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-extrabold text-xl tracking-tight text-[#3A2D28] group-hover:text-[#F5A623] transition-colors">
+              <span className="font-extrabold text-xl tracking-tight text-[#3A2D28] dark:text-slate-100 group-hover:text-[#F5A623] transition-colors">
                 Learning<span className="text-[#FF708F]"> English</span>
               </span>
               <span className="text-[10px] uppercase tracking-wider font-black px-1.5 py-0.5 rounded-full bg-[#FFF0F5] text-[#FF4D80] border border-[#FFD0DE]">
                 PRO
               </span>
             </div>
-            <p className="text-[11px] font-semibold text-[#8C827A] hidden sm:block">
+            <p className="text-[11px] font-semibold text-[#8C827A] dark:text-slate-400 hidden sm:block">
               Học từ vựng thông minh theo Thời điểm vàng
             </p>
           </div>
@@ -63,14 +65,34 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Gamification Stats */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* Speaking Part 1, 2, 3 Button */}
+          <button
+            onClick={onOpenSpeaking}
+            title="Luyện nói phản xạ IELTS Speaking Part 1, Part 2, Part 3"
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full font-black text-xs shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer ${
+              currentView === 'roadmap'
+                ? 'bg-linear-to-r from-rose-500 via-amber-500 to-orange-500 text-white ring-2 ring-rose-400'
+                : 'bg-linear-to-r from-rose-500/90 to-amber-500/90 hover:from-rose-600 hover:to-amber-600 text-white'
+            }`}
+          >
+            <Mic className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">🎙️ Luyện Nói Part 1, 2, 3</span>
+            <span className="sm:hidden">🎙️ Luyện Nói</span>
+          </button>
+
           {/* Gemini AI Conversation Button */}
           <button
             onClick={onOpenAIChat}
             title="Trò chuyện và luyện tiếng Anh cùng Google Gemini AI"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-xs rounded-full shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer ring-2 ring-blue-400/40"
+            className={`flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full font-black text-xs shadow-xs transition-all hover:scale-105 active:scale-95 cursor-pointer ring-2 ring-blue-400/40 ${
+              currentView === 'ai-chat'
+                ? 'bg-linear-to-r from-blue-700 via-indigo-700 to-purple-700 text-white ring-2 ring-purple-400'
+                : 'bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white'
+            }`}
           >
             <Sparkles className="w-3.5 h-3.5 fill-blue-200" />
-            <span>💎 Chat Gemini AI</span>
+            <span className="hidden sm:inline">💎 Chat Gemini AI</span>
+            <span className="sm:hidden">💎 Gemini</span>
           </button>
 
           {/* Streak */}

@@ -23,11 +23,12 @@ import { YouTubeBackground } from './components/YouTubeBackground';
 import { AuthModal } from './components/AuthModal';
 import { WelcomeLoginScreen } from './components/WelcomeLoginScreen';
 import { GeminiFloatingWindow } from './components/GeminiFloatingWindow';
+import { RoadmapView } from './components/RoadmapView';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { cloudSync } from './utils/cloudSync';
 import { Heart } from 'lucide-react';
 
-type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-speaking' | 'study-mochi' | 'ai-chat';
+type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-speaking' | 'study-mochi' | 'ai-chat' | 'roadmap';
 
 export function App() {
   const [decks, setDecks] = useState<Deck[]>([]);
@@ -39,6 +40,7 @@ export function App() {
 
   // Views & Navigation
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
+  const [returnView, setReturnView] = useState<ViewMode>('dashboard');
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
   const [studyCards, setStudyCards] = useState<Card[]>([]);
   const [studyDeckTitle, setStudyDeckTitle] = useState('');
@@ -192,14 +194,14 @@ export function App() {
 
     const newStats = storage.recordReview(xpGained, updatedSessionCards.length);
     updateStats(newStats);
-    setCurrentView('dashboard');
+    setCurrentView(returnView);
   };
 
   // Finish quiz / typing / speaking study
   const handleFinishMiniStudy = (xpGained: number) => {
     const newStats = storage.recordReview(xpGained, studyCards.length);
     updateStats(newStats);
-    setCurrentView('dashboard');
+    setCurrentView(returnView);
   };
 
   // Import new deck handler
@@ -314,9 +316,13 @@ export function App() {
         settings={settings}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenSpeaking={() => {
+          soundManager.playClick();
+          setCurrentView('roadmap');
+        }}
         onOpenAIChat={() => {
           soundManager.playClick();
-          setIsGeminiWindowOpen(true);
+          setCurrentView('ai-chat');
         }}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
@@ -350,40 +356,50 @@ export function App() {
               onReviewLevel={handleReviewLevel}
             />
 
-            {/* Gemini AI Interactive Partner Banner */}
+            {/* IELTS Speaking & Gemini AI Interactive Partner Banner */}
             <div
-              onClick={() => {
-                soundManager.playClick();
-                setIsGeminiWindowOpen(true);
-              }}
-              className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white rounded-3xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 cursor-pointer flex flex-col sm:flex-row items-center justify-between gap-4 border border-blue-400/40 relative overflow-hidden group hover:scale-[1.01]"
+              className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white rounded-3xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-5 border border-blue-400/40 relative overflow-hidden group"
             >
               <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform" />
               <div className="flex items-center gap-4 relative z-10">
                 <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center text-3xl shrink-0 shadow-sm group-hover:rotate-6 transition-transform">
-                  💎
+                  🎙️
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-lg sm:text-xl font-black tracking-tight text-white">
-                      Trò Chuyện Cùng Google Gemini AI
+                      Luyện Nói Phản Xạ IELTS (Part 1, 2, 3) & Gemini AI
                     </h3>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 border border-white/40 text-blue-100">
-                      2.5 Flash
+                      Gojo Satoru AI
                     </span>
                   </div>
                   <p className="text-xs sm:text-sm text-blue-100/90 font-medium mt-1 max-w-xl leading-relaxed">
-                    Liên kết tài khoản Gemini của bạn để hỏi đáp ngữ pháp, tra từ vựng hoặc luyện giao tiếp phản xạ tiếng Anh 1-1 không giới hạn!
+                    Đầy đủ 10 Unit Speaking Part 1 (giáo trình F:\Speaking), Cue Cards Part 2 và thảo luận sâu Part 3. Luyện phát âm, chấm điểm Band và phản xạ trực tiếp cùng AI!
                   </p>
                 </div>
               </div>
 
-              <div className="relative z-10 w-full sm:w-auto">
+              <div className="relative z-10 flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
                 <button
                   type="button"
-                  className="w-full sm:w-auto px-6 py-3 bg-white text-blue-700 hover:bg-blue-50 font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+                  onClick={() => {
+                    soundManager.playClick();
+                    setCurrentView('roadmap');
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-3 bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <span>Mở Phòng Chat Gemini</span>
+                  <span>🗺️ Lộ Trình Part 1, 2, 3</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    soundManager.playClick();
+                    setCurrentView('ai-chat');
+                  }}
+                  className="flex-1 sm:flex-none px-4 py-3 bg-white text-blue-700 hover:bg-blue-50 font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                >
+                  <span>💎 Phòng Thi AI 1-1</span>
                   <span>➔</span>
                 </button>
               </div>
@@ -440,7 +456,7 @@ export function App() {
             deckTitle={studyDeckTitle}
             settings={settings}
             onFinishSession={handleFinishFlashcard}
-            onExit={() => setCurrentView('dashboard')}
+            onExit={() => setCurrentView(returnView)}
           />
         )}
 
@@ -452,7 +468,7 @@ export function App() {
             deckTitle={studyDeckTitle}
             settings={settings}
             onFinish={handleFinishMiniStudy}
-            onExit={() => setCurrentView('dashboard')}
+            onExit={() => setCurrentView(returnView)}
           />
         )}
 
@@ -463,7 +479,7 @@ export function App() {
             deckTitle={studyDeckTitle}
             settings={settings}
             onFinish={handleFinishMiniStudy}
-            onExit={() => setCurrentView('dashboard')}
+            onExit={() => setCurrentView(returnView)}
           />
         )}
 
@@ -474,7 +490,7 @@ export function App() {
             deckTitle={studyDeckTitle}
             settings={settings}
             onFinishSession={handleFinishMiniStudy}
-            onExit={() => setCurrentView('dashboard')}
+            onExit={() => setCurrentView(returnView)}
           />
         )}
 
@@ -494,7 +510,7 @@ export function App() {
               }
             }}
             onFinishSession={handleFinishFlashcard}
-            onExit={() => setCurrentView('dashboard')}
+            onExit={() => setCurrentView(returnView)}
           />
         )}
 
@@ -503,9 +519,34 @@ export function App() {
           <AIConversation
             settings={settings}
             onExit={() => setCurrentView('dashboard')}
+            onSwitchToRoadmap={() => setCurrentView('roadmap')}
             onRewardXP={(gained) => {
               const newStats = storage.recordReview(gained, 1);
-              setStats(newStats);
+              updateStats(newStats);
+            }}
+          />
+        )}
+
+        {/* VIEW 9: IELTS Speaking Roadmap (Part 1, 2, 3) */}
+        {currentView === 'roadmap' && (
+          <RoadmapView
+            settings={settings}
+            onBack={() => setCurrentView('dashboard')}
+            onSwitchToAIChat={() => setCurrentView('ai-chat')}
+            onStartStudy={(targetCards, title, mode) => {
+              setStudyCards(targetCards);
+              setStudyDeckTitle(title);
+              setActiveDeckId(null);
+              setReturnView('roadmap');
+              if (mode === 'mochi') setCurrentView('study-mochi');
+              else if (mode === 'flashcard') setCurrentView('study-flashcard');
+              else if (mode === 'quiz') setCurrentView('study-quiz');
+              else if (mode === 'typing') setCurrentView('study-typing');
+              else if (mode === 'speaking') setCurrentView('study-speaking');
+            }}
+            onRewardXP={(gained) => {
+              const newStats = storage.recordReview(gained, 1);
+              updateStats(newStats);
             }}
           />
         )}

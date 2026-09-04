@@ -34,12 +34,14 @@ interface AIConversationProps {
   settings: UserSettings;
   onExit: () => void;
   onRewardXP: (xp: number) => void;
+  onSwitchToRoadmap?: () => void;
 }
 
 export const AIConversation: React.FC<AIConversationProps> = ({
   settings,
   onExit,
   onRewardXP,
+  onSwitchToRoadmap,
 }) => {
   const [localSettings, setLocalSettings] = useState<UserSettings>(settings);
   const [apiKeyInput, setApiKeyInput] = useState(settings.geminiApiKey || '');
@@ -262,6 +264,34 @@ export const AIConversation: React.FC<AIConversationProps> = ({
     return (
       <div className="max-w-5xl w-full mx-auto space-y-6 pb-20 select-none animate-fadeIn">
         
+        {/* Navigation Header & Speaking Mode Switcher */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white/95 dark:bg-slate-900/95 rounded-2xl p-3.5 sm:p-4 border border-slate-200 dark:border-slate-800 shadow-xs backdrop-blur-md">
+          <button
+            onClick={onExit}
+            className="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-all cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Quay lại Trang Chủ</span>
+          </button>
+
+          {/* View Switcher: Roadmap vs AI Speaking Room */}
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+            {onSwitchToRoadmap && (
+              <button
+                onClick={onSwitchToRoadmap}
+                className="px-3.5 py-1.5 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700"
+              >
+                <span>🗺️ Bản Đồ Lộ Trình Part 1, 2, 3</span>
+              </button>
+            )}
+            <button
+              className="px-3.5 py-1.5 bg-linear-to-r from-blue-600 to-indigo-600 text-white rounded-lg text-xs font-black shadow-xs flex items-center gap-1.5"
+            >
+              <span>🎙️ Phòng Thi AI 1-1 (Part 1, 2, 3 & Gemini)</span>
+            </button>
+          </div>
+        </div>
+
         {/* Main Glassmorphic Wrapper */}
         <div className="bg-white/95 dark:bg-slate-900/95 rounded-3xl p-5 sm:p-7 border border-slate-200/90 dark:border-slate-800 shadow-xl backdrop-blur-md space-y-6">
           
