@@ -92,32 +92,21 @@ export function App() {
         setCurrentUser(userAcc);
         storage.setCurrentUser(userAcc);
 
-        // Sync user cards from cloud
+        // Sync user decks and cards strictly from cloud (no leaking across accounts)
+        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
+        const userDecks = cloudDecks || [];
+        setDecks(userDecks);
+        storage.saveDecks(userDecks);
+
         const cloudCards = await cloudSync.fetchUserCards(user.id);
-        if (cloudCards && cloudCards.length > 0) {
-          setCards(cloudCards);
-          storage.saveCards(cloudCards);
-        } else {
-          // New cloud user: seed initial cards to cloud
-          const currentCards = storage.getCards();
-          cloudSync.saveAllCards(user.id, currentCards);
-        }
+        const userCards = cloudCards || [];
+        setCards(userCards);
+        storage.saveCards(userCards);
 
         const cloudStats = await cloudSync.fetchUserStats(user.id);
-        if (cloudStats) {
-          setStats(cloudStats);
-          storage.saveStats(cloudStats);
-        } else {
-          cloudSync.saveUserStats(user.id, storage.getStats());
-        }
-
-        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
-        if (cloudDecks && cloudDecks.length > 0) {
-          setDecks(cloudDecks);
-          storage.saveDecks(cloudDecks);
-        } else {
-          cloudSync.saveAllDecks(user.id, storage.getDecks());
-        }
+        const userStats = cloudStats || storage.resetStatsToZero();
+        setStats(userStats);
+        storage.saveStats(userStats);
       }
     });
 
@@ -134,28 +123,29 @@ export function App() {
         setCurrentUser(userAcc);
         storage.setCurrentUser(userAcc);
 
+        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
+        const userDecks = cloudDecks || [];
+        setDecks(userDecks);
+        storage.saveDecks(userDecks);
+
         const cloudCards = await cloudSync.fetchUserCards(user.id);
-        if (cloudCards && cloudCards.length > 0) {
-          setCards(cloudCards);
-          storage.saveCards(cloudCards);
-        } else {
-          cloudSync.saveAllCards(user.id, storage.getCards());
-        }
+        const userCards = cloudCards || [];
+        setCards(userCards);
+        storage.saveCards(userCards);
 
         const cloudStats = await cloudSync.fetchUserStats(user.id);
-        if (cloudStats) {
-          setStats(cloudStats);
-          storage.saveStats(cloudStats);
-        }
-
-        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
-        if (cloudDecks && cloudDecks.length > 0) {
-          setDecks(cloudDecks);
-          storage.saveDecks(cloudDecks);
-        }
+        const userStats = cloudStats || storage.resetStatsToZero();
+        setStats(userStats);
+        storage.saveStats(userStats);
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         storage.setCurrentUser(null);
+        setDecks([]);
+        setCards([]);
+        storage.saveDecks([]);
+        storage.saveCards([]);
+        const zeroStats = storage.resetStatsToZero();
+        setStats(zeroStats);
       }
     });
 
@@ -343,6 +333,15 @@ export function App() {
     updateCards(cards.filter((c) => c.id !== cardId));
   };
 
+  // Clear all decks and cards completely
+  const handleClearAllDecks = () => {
+    if (window.confirm('Bạn có chắc chắn muốn XÓA TẤT CẢ các bộ thẻ và từ vựng hiện tại để làm mới hoàn toàn không?')) {
+      soundManager.playClick();
+      updateDecks([]);
+      updateCards([]);
+    }
+  };
+
   // Reset demo data
   const handleResetData = () => {
     storage.resetAllData();
@@ -469,6 +468,7 @@ export function App() {
                 setEditingDeck(deck);
                 setIsDeckModalOpen(true);
               }}
+              onClearAllDecks={handleClearAllDecks}
             />
           </div>
         )}

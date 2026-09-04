@@ -26,6 +26,7 @@ interface DeckListProps {
   onImportDeck: () => void;
   onDeleteDeck: (deckId: string) => void;
   onEditDeck: (deck: Deck) => void;
+  onClearAllDecks?: () => void;
 }
 
 export const DeckList: React.FC<DeckListProps> = ({
@@ -37,6 +38,7 @@ export const DeckList: React.FC<DeckListProps> = ({
   onImportDeck,
   onDeleteDeck,
   onEditDeck,
+  onClearAllDecks,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
@@ -90,6 +92,17 @@ export const DeckList: React.FC<DeckListProps> = ({
 
         {/* Buttons */}
         <div className="flex items-center gap-2.5 w-full sm:w-auto">
+          {decks.length > 0 && onClearAllDecks && (
+            <button
+              onClick={onClearAllDecks}
+              title="Xóa tất cả các bộ thẻ hiện tại để làm mới hoàn toàn"
+              className="px-3.5 py-2.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 font-bold text-xs sm:text-sm rounded-2xl shadow-xs transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Xóa Sạch Bộ Thẻ</span>
+            </button>
+          )}
+
           <button
             onClick={onImportDeck}
             className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white dark:bg-slate-800/90 hover:bg-slate-50 dark:hover:bg-slate-700 border border-[#DCD6E8] dark:border-slate-700 text-[#554640] dark:text-slate-200 font-bold text-sm rounded-2xl shadow-xs transition-all hover:scale-105 active:scale-95"

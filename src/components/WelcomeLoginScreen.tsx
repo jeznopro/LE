@@ -169,10 +169,18 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           createdAt: Date.now(),
         };
 
-        // Seed initial cards to cloud
-        cloudSync.saveAllCards(data.user.id, storage.getCards());
-        cloudSync.saveAllDecks(data.user.id, storage.getDecks());
-        cloudSync.saveUserStats(data.user.id, storage.getStats());
+        // New account starts completely fresh and empty (0 cards, 0 decks)
+        const emptyCards: any[] = [];
+        const emptyDecks: any[] = [];
+        const freshStats = storage.resetStatsToZero();
+
+        storage.saveCards(emptyCards);
+        storage.saveDecks(emptyDecks);
+        storage.saveStats(freshStats);
+
+        cloudSync.saveAllCards(data.user.id, emptyCards);
+        cloudSync.saveAllDecks(data.user.id, emptyDecks);
+        cloudSync.saveUserStats(data.user.id, freshStats);
 
         storage.setCurrentUser(newAcc);
         onLoginSuccess(newAcc);
