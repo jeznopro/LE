@@ -83,22 +83,6 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           createdAt: new Date(user.created_at).getTime(),
         };
 
-        // Sync user cards from cloud
-        const cloudCards = await cloudSync.fetchUserCards(user.id);
-        if (cloudCards && cloudCards.length > 0) {
-          storage.saveCards(cloudCards);
-        }
-
-        const cloudStats = await cloudSync.fetchUserStats(user.id);
-        if (cloudStats) {
-          storage.saveStats(cloudStats);
-        }
-
-        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
-        if (cloudDecks && cloudDecks.length > 0) {
-          storage.saveDecks(cloudDecks);
-        }
-
         storage.setCurrentUser(userAcc);
         onLoginSuccess(userAcc);
       }
@@ -170,18 +154,10 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
           createdAt: Date.now(),
         };
 
-        // New account starts completely fresh and empty (0 cards, 0 decks)
-        const emptyCards: any[] = [];
-        const emptyDecks: any[] = [];
-        const freshStats = storage.resetStatsToZero();
-
-        storage.saveCards(emptyCards);
-        storage.saveDecks(emptyDecks);
-        storage.saveStats(freshStats);
-
-        cloudSync.saveAllCards(data.user.id, emptyCards);
-        cloudSync.saveAllDecks(data.user.id, emptyDecks);
-        cloudSync.saveUserStats(data.user.id, freshStats);
+        // New account starts completely fresh and empty on this machine
+        storage.saveCardsForUser(data.user.id, []);
+        storage.saveDecksForUser(data.user.id, []);
+        storage.saveStatsForUser(data.user.id, storage.resetStatsToZero());
 
         storage.setCurrentUser(newAcc);
         onLoginSuccess(newAcc);

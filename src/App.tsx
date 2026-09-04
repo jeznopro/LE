@@ -92,21 +92,14 @@ export function App() {
         setCurrentUser(userAcc);
         storage.setCurrentUser(userAcc);
 
-        // Sync user decks and cards strictly from cloud (no leaking across accounts)
-        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
-        const userDecks = cloudDecks || [];
+        // Load user decks, cards, and stats strictly from this local machine
+        const userDecks = storage.getDecksForUser(user.id);
+        const userCards = storage.getCardsForUser(user.id);
+        const userStats = storage.getStatsForUser(user.id);
+
         setDecks(userDecks);
-        storage.saveDecks(userDecks);
-
-        const cloudCards = await cloudSync.fetchUserCards(user.id);
-        const userCards = cloudCards || [];
         setCards(userCards);
-        storage.saveCards(userCards);
-
-        const cloudStats = await cloudSync.fetchUserStats(user.id);
-        const userStats = cloudStats || storage.resetStatsToZero();
         setStats(userStats);
-        storage.saveStats(userStats);
       }
     });
 
@@ -123,29 +116,20 @@ export function App() {
         setCurrentUser(userAcc);
         storage.setCurrentUser(userAcc);
 
-        const cloudDecks = await cloudSync.fetchUserDecks(user.id);
-        const userDecks = cloudDecks || [];
+        // Load user decks, cards, and stats strictly from this local machine
+        const userDecks = storage.getDecksForUser(user.id);
+        const userCards = storage.getCardsForUser(user.id);
+        const userStats = storage.getStatsForUser(user.id);
+
         setDecks(userDecks);
-        storage.saveDecks(userDecks);
-
-        const cloudCards = await cloudSync.fetchUserCards(user.id);
-        const userCards = cloudCards || [];
         setCards(userCards);
-        storage.saveCards(userCards);
-
-        const cloudStats = await cloudSync.fetchUserStats(user.id);
-        const userStats = cloudStats || storage.resetStatsToZero();
         setStats(userStats);
-        storage.saveStats(userStats);
       } else if (event === 'SIGNED_OUT') {
         setCurrentUser(null);
         storage.setCurrentUser(null);
         setDecks([]);
         setCards([]);
-        storage.saveDecks([]);
-        storage.saveCards([]);
-        const zeroStats = storage.resetStatsToZero();
-        setStats(zeroStats);
+        setStats(storage.resetStatsToZero());
       }
     });
 
@@ -156,17 +140,28 @@ export function App() {
 
   const updateDecks = (newDecks: Deck[]) => {
     setDecks(newDecks);
-    storage.saveDecks(newDecks);
     if (currentUser) {
-      cloudSync.saveAllDecks(currentUser.id, newDecks);
+      storage.saveDecksForUser(currentUser.id, newDecks);
+    } else {
+      storage.saveDecks(newDecks);
     }
   };
 
   const updateCards = (newCards: Card[]) => {
     setCards(newCards);
-    storage.saveCards(newCards);
     if (currentUser) {
-      cloudSync.saveAllCards(currentUser.id, newCards);
+      storage.saveCardsForUser(currentUser.id, newCards);
+    } else {
+      storage.saveCards(newCards);
+    }
+  };
+
+  const updateStats = (newStats: UserStats) => {
+    setStats(newStats);
+    if (currentUser) {
+      storage.saveStatsForUser(currentUser.id, newStats);
+    } else {
+      storage.saveStats(newStats);
     }
   };
 
@@ -244,20 +239,14 @@ export function App() {
     updateCards(nextCards);
 
     const newStats = storage.recordReview(xpGained, updatedSessionCards.length);
-    setStats(newStats);
-    if (currentUser) {
-      cloudSync.saveUserStats(currentUser.id, newStats);
-    }
+    updateStats(newStats);
     setCurrentView('dashboard');
   };
 
   // Finish quiz / typing / speaking study
   const handleFinishMiniStudy = (xpGained: number) => {
     const newStats = storage.recordReview(xpGained, studyCards.length);
-    setStats(newStats);
-    if (currentUser) {
-      cloudSync.saveUserStats(currentUser.id, newStats);
-    }
+    updateStats(newStats);
     setCurrentView('dashboard');
   };
 

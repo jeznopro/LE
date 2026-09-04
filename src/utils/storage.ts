@@ -54,6 +54,20 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.DECKS, JSON.stringify(decks));
   },
 
+  getDecksForUser(userId: string): Deck[] {
+    try {
+      const data = localStorage.getItem(`mochi_user_decks_${userId}`);
+      if (!data) return [];
+      return JSON.parse(data);
+    } catch {
+      return [];
+    }
+  },
+
+  saveDecksForUser(userId: string, decks: Deck[]) {
+    localStorage.setItem(`mochi_user_decks_${userId}`, JSON.stringify(decks));
+  },
+
   getCards(): Card[] {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.CARDS);
@@ -69,6 +83,34 @@ export const storage = {
 
   saveCards(cards: Card[]) {
     localStorage.setItem(STORAGE_KEYS.CARDS, JSON.stringify(cards));
+  },
+
+  getCardsForUser(userId: string): Card[] {
+    try {
+      const data = localStorage.getItem(`mochi_user_cards_${userId}`);
+      if (!data) return [];
+      return JSON.parse(data);
+    } catch {
+      return [];
+    }
+  },
+
+  saveCardsForUser(userId: string, cards: Card[]) {
+    localStorage.setItem(`mochi_user_cards_${userId}`, JSON.stringify(cards));
+  },
+
+  getStatsForUser(userId: string): UserStats {
+    try {
+      const data = localStorage.getItem(`mochi_user_stats_${userId}`);
+      if (!data) return this.resetStatsToZero();
+      return JSON.parse(data);
+    } catch {
+      return this.resetStatsToZero();
+    }
+  },
+
+  saveStatsForUser(userId: string, stats: UserStats) {
+    localStorage.setItem(`mochi_user_stats_${userId}`, JSON.stringify(stats));
   },
 
   updateSingleCard(updatedCard: Card) {
