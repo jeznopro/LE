@@ -85,13 +85,22 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
   const cleanWord = (s: string) =>
     (s || '').trim().toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
 
-  // Initialize Letter Slots for "Điền từ" (Gõ nguyên từ với chữ mờ)
+  // Initialize Letter Slots for "Điền từ" (Chỉ hiện 1-2 chữ gợi ý mờ, người học tự gõ nguyên từ)
   const initLetterSlots = useCallback((targetWord: string) => {
     const letters = targetWord.split('');
+    const len = letters.length;
 
-    // Bỏ hoàn toàn chữ gợi ý sẵn - người học phải gõ nguyên cả từ từ đầu đến cuối
-    setRevealedIndices([]);
+    // Chọn 1-2 vị trí để hiển thị CHỮ GỢI Ý MỜ (như Hangman/Mochi)
+    const hints: number[] = [];
+    if (len >= 4) {
+      hints.push(Math.floor(len / 2));
+    }
+    if (len >= 6) {
+      hints.push(len - 1);
+    }
+    setRevealedIndices(hints);
 
+    // Người học phải gõ nguyên cả từ từ đầu đến cuối -> Toàn bộ ô đều trống!
     const initialUserLetters = letters.map((char) => {
       if (!/[a-zA-Z0-9]/.test(char)) return char;
       return '';
@@ -757,6 +766,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
               {userLetters.map((letter, idx) => {
                 const targetChar = cleanWord(currentCard.front)[idx] || '';
+                const isHint = revealedIndices.includes(idx);
                 const isActive = activeSlotIndex === idx;
 
                 return (
@@ -765,15 +775,20 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                     onClick={() => setActiveSlotIndex(idx)}
                     className="flex flex-col items-center cursor-pointer select-none group"
                   >
-                    {/* Letter Character or Ghost hint (Chữ mờ mờ) */}
+                    {/* Letter Character or Ghost hint (Chỉ hiện chữ mờ ở ô gợi ý) */}
                     <div className="w-8 sm:w-10 text-center text-xl sm:text-2xl font-black min-h-[36px] flex items-center justify-center">
                       {letter ? (
                         <span className="text-slate-900 dark:text-white transition-all transform scale-105">
                           {letter}
                         </span>
+                      ) : isHint ? (
+                        // Chỉ ô gợi ý mới hiện chữ mờ mờ
+                        <span className="text-slate-400/45 dark:text-slate-500/55 select-none transition-opacity font-black">
+                          {targetChar}
+                        </span>
                       ) : (
-                        // Chữ mờ gợi ý để người học nhìn theo và gõ nguyên toàn bộ từ
-                        <span className="text-slate-400/35 dark:text-slate-500/40 select-none transition-opacity font-extrabold">
+                        // Các ô khác để trống hoàn toàn (chỉ có gạch chân)
+                        <span className="opacity-0 select-none pointer-events-none">
                           {targetChar}
                         </span>
                       )}
@@ -786,6 +801,8 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                           ? 'bg-amber-500 dark:bg-amber-400 h-1.5 shadow-xs'
                           : letter
                           ? 'bg-slate-700 dark:bg-slate-300'
+                          : isHint
+                          ? 'bg-slate-400/60 dark:bg-slate-500/60'
                           : 'bg-slate-200 dark:bg-slate-700'
                       }`}
                     />
@@ -804,7 +821,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
-              Nhìn chữ mờ và gõ nguyên toàn bộ từ (Backspace để xóa)
+              Nhìn chữ gợi ý mờ và gõ nguyên toàn bộ từ (Backspace để xóa)
             </p>
 
             {/* Submit Button for Letter Slots (Only submits when full and Enter pressed) */}
