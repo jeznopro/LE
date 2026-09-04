@@ -85,29 +85,20 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
   const cleanWord = (s: string) =>
     (s || '').trim().toLowerCase().replace(/[^a-zA-Z0-9]/g, '');
 
-  // Initialize Letter Slots for "Điền từ"
+  // Initialize Letter Slots for "Điền từ" (Gõ nguyên từ với chữ mờ)
   const initLetterSlots = useCallback((targetWord: string) => {
     const letters = targetWord.split('');
-    const len = letters.length;
-    
-    // Pick 1-2 hint letters (middle and/or last like We Bare Bears / Mochi style)
-    const hints: number[] = [];
-    if (len >= 4) {
-      hints.push(Math.floor(len / 2));
-    }
-    if (len >= 6) {
-      hints.push(len - 1);
-    }
-    setRevealedIndices(hints);
 
-    const initialUserLetters = letters.map((char, idx) => {
-      if (hints.includes(idx)) return char.toLowerCase();
+    // Bỏ hoàn toàn chữ gợi ý sẵn - người học phải gõ nguyên cả từ từ đầu đến cuối
+    setRevealedIndices([]);
+
+    const initialUserLetters = letters.map((char) => {
       if (!/[a-zA-Z0-9]/.test(char)) return char;
       return '';
     });
     setUserLetters(initialUserLetters);
 
-    // Find first empty slot
+    // Con trỏ bắt đầu từ chữ cái đầu tiên (vị trí 0)
     const firstEmpty = initialUserLetters.findIndex((l) => l === '');
     setActiveSlotIndex(firstEmpty !== -1 ? firstEmpty : 0);
   }, []);
@@ -146,7 +137,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
     }
   }, [currentStep, showBottomSheet]);
 
-  // Keyboard handler for Letter Slots (Điền từ): Type letters, Backspace to erase, and ENTER to submit when full!
+  // Keyboard handler for Letter Slots (Gõ nguyên từ): Type letters, Backspace to erase, and ENTER to submit when full!
   useEffect(() => {
     if (currentStep !== 'slots' || showBottomSheet || isFinished || !currentCard) return;
 
@@ -163,7 +154,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
         return;
       }
 
-      // Handle letter key (a-z)
+      // Handle letter key (a-z, 0-9)
       if (/^[a-zA-Z0-9]$/.test(key)) {
         e.preventDefault();
         const nextLetters = [...userLetters];
@@ -171,49 +162,47 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
         setUserLetters(nextLetters);
         soundManager.playClick();
 
-        // Advance to next unfilled slot
-        let nextIdx = -1;
-        for (let i = activeSlotIndex + 1; i < nextLetters.length; i++) {
-          if (!revealedIndices.includes(i) && nextLetters[i] === '') {
-            nextIdx = i;
-            break;
-          }
+        // Advance to next slot
+        if (activeSlotIndex + 1 < nextLetters.length) {
+          setActiveSlotIndex(activeSlotIndex + 1);
         }
-        if (nextIdx === -1) {
-          for (let i = 0; i < activeSlotIndex; i++) {
-            if (!revealedIndices.includes(i) && nextLetters[i] === '') {
-              nextIdx = i;
-              break;
-            }
-          }
-        }
+        return;
+      }
 
-        if (nextIdx !== -1) {
-          setActiveSlotIndex(nextIdx);
-        }
-        // Do NOT auto-submit: User must press Enter when full!
-      } else if (key === 'Backspace') {
+      // Backspace handler
+      if (key === 'Backspace') {
         e.preventDefault();
         const nextLetters = [...userLetters];
-        if (!revealedIndices.includes(activeSlotIndex) && nextLetters[activeSlotIndex] !== '') {
+        if (nextLetters[activeSlotIndex] !== '') {
+          // Clear current slot
           nextLetters[activeSlotIndex] = '';
           setUserLetters(nextLetters);
-        } else {
-          for (let i = activeSlotIndex - 1; i >= 0; i--) {
-            if (!revealedIndices.includes(i)) {
-              nextLetters[i] = '';
-              setUserLetters(nextLetters);
-              setActiveSlotIndex(i);
-              break;
-            }
-          }
+        } else if (activeSlotIndex > 0) {
+          // Clear previous slot and move cursor back
+          nextLetters[activeSlotIndex - 1] = '';
+          setUserLetters(nextLetters);
+          setActiveSlotIndex(activeSlotIndex - 1);
         }
+        return;
+      }
+
+      // Arrow navigation
+      if (key === 'ArrowLeft') {
+        e.preventDefault();
+        if (activeSlotIndex > 0) setActiveSlotIndex(activeSlotIndex - 1);
+        return;
+      }
+
+      if (key === 'ArrowRight') {
+        e.preventDefault();
+        if (activeSlotIndex < userLetters.length - 1) setActiveSlotIndex(activeSlotIndex + 1);
+        return;
       }
     };
 
     window.addEventListener('keydown', handleSlotKeyDown);
     return () => window.removeEventListener('keydown', handleSlotKeyDown);
-  }, [currentStep, showBottomSheet, isFinished, userLetters, activeSlotIndex, revealedIndices, currentCard]);
+  }, [currentStep, showBottomSheet, isFinished, userLetters, activeSlotIndex, currentCard]);
 
   // Submit Dictation
   const handleDictationSubmit = (e: React.FormEvent) => {
@@ -767,30 +756,37 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
           <div className="max-w-md mx-auto p-6 sm:p-8 bg-white dark:bg-slate-900 rounded-3xl border-2 border-slate-200 dark:border-slate-700 shadow-xl space-y-3">
             <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
               {userLetters.map((letter, idx) => {
-                const isHint = revealedIndices.includes(idx);
+                const targetChar = cleanWord(currentCard.front)[idx] || '';
                 const isActive = activeSlotIndex === idx;
 
                 return (
                   <div
                     key={idx}
-                    onClick={() => {
-                      if (!isHint) setActiveSlotIndex(idx);
-                    }}
-                    className="flex flex-col items-center cursor-pointer select-none"
+                    onClick={() => setActiveSlotIndex(idx)}
+                    className="flex flex-col items-center cursor-pointer select-none group"
                   >
-                    {/* Letter Character or Empty */}
-                    <div className="w-8 sm:w-10 text-center text-xl sm:text-2xl font-black text-slate-900 dark:text-white min-h-[32px]">
-                      {letter ? letter : ''}
+                    {/* Letter Character or Ghost hint (Chữ mờ mờ) */}
+                    <div className="w-8 sm:w-10 text-center text-xl sm:text-2xl font-black min-h-[36px] flex items-center justify-center">
+                      {letter ? (
+                        <span className="text-slate-900 dark:text-white transition-all transform scale-105">
+                          {letter}
+                        </span>
+                      ) : (
+                        // Chữ mờ gợi ý để người học nhìn theo và gõ nguyên toàn bộ từ
+                        <span className="text-slate-400/35 dark:text-slate-500/40 select-none transition-opacity font-extrabold">
+                          {targetChar}
+                        </span>
+                      )}
                     </div>
 
                     {/* Underline Dash */}
                     <div
-                      className={`w-7 sm:w-9 h-1 rounded-full transition-colors ${
+                      className={`w-7 sm:w-9 h-1 rounded-full transition-all duration-200 ${
                         isActive
-                          ? 'bg-amber-500 dark:bg-amber-400'
+                          ? 'bg-amber-500 dark:bg-amber-400 h-1.5 shadow-xs'
                           : letter
                           ? 'bg-slate-700 dark:bg-slate-300'
-                          : 'bg-slate-300 dark:bg-slate-600'
+                          : 'bg-slate-200 dark:bg-slate-700'
                       }`}
                     />
 
@@ -807,12 +803,12 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
               })}
             </div>
 
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold pt-2">
-              Nhấn phím chữ cái để điền vào ô trống (Backspace để xóa)
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold pt-1">
+              Nhìn chữ mờ và gõ nguyên toàn bộ từ (Backspace để xóa)
             </p>
 
             {/* Submit Button for Letter Slots (Only submits when full and Enter pressed) */}
-            <div className="pt-3">
+            <div className="pt-2">
               {userLetters.every((l) => l !== '') ? (
                 <button
                   type="button"
@@ -822,8 +818,8 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                   Nộp Bài & Kiểm Tra (Enter) ➔
                 </button>
               ) : (
-                <div className="text-xs text-slate-400 dark:text-slate-500 font-bold py-2 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
-                  Điền đủ tất cả các ô chữ cái rồi nhấn <kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded font-mono font-black">Enter</kbd> để nộp bài
+                <div className="text-xs text-slate-400 dark:text-slate-500 font-bold py-2.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-700">
+                  Gõ đủ tất cả các chữ cái rồi nhấn <kbd className="px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 rounded font-mono font-black">Enter</kbd> để nộp bài
                 </div>
               )}
             </div>
