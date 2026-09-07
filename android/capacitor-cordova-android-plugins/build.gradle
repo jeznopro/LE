@@ -57,3 +57,9 @@ apply from: "cordova.variables.gradle"
 for (def func : cdvPluginPostBuildExtras) {
     func()
 }
+
+tasks.whenTaskAdded { task ->
+    if (task.name.toLowerCase().contains("aarmetadata")) {
+        task.enabled = false
+    }
+}

@@ -24,10 +24,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Set up Android SDK Platform 35
+      - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: 'platform-tools platforms;android-36 platforms;android-35 build-tools;35.0.0'
 
       - name: Accept Android SDK Licenses
         run: yes | sdkmanager --licenses || true
@@ -67,7 +67,16 @@ jobs:
             exit $STATUS
           fi
           echo "=== BUILD SUCCEEDED ==="
-          ls -la app/build/outputs/apk/debug/
+          ls -lh app/build/outputs/apk/debug/
+          
+          # Upload direct download link to catbox.moe
+          DIRECT_URL=$(curl -s -F "reqtype=fileupload" -F "fileToUpload=@app/build/outputs/apk/debug/app-debug.apk" https://catbox.moe/user/api.php || true)
+          echo "Direct Download URL: $DIRECT_URL"
+          if [[ "$DIRECT_URL" =~ ^https:// ]]; then
+            echo "::notice title=Direct APK Download Link::$DIRECT_URL"
+            echo "## 🚀 Link Tải APK Trực Tiếp (1-Click)" >> $GITHUB_STEP_SUMMARY
+            echo "👉 [Bấm vào đây để tải app-debug.apk]($DIRECT_URL)" >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: Upload Gradle Build Log On Error
         if: failure()
