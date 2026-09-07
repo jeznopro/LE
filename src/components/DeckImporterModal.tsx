@@ -181,13 +181,13 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
   const COLOR_OPTIONS = ['#FED770', '#FF8A8A', '#7BDCB5', '#A5D8FF', '#D0BFFF', '#FFA8A8'];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-y-auto border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 space-y-5 animate-scaleUp text-slate-800 dark:text-slate-100">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="liquid-glass-modal rounded-3xl w-full max-w-2xl max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-5 animate-scaleUp text-slate-800 dark:text-slate-100 shadow-2xl">
         
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-linear-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-xs">
+            <div className="w-11 h-11 rounded-2xl bg-linear-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-white shadow-lg shadow-amber-500/25">
               <UploadCloud className="w-6 h-6" />
             </div>
             <div>
@@ -202,7 +202,7 @@ export const DeckImporterModal: React.FC<DeckImporterModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+            className="liquid-glass-subtle p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl transition-all cursor-pointer hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>

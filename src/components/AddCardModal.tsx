@@ -83,15 +83,15 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn">
-      <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-lg max-h-[92vh] overflow-y-auto border border-slate-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 text-slate-800 dark:text-slate-100 animate-scaleUp">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="liquid-glass-modal rounded-3xl w-full max-w-lg max-h-[92vh] overflow-y-auto p-6 sm:p-8 text-slate-800 dark:text-slate-100 animate-scaleUp shadow-2xl">
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-xl font-black text-slate-900 dark:text-white">
             {editingCard ? 'Chỉnh Sửa Từ Vựng' : 'Thêm Từ Vựng Mới'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors cursor-pointer"
+            className="liquid-glass-subtle p-2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-xl transition-all cursor-pointer hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>
@@ -110,13 +110,13 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
                 value={front}
                 onChange={(e) => setFront(e.target.value)}
                 placeholder="Ví dụ: classroom, magnificent..."
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-800 dark:text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                className="liquid-glass-input w-full px-4 py-2.5 rounded-2xl text-sm font-bold"
               />
               <button
                 type="button"
                 onClick={handleTestTTS}
                 title="Nghe phát âm thử"
-                className="p-2.5 bg-amber-50 dark:bg-amber-950/60 hover:bg-amber-100 text-amber-700 dark:text-amber-400 rounded-2xl border border-amber-200 dark:border-amber-800 transition-transform active:scale-95 shrink-0 cursor-pointer"
+                className="liquid-glass-subtle p-2.5 text-amber-600 dark:text-amber-400 rounded-2xl transition-all active:scale-95 shrink-0 cursor-pointer hover:scale-105"
               >
                 <Volume2 className="w-5 h-5" />
               </button>
@@ -134,7 +134,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={back}
               onChange={(e) => setBack(e.target.value)}
               placeholder="Ví dụ: phòng học, lớp học"
-              className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-800 dark:text-slate-100 focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+              className="liquid-glass-input w-full px-4 py-2.5 rounded-2xl text-sm font-bold"
             />
           </div>
 
@@ -149,7 +149,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
                 value={phonetic}
                 onChange={(e) => setPhonetic(e.target.value)}
                 placeholder="Ví dụ: / 'klɑ:s.ru:m/"
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-mono text-slate-800 dark:text-slate-100"
+                className="liquid-glass-input w-full px-4 py-2.5 rounded-2xl text-sm font-mono"
               />
             </div>
 
@@ -160,15 +160,15 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               <select
                 value={partOfSpeech}
                 onChange={(e) => setPartOfSpeech(e.target.value)}
-                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-bold text-slate-700 dark:text-slate-200"
+                className="liquid-glass-input w-full px-4 py-2.5 rounded-2xl text-sm font-bold"
               >
-                <option value="noun">noun (Danh từ)</option>
-                <option value="verb">verb (Động từ)</option>
-                <option value="adjective">adjective (Tính từ)</option>
-                <option value="adverb">adverb (Trạng từ)</option>
-                <option value="preposition">preposition (Giới từ)</option>
-                <option value="phrase">phrase (Cụm từ)</option>
-                <option value="idiom">idiom (Thành ngữ)</option>
+                <option value="noun" className="bg-slate-900 text-white">noun (Danh từ)</option>
+                <option value="verb" className="bg-slate-900 text-white">verb (Động từ)</option>
+                <option value="adjective" className="bg-slate-900 text-white">adjective (Tính từ)</option>
+                <option value="adverb" className="bg-slate-900 text-white">adverb (Trạng từ)</option>
+                <option value="preposition" className="bg-slate-900 text-white">preposition (Giới từ)</option>
+                <option value="phrase" className="bg-slate-900 text-white">phrase (Cụm từ)</option>
+                <option value="idiom" className="bg-slate-900 text-white">idiom (Thành ngữ)</option>
               </select>
             </div>
           </div>
@@ -183,7 +183,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={example}
               onChange={(e) => setExample(e.target.value)}
               placeholder="Ví dụ: The students entered the classroom quietly..."
-              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-medium text-slate-800 dark:text-slate-100"
+              className="liquid-glass-input w-full px-4 py-2 rounded-2xl text-xs font-medium"
             />
           </div>
 
@@ -197,7 +197,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={exampleMeaning}
               onChange={(e) => setExampleMeaning(e.target.value)}
               placeholder="Ví dụ: Học sinh bước vào lớp học một cách trật tự..."
-              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-medium text-slate-800 dark:text-slate-100"
+              className="liquid-glass-input w-full px-4 py-2 rounded-2xl text-xs font-medium"
             />
           </div>
 
@@ -212,7 +212,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={image}
               onChange={(e) => setImage(e.target.value)}
               placeholder="https://images.unsplash.com/..."
-              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-mono text-slate-800 dark:text-slate-100"
+              className="liquid-glass-input w-full px-4 py-2 rounded-2xl text-xs font-mono"
             />
           </div>
 
@@ -227,7 +227,7 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={relatedWords}
               onChange={(e) => setRelatedWords(e.target.value)}
               placeholder="Ví dụ: classmate, teacher, desk, school"
-              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-medium text-purple-700 dark:text-purple-300 bg-purple-50/40 dark:bg-purple-950/30"
+              className="liquid-glass-input w-full px-4 py-2 rounded-2xl text-xs font-medium text-purple-700 dark:text-purple-300"
             />
           </div>
 
@@ -241,21 +241,21 @@ export const AddCardModal: React.FC<AddCardModalProps> = ({
               value={hint}
               onChange={(e) => setHint(e.target.value)}
               placeholder="Ví dụ: Class (lớp) + Room (phòng) = Phòng học"
-              className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-xs font-medium text-slate-800 dark:text-slate-100"
+              className="liquid-glass-input w-full px-4 py-2 rounded-2xl text-xs font-medium"
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 pt-3">
+          <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/40 dark:border-white/10">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs rounded-2xl cursor-pointer"
+              className="liquid-glass-pill px-4 py-2.5 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer hover:scale-105"
             >
               Hủy
             </button>
             <button
               type="submit"
-              className="px-6 py-2.5 bg-linear-to-r from-[#FFD13B] to-[#FFAA00] hover:from-[#FFC61A] text-[#4A3200] font-black text-sm rounded-2xl shadow-sm hover:shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer"
+              className="liquid-glass-pill px-6 py-2.5 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-sm shadow-lg shadow-amber-500/20 cursor-pointer hover:scale-105 active:scale-95"
             >
               {editingCard ? 'Cập Nhật' : 'Lưu Từ Vựng'}
             </button>

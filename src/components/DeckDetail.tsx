@@ -63,7 +63,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800/90 hover:bg-slate-50 border border-slate-200 text-slate-700 font-bold text-sm rounded-2xl shadow-2xs transition-all hover:scale-105 active:scale-95"
+          className="liquid-glass-pill flex items-center gap-2 px-4 py-2 text-slate-700 dark:text-slate-200 font-bold text-sm hover:scale-105 active:scale-95 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Quay lại danh sách</span>
@@ -71,7 +71,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 
         <button
           onClick={() => onAddCard(deck.id)}
-          className="flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-[#FFD13B] to-[#FFAA00] hover:from-[#FFC61A] hover:to-[#E69900] text-[#4A3200] font-black text-sm rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95"
+          className="liquid-glass-pill flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-amber-950 font-black text-sm shadow-lg shadow-amber-500/20 hover:scale-105 active:scale-95 cursor-pointer"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
           <span>Thêm Từ Mới</span>
@@ -79,11 +79,11 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       </div>
 
       {/* Deck Hero Banner */}
-      <div className="bg-white dark:bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-[#E9E4F0] dark:border-slate-800 shadow-xs relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center gap-4">
+      <div className="liquid-glass-card rounded-3xl p-6 sm:p-8 relative overflow-hidden flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center gap-5 relative z-10">
           <div
-            className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-4xl shadow-sm"
-            style={{ backgroundColor: `${deck.color || '#FED770'}33` }}
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl flex items-center justify-center text-4xl shadow-inner border border-white/40 dark:border-white/10 shrink-0"
+            style={{ backgroundColor: `${deck.color || '#FED770'}40` }}
           >
             {deck.emoji || '📚'}
           </div>
@@ -95,11 +95,11 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
               {deck.description || 'Bộ thẻ học từ vựng'}
             </p>
             <div className="flex items-center gap-3 mt-2.5">
-              <span className="text-xs font-black px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-slate-700 dark:text-slate-300">
+              <span className="liquid-glass-pill text-xs font-black px-3 py-1 text-slate-700 dark:text-slate-300">
                 {deckCards.length} từ vựng
               </span>
               {dueCards.length > 0 && (
-                <span className="text-xs font-black px-3 py-1 bg-rose-100 dark:bg-rose-950/60 rounded-full text-rose-600 dark:text-rose-300 animate-mochi-pulse">
+                <span className="liquid-glass-pill text-xs font-black px-3 py-1 text-rose-600 dark:text-rose-400 bg-rose-500/15 border-rose-400/30 animate-mochi-pulse">
                   {dueCards.length} từ cần ôn tập ngay
                 </span>
               )}
@@ -108,10 +108,10 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
         </div>
 
         {/* Start Study Big Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto">
+        <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto relative z-10">
           <button
             onClick={() => onStartStudy(deck.id, 'mochi')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-linear-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:to-orange-600 text-white font-black text-sm sm:text-base rounded-2xl shadow-md hover:shadow-lg transition-all hover:scale-105 active:scale-95 cursor-pointer ring-2 ring-amber-400/60 drop-shadow-xs"
+            className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-6 py-3.5 bg-linear-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <span className="text-xl">🐻</span>
             <span>Học We Bare Bears (3 Bước)</span>
@@ -119,7 +119,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 
           <button
             onClick={() => onStartStudy(deck.id, 'quiz')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-linear-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-black text-sm sm:text-base rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 cursor-pointer ring-2 ring-purple-400/50"
+            className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-linear-to-r from-purple-500 to-indigo-600 hover:from-purple-400 hover:to-indigo-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg shadow-indigo-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <span className="text-xl">🎯</span>
             <span>Trắc Nghiệm</span>
@@ -127,15 +127,15 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 
           <button
             onClick={() => onStartStudy(deck.id, 'flashcard')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-linear-to-r from-[#FED770] to-[#FFB703] hover:from-[#FFCA3A] hover:to-[#FB8500] text-[#543800] font-black text-sm sm:text-base rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-linear-to-r from-amber-300 to-amber-400 hover:from-amber-200 hover:to-amber-300 text-amber-950 font-black text-sm sm:text-base rounded-2xl shadow-md shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
-            <Play className="w-5 h-5 fill-[#543800]" />
+            <Play className="w-5 h-5 fill-amber-950" />
             <span>Lật Thẻ SRS</span>
           </button>
 
           <button
             onClick={() => onStartStudy(deck.id, 'speaking')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3.5 bg-cyan-50 dark:bg-cyan-950/60 hover:bg-cyan-100 dark:hover:bg-cyan-900/60 text-cyan-700 dark:text-cyan-300 font-black text-sm rounded-2xl border-2 border-cyan-300 dark:border-cyan-700 shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 border border-cyan-400/30 font-black text-sm rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
           >
             <Mic className="w-5 h-5" />
             <span>Phát Âm AI</span>
@@ -144,7 +144,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       </div>
 
       {/* Search & Filter bar */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-slate-900/90 p-4 rounded-2xl border border-[#E9E4F0] dark:border-slate-800 shadow-2xs">
+      <div className="liquid-glass-subtle flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-3xl">
         <div className="relative w-full sm:w-64">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
@@ -152,7 +152,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Tìm kiếm từ trong bộ này..."
-            className="w-full pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl text-xs font-semibold focus:outline-hidden focus:border-amber-400"
+            className="liquid-glass-input w-full pl-9 pr-4 py-2 text-xs font-semibold rounded-2xl"
           />
         </div>
 
@@ -160,10 +160,10 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
         <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
           <button
             onClick={() => setSelectedLevel('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedLevel === 'all'
-                ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 shadow-xs'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200'
+                ? 'liquid-glass-pill shadow-xs ring-2 ring-amber-400/40 text-slate-900 dark:text-white font-black'
+                : 'liquid-glass-subtle text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             Tất cả ({deckCards.length})
@@ -178,10 +178,10 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
               <button
                 key={lvl}
                 onClick={() => setSelectedLevel(lvl)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 ${
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
                   isSelected
-                    ? 'shadow-xs ring-2 ring-offset-1'
-                    : 'opacity-80 hover:opacity-100'
+                    ? 'shadow-md ring-2 ring-white/60 dark:ring-white/20'
+                    : 'opacity-80 hover:opacity-100 hover:scale-105'
                 }`}
                 style={{
                   backgroundColor: isSelected ? info.color : info.bg,
@@ -199,7 +199,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 
       {/* Cards List */}
       {filteredCards.length === 0 ? (
-        <div className="text-center py-16 bg-white dark:bg-slate-900/90 rounded-3xl border border-dashed border-[#DDD6EB] dark:border-slate-800 p-8">
+        <div className="liquid-glass-card text-center py-16 rounded-3xl p-8">
           <div className="text-4xl mb-2">🔍</div>
           <p className="font-bold text-slate-700 dark:text-slate-300">Không tìm thấy từ vựng nào phù hợp bộ lọc.</p>
         </div>
@@ -212,7 +212,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
             return (
               <div
                 key={card.id}
-                className="bg-white dark:bg-slate-900/90 rounded-2xl border border-[#E9E4F0] dark:border-slate-800 p-4 sm:p-5 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between group"
+                className="liquid-glass-card rounded-3xl p-4 sm:p-5 flex flex-col justify-between group transition-all duration-300 hover:scale-[1.01]"
               >
                 <div>
                   <div className="flex items-start justify-between gap-2">
@@ -224,20 +224,20 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                       <button
                         onClick={(e) => handleSpeak(card.front, e)}
                         title="Phát âm từ này"
-                        className="p-1.5 text-slate-400 hover:text-[#F59F00] hover:bg-[#FFF9DB] dark:hover:bg-slate-800 rounded-xl transition-colors"
+                        className="liquid-glass-subtle p-1.5 text-slate-500 hover:text-amber-500 rounded-xl transition-all hover:scale-110 cursor-pointer"
                       >
                         <Volume2 className="w-4 h-4" />
                       </button>
 
                       {card.partOfSpeech && (
-                        <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-purple-300">
+                        <span className="liquid-glass-subtle text-[11px] font-bold px-2 py-0.5 rounded-lg text-slate-600 dark:text-purple-300">
                           {card.partOfSpeech}
                         </span>
                       )}
                     </div>
 
                     <div
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black border shrink-0"
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-black border shrink-0 backdrop-blur-md"
                       style={{
                         backgroundColor: lvlInfo.bg,
                         color: lvlInfo.color,
@@ -255,13 +255,13 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                     </div>
                   )}
 
-                  <div className="font-bold text-sm sm:text-base text-[#1E293B] dark:text-amber-200 mt-2.5 bg-[#FAF9FD] dark:bg-slate-800/80 p-2.5 rounded-xl border border-[#F0EDF5] dark:border-slate-700">
+                  <div className="liquid-glass-subtle font-bold text-sm sm:text-base text-slate-800 dark:text-amber-100 mt-2.5 p-2.5 rounded-2xl border border-white/40 dark:border-white/10">
                     {card.back}
                   </div>
 
                   {card.example && (
-                    <div className="mt-2.5 text-xs text-slate-600 dark:text-slate-300 italic bg-amber-50/50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-amber-100 dark:border-slate-700">
-                      <div className="font-medium text-slate-700 dark:text-slate-200">&ldquo;{card.example}&rdquo;</div>
+                    <div className="mt-2.5 text-xs text-slate-600 dark:text-slate-300 italic bg-amber-500/10 dark:bg-amber-400/10 backdrop-blur-md p-2.5 rounded-2xl border border-amber-300/20 dark:border-amber-400/20">
+                      <div className="font-medium text-slate-800 dark:text-slate-200">&ldquo;{card.example}&rdquo;</div>
                       {card.exampleMeaning && (
                         <div className="text-slate-500 dark:text-slate-400 not-italic mt-0.5">
                           👉 {card.exampleMeaning}
@@ -271,7 +271,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   )}
 
                   {card.image && (
-                    <div className="mt-2.5 rounded-xl overflow-hidden max-h-36 border border-slate-200 dark:border-slate-700 bg-slate-100">
+                    <div className="mt-2.5 rounded-2xl overflow-hidden max-h-36 border border-white/30 dark:border-white/10 bg-slate-900/10 dark:bg-black/20">
                       <img
                         src={card.image}
                         alt={card.front}
@@ -285,18 +285,18 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   )}
 
                   {card.relatedWords && (
-                    <div className="mt-2 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/40 px-2.5 py-1 rounded-xl border border-purple-200 dark:border-purple-800">
+                    <div className="mt-2 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-400/10 backdrop-blur-md px-2.5 py-1 rounded-xl border border-purple-300/20 dark:border-purple-800/30">
                       🔗 <span className="font-bold">Từ liên quan:</span> {card.relatedWords}
                     </div>
                   )}
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+                <div className="mt-4 pt-3 border-t border-white/40 dark:border-white/10 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-slate-400" />
                     <span>
                       {isDue ? (
-                        <strong className="text-rose-600">Đến hạn ôn tập</strong>
+                        <strong className="text-rose-500 font-bold">Đến hạn ôn tập</strong>
                       ) : (
                         `Ôn lại sau: ${formatIntervalPreview(card.interval || 1)}`
                       )}
@@ -307,14 +307,14 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                     <button
                       onClick={() => onEditCard(card)}
                       title="Sửa từ"
-                      className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                      className="liquid-glass-subtle p-1.5 text-slate-500 hover:text-slate-900 dark:hover:text-white rounded-xl transition-all hover:scale-110 cursor-pointer"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => onDeleteCard(card.id)}
                       title="Xóa từ"
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                      className="liquid-glass-subtle p-1.5 text-slate-500 hover:text-rose-500 rounded-xl transition-all hover:scale-110 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>

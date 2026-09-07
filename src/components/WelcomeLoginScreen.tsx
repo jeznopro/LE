@@ -150,11 +150,11 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
 
       {/* Brand Header */}
       <div className="text-center mb-6 z-10 animate-fadeIn">
-        <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-2xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-md border border-slate-200/80 dark:border-slate-700 mb-3">
+        <div className="liquid-glass-pill inline-flex items-center gap-2.5 px-4 py-2 mb-3 shadow-lg shadow-black/5">
           <img
             src="./gojo.png"
             alt="Gojo Logo"
-            className="w-8 h-8 rounded-xl object-cover border border-amber-300"
+            className="w-8 h-8 rounded-xl object-cover border border-amber-300 shadow-xs"
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
@@ -172,11 +172,11 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       </div>
 
       {/* Main Card Container */}
-      <div className="w-full max-w-xl bg-white/95 dark:bg-slate-900/95 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-700/80 backdrop-blur-xl p-6 sm:p-8 z-10 animate-scaleUp">
+      <div className="w-full max-w-xl liquid-glass-modal rounded-3xl p-6 sm:p-8 z-10 animate-scaleUp shadow-2xl">
         {/* VIEW 1: Profile Selector (When profiles already exist) */}
         {!isCreating && users.length > 0 && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+            <div className="flex items-center justify-between border-b border-white/40 dark:border-white/10 pb-4">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-rose-500" />
                 <h2 className="text-lg font-black text-slate-800 dark:text-white">
@@ -188,7 +188,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                   soundManager.playClick();
                   setIsCreating(true);
                 }}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/50 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-xl border border-rose-200 dark:border-rose-900/40 transition-all active:scale-95 cursor-pointer"
+                className="liquid-glass-pill flex items-center gap-1.5 px-3.5 py-1.5 bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-400/30 transition-all active:scale-95 cursor-pointer"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span>+ Thêm Hồ Sơ Mới</span>
@@ -196,7 +196,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             </div>
 
             {/* Profile Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3.5">
               {users.map((u) => {
                 const userCards = storage.getCardsForUser(u.id);
                 const userStats = storage.getStatsForUser(u.id);
@@ -205,19 +205,19 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                   <div
                     key={u.id}
                     onClick={() => handleSelectUser(u)}
-                    className="group relative p-4 rounded-2xl border-2 border-slate-200 dark:border-slate-700/80 bg-slate-50 dark:bg-slate-800/60 hover:border-rose-500 dark:hover:border-rose-400 hover:bg-white dark:hover:bg-slate-800 transition-all hover:scale-[1.03] hover:shadow-lg cursor-pointer flex flex-col items-center text-center select-none"
+                    className="group relative p-4 rounded-3xl liquid-glass-subtle hover:border-rose-500/50 hover:bg-white/40 dark:hover:bg-slate-800/60 transition-all duration-300 hover:scale-[1.03] hover:shadow-xl cursor-pointer flex flex-col items-center text-center select-none"
                   >
                     {/* Delete button (hover) */}
                     <button
                       onClick={(e) => handleDeleteUser(e, u)}
                       title="Xóa hồ sơ này khỏi máy"
-                      className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                      className="absolute top-2 right-2 p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-500/15 rounded-xl transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
 
                     {/* Avatar with glow */}
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden bg-white dark:bg-slate-800 shadow-md border-2 border-white dark:border-slate-700 flex items-center justify-center mb-2.5 group-hover:border-rose-400 transition-colors">
+                    <div className="w-16 h-16 rounded-2xl overflow-hidden liquid-glass-subtle shadow-inner border border-white/40 dark:border-white/10 flex items-center justify-center mb-2.5 group-hover:border-rose-400/80 transition-colors">
                       {u.avatar.startsWith('.') || u.avatar.startsWith('/') || u.avatar.startsWith('http') ? (
                         <img
                           src={u.avatar.startsWith('/') ? '.' + u.avatar : u.avatar}
@@ -233,7 +233,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                     </div>
 
                     {/* Name */}
-                    <div className="font-extrabold text-sm text-slate-800 dark:text-slate-100 group-hover:text-rose-600 dark:group-hover:text-rose-400 truncate max-w-full">
+                    <div className="font-extrabold text-sm text-slate-800 dark:text-slate-100 group-hover:text-rose-500 dark:group-hover:text-rose-400 truncate max-w-full">
                       {u.username}
                     </div>
 
@@ -253,11 +253,11 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             </div>
 
             {/* Bottom Actions: Backup / Import */}
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div className="pt-4 border-t border-white/40 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-xl transition-all cursor-pointer"
+                className="liquid-glass-pill w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-2.5 text-slate-700 dark:text-slate-200 font-bold transition-all cursor-pointer hover:scale-105"
               >
                 <FileUp className="w-4 h-4 text-indigo-500" />
                 <span>Nhập File Sao Lưu (.json)</span>
@@ -280,7 +280,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
         {/* VIEW 2: Profile Creator (When creating or no profiles exist) */}
         {isCreating && (
           <form onSubmit={handleCreateProfile} className="space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center justify-between border-b border-white/40 dark:border-white/10 pb-3">
               <div className="flex items-center gap-2">
                 <UserPlus className="w-5 h-5 text-rose-500" />
                 <h2 className="text-lg font-black text-slate-800 dark:text-white">
@@ -294,7 +294,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                     soundManager.playClick();
                     setIsCreating(false);
                   }}
-                  className="text-xs font-bold text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 cursor-pointer"
+                  className="liquid-glass-pill text-xs font-bold text-slate-600 dark:text-slate-300 px-3 py-1 cursor-pointer hover:scale-105"
                 >
                   ← Quay lại
                 </button>
@@ -302,14 +302,14 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             </div>
 
             {error && (
-              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-300 text-xs font-bold border border-rose-200 dark:border-rose-900">
+              <div className="p-3 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-300 text-xs font-bold border border-rose-400/30">
                 {error}
               </div>
             )}
 
             {/* Input Name */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider">
+              <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                 Tên Người Học / Biệt Danh: *
               </label>
               <input
@@ -318,13 +318,13 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Ví dụ: Triết, Học Viên IELTS, Bé Bắp..."
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-2xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 text-slate-800 dark:text-slate-100"
+                className="liquid-glass-input w-full px-4 py-3 rounded-2xl text-sm font-semibold"
               />
             </div>
 
             {/* Choose Avatar */}
             <div className="space-y-2">
-              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider">
+              <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">
                 Chọn Ảnh Đại Diện (Avatar):
               </label>
               <div className="grid grid-cols-5 gap-2">
@@ -338,10 +338,10 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                         soundManager.playClick();
                         setSelectedAvatar(av.isImg ? av.src! : av.emoji!);
                       }}
-                      className={`h-14 rounded-2xl border-2 flex items-center justify-center transition-all hover:scale-105 relative cursor-pointer ${
+                      className={`h-14 rounded-2xl flex items-center justify-center transition-all hover:scale-105 relative cursor-pointer ${
                         isSelected
-                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/40 scale-105 shadow-md'
-                          : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800'
+                          ? 'border-2 border-rose-500 bg-rose-500/20 scale-105 shadow-lg shadow-rose-500/25'
+                          : 'liquid-glass-subtle'
                       }`}
                     >
                       {av.isImg ? (
@@ -369,7 +369,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
 
             {/* Optional PIN */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider flex items-center justify-between">
+              <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center justify-between">
                 <span>Mã PIN 4 Số (Tùy Chọn):</span>
                 <span className="text-[10px] text-slate-400 font-normal">Để bảo mật nếu dùng chung máy tính</span>
               </label>
@@ -381,13 +381,13 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                   value={newPin}
                   onChange={(e) => setNewPin(e.target.value)}
                   placeholder="Để trống nếu không cần mã khóa"
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 text-slate-800 dark:text-slate-100"
+                  className="liquid-glass-input w-full pl-10 pr-4 py-2.5 rounded-xl text-sm font-semibold"
                 />
               </div>
             </div>
 
             {/* Sample Deck Checkbox */}
-            <label className="flex items-start gap-2.5 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 cursor-pointer">
+            <label className="liquid-glass-subtle flex items-start gap-2.5 p-3 rounded-2xl cursor-pointer">
               <input
                 type="checkbox"
                 checked={seedSampleCards}
@@ -407,7 +407,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3.5 bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-sm rounded-2xl shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
+              className="liquid-glass-pill w-full py-3.5 bg-linear-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-rose-500/25 transition-all active:scale-95 flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Hoàn Tất & Bắt Đầu Học Ngay</span>
               <ArrowRight className="w-4 h-4" />
@@ -437,17 +437,17 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
 
       {/* Feature Highlights Footer */}
       <div className="mt-8 grid grid-cols-3 gap-3 sm:gap-6 max-w-xl w-full text-center z-10 animate-fadeIn">
-        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+        <div className="p-3.5 rounded-2xl liquid-glass-subtle">
           <Brain className="w-5 h-5 text-rose-500 mx-auto mb-1" />
           <div className="text-xs font-black text-slate-800 dark:text-slate-100">SRS 5 Cấp Độ</div>
           <div className="text-[10px] text-slate-400">Thời điểm vàng</div>
         </div>
-        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+        <div className="p-3.5 rounded-2xl liquid-glass-subtle">
           <Laptop className="w-5 h-5 text-indigo-500 mx-auto mb-1" />
           <div className="text-xs font-black text-slate-800 dark:text-slate-100">Lưu Trữ Cục Bộ</div>
           <div className="text-[10px] text-slate-400">0đ chi phí máy chủ</div>
         </div>
-        <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-slate-200/60 dark:border-slate-800 backdrop-blur-md">
+        <div className="p-3.5 rounded-2xl liquid-glass-subtle">
           <ShieldCheck className="w-5 h-5 text-emerald-500 mx-auto mb-1" />
           <div className="text-xs font-black text-slate-800 dark:text-slate-100">Riêng Tư 100%</div>
           <div className="text-[10px] text-slate-400">Không lo lộ dữ liệu</div>
@@ -457,15 +457,15 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       {/* PIN Prompt Modal */}
       {pinTargetUser && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn"
           onClick={() => setPinTargetUser(null)}
         >
           <div
-            className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-4 animate-scaleUp text-slate-800 dark:text-slate-100"
+            className="liquid-glass-modal rounded-3xl w-full max-w-sm p-6 shadow-2xl space-y-4 animate-scaleUp text-slate-800 dark:text-slate-100"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-amber-100 dark:bg-amber-950/50 text-amber-600 rounded-2xl">
+              <div className="p-3 bg-amber-500/20 text-amber-500 rounded-2xl border border-amber-400/30">
                 <KeyRound className="w-6 h-6" />
               </div>
               <div>
@@ -475,7 +475,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
             </div>
 
             {pinError && (
-              <div className="p-2.5 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold">
+              <div className="p-2.5 rounded-xl bg-rose-500/15 text-rose-600 dark:text-rose-300 text-xs font-bold border border-rose-400/30">
                 {pinError}
               </div>
             )}
@@ -489,20 +489,20 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
                 value={enteredPin}
                 onChange={(e) => setEnteredPin(e.target.value)}
                 placeholder="Nhập mã PIN..."
-                className="w-full text-center tracking-widest text-xl px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-2xl font-bold focus:outline-hidden focus:border-rose-500"
+                className="liquid-glass-input w-full text-center tracking-widest text-xl px-4 py-3 rounded-2xl font-bold"
               />
 
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPinTargetUser(null)}
-                  className="flex-1 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl cursor-pointer"
+                  className="liquid-glass-pill flex-1 py-2.5 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl cursor-pointer"
                 >
                   Hủy
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2.5 bg-rose-500 text-white font-black text-xs rounded-xl shadow-md cursor-pointer"
+                  className="liquid-glass-pill flex-1 py-2.5 bg-rose-500 hover:bg-rose-600 text-white font-black text-xs rounded-xl shadow-lg shadow-rose-500/25 cursor-pointer"
                 >
                   Mở Khóa 🔓
                 </button>

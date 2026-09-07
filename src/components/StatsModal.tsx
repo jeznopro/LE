@@ -30,11 +30,11 @@ export const StatsModal: React.FC<StatsModalProps> = ({
   const masteryPercentage = totalCards > 0 ? Math.round((deepMemoryCount / totalCards) * 100) : 0;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-      <div className="bg-white dark:bg-slate-800/95 rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto border border-[#E9E4F0] dark:border-slate-700 shadow-2xl p-6 sm:p-8 space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="liquid-glass-modal rounded-3xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 animate-scaleUp shadow-2xl">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-700 dark:text-indigo-300">
+            <div className="w-10 h-10 rounded-2xl liquid-glass-subtle flex items-center justify-center text-indigo-500 dark:text-indigo-300 shadow-inner">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
@@ -49,7 +49,7 @@ export const StatsModal: React.FC<StatsModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-xl transition-colors"
+            className="liquid-glass-subtle p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl transition-all cursor-pointer hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>
@@ -57,33 +57,33 @@ export const StatsModal: React.FC<StatsModalProps> = ({
 
         {/* Top Highlight Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="p-3.5 bg-[#FFF4E5] dark:bg-[#FFF4E5]/10 border border-[#FFD8A8] dark:border-transparent rounded-2xl text-center">
-            <Flame className="w-5 h-5 text-[#F76707] mx-auto fill-[#FFA94D] mb-1 animate-mochi-pulse" />
-            <div className="text-xl font-black text-[#D9480F] dark:text-[#FFA94D]">{stats.streak} ngày</div>
-            <div className="text-[11px] font-bold text-[#E8590C] dark:text-[#FFC078]">Chuỗi học liên tục</div>
+          <div className="p-3.5 liquid-glass-subtle rounded-2xl text-center border-amber-500/20">
+            <Flame className="w-5 h-5 text-amber-500 mx-auto mb-1 animate-mochi-pulse" />
+            <div className="text-xl font-black text-amber-600 dark:text-amber-400">{stats.streak} ngày</div>
+            <div className="text-[11px] font-bold text-amber-700 dark:text-amber-300">Chuỗi học liên tục</div>
           </div>
 
-          <div className="p-3.5 bg-[#FFF9DB] dark:bg-[#FFF9DB]/10 border border-[#FFE066] dark:border-transparent rounded-2xl text-center">
-            <Sparkles className="w-5 h-5 text-[#F59F00] mx-auto fill-[#FFD43B] mb-1" />
-            <div className="text-xl font-black text-[#E67700] dark:text-[#FFD43B]">{stats.xp}</div>
-            <div className="text-[11px] font-bold text-[#F59F00] dark:text-[#FFE066]">Tổng điểm XP</div>
+          <div className="p-3.5 liquid-glass-subtle rounded-2xl text-center border-yellow-500/20">
+            <Sparkles className="w-5 h-5 text-amber-400 mx-auto mb-1" />
+            <div className="text-xl font-black text-amber-600 dark:text-amber-300">{stats.xp}</div>
+            <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400">Tổng điểm XP</div>
           </div>
 
-          <div className="p-3.5 bg-[#EBFBEE] dark:bg-[#EBFBEE]/10 border border-[#B2F2BB] dark:border-transparent rounded-2xl text-center">
-            <CheckCircle2 className="w-5 h-5 text-[#2B8A3E] dark:text-[#69DB7C] mx-auto mb-1" />
-            <div className="text-xl font-black text-[#2B8A3E] dark:text-[#51CF66]">{stats.totalReviews}</div>
-            <div className="text-[11px] font-bold text-[#2F9E44] dark:text-[#8CE99A]">Lượt ôn tập</div>
+          <div className="p-3.5 liquid-glass-subtle rounded-2xl text-center border-emerald-500/20">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500 dark:text-emerald-400 mx-auto mb-1" />
+            <div className="text-xl font-black text-emerald-600 dark:text-emerald-400">{stats.totalReviews}</div>
+            <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-300">Lượt ôn tập</div>
           </div>
 
-          <div className="p-3.5 bg-[#F3F0FA] dark:bg-[#F3F0FA]/10 border border-[#D0BFFF] dark:border-transparent rounded-2xl text-center">
-            <Trophy className="w-5 h-5 text-[#7048E8] dark:text-[#9775FA] mx-auto mb-1" />
-            <div className="text-xl font-black text-[#7048E8] dark:text-[#845EF7]">Cấp {stats.level}</div>
-            <div className="text-[11px] font-bold text-[#7048E8] dark:text-[#B197FC]">Cấp bậc Mochi</div>
+          <div className="p-3.5 liquid-glass-subtle rounded-2xl text-center border-purple-500/20">
+            <Trophy className="w-5 h-5 text-purple-500 dark:text-purple-400 mx-auto mb-1" />
+            <div className="text-xl font-black text-purple-600 dark:text-purple-300">Cấp {stats.level}</div>
+            <div className="text-[11px] font-bold text-purple-700 dark:text-purple-300">Cấp bậc Mochi</div>
           </div>
         </div>
 
         {/* 6-Level Memory Breakdown */}
-        <div className="bg-slate-50 dark:bg-slate-700/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-600 space-y-3">
+        <div className="liquid-glass-subtle rounded-3xl p-5 space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-xs font-black uppercase text-slate-600 dark:text-slate-300">
               Phân Phối 6 Cấp Độ Trí Nhớ
@@ -105,13 +105,13 @@ export const StatsModal: React.FC<StatsModalProps> = ({
                     <span>{info.emoji}</span>
                     <span>{info.name} (Cấp {lvl})</span>
                   </span>
-                  <span className="text-slate-600 dark:text-slate-400">
+                  <span className="text-slate-600 dark:text-slate-400 font-semibold">
                     {count} từ ({pct}%)
                   </span>
                 </div>
-                <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden">
+                <div className="w-full h-2.5 bg-black/10 dark:bg-white/10 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full transition-all duration-500"
+                    className="h-full rounded-full transition-all duration-500 shadow-xs"
                     style={{ width: `${pct}%`, backgroundColor: info.color }}
                   />
                 </div>
@@ -121,9 +121,9 @@ export const StatsModal: React.FC<StatsModalProps> = ({
         </div>
 
         {/* Mascot cheer message */}
-        <div className="p-4 bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-900/30 dark:to-orange-900/30 border border-amber-200 dark:border-amber-800/50 rounded-2xl flex items-center gap-4">
+        <div className="p-4 liquid-glass-subtle rounded-3xl flex items-center gap-4 border-amber-400/30">
           <Mascot mood="cheering" size="sm" />
-          <div className="text-xs text-amber-900 dark:text-amber-100 font-bold">
+          <div className="text-xs text-amber-900 dark:text-amber-100 font-bold leading-relaxed">
             Mỗi ngày chỉ cần dành 10-15 phút ôn tập đúng vào <strong>Thời Điểm Vàng</strong>, bạn sẽ chuyển toàn bộ từ vựng sang trí nhớ dài hạn vĩnh viễn!
           </div>
         </div>

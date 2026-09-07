@@ -29,15 +29,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs">
-      <div className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-[#E9E4F0] shadow-2xl p-6 sm:p-8 space-y-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn">
+      <div className="liquid-glass-modal rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 animate-scaleUp shadow-2xl text-slate-800 dark:text-slate-100">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black text-[#2E241E]">
+          <h2 className="text-xl font-black text-slate-900 dark:text-white">
             Cài Đặt Ứng Dụng
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
+            className="liquid-glass-subtle p-2 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-xl transition-all cursor-pointer hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>
@@ -46,7 +46,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <div className="space-y-5">
           {/* TTS Accent */}
           <div>
-            <label className="block text-xs font-black uppercase text-slate-500 mb-2">
+            <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 mb-2">
               Giọng Đọc Phát Âm (TTS)
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
@@ -60,10 +60,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onSaveSettings({ ...settings, ttsAccent: acc.value });
                       handleTestAccent(acc.value);
                     }}
-                    className={`p-3 rounded-2xl border-2 text-xs font-black transition-all flex flex-col items-center gap-1 ${
+                    className={`p-3 rounded-2xl text-xs font-black transition-all flex flex-col items-center gap-1 cursor-pointer ${
                       isSelected
-                        ? 'bg-amber-50 border-amber-400 text-amber-900 shadow-2xs'
-                        : 'bg-white dark:bg-slate-800 border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'border-2 border-amber-400 bg-amber-500/20 text-amber-900 dark:text-amber-200 shadow-md shadow-amber-500/20 scale-105'
+                        : 'liquid-glass-subtle text-slate-600 dark:text-slate-300 hover:scale-102'
                     }`}
                   >
                     <span>{acc.label}</span>
@@ -76,10 +76,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           {/* TTS Speed */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-black uppercase text-slate-500">
+              <label className="text-xs font-black uppercase text-slate-500 dark:text-slate-400">
                 Tốc Độ Phát Âm
               </label>
-              <span className="text-xs font-black text-amber-600">
+              <span className="text-xs font-black text-amber-600 dark:text-amber-400">
                 {settings.ttsSpeed}x
               </span>
             </div>
@@ -102,9 +102,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Sound & Auto Play Toggles */}
-          <div className="space-y-3 pt-2 border-t border-slate-100">
-            <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
-              <span className="text-xs font-bold text-slate-700">
+          <div className="space-y-3 pt-2 border-t border-white/40 dark:border-white/10">
+            <label className="liquid-glass-subtle flex items-center justify-between p-3 rounded-2xl cursor-pointer">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                 Tự động phát âm thanh khi lật thẻ
               </span>
               <input
@@ -117,8 +117,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               />
             </label>
 
-            <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-200 cursor-pointer">
-              <span className="text-xs font-bold text-slate-700">
+            <label className="liquid-glass-subtle flex items-center justify-between p-3 rounded-2xl cursor-pointer">
+              <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                 Hiệu ứng âm thanh vui nhộn (Mochi Sound FX)
               </span>
               <input
@@ -132,7 +132,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               />
             </label>
 
-            <label className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-700/50 border border-slate-200 dark:border-slate-600 cursor-pointer">
+            <label className="liquid-glass-subtle flex items-center justify-between p-3 rounded-2xl cursor-pointer">
               <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                 Hiệu ứng nền động (Animated Ambient Glow)
               </span>
@@ -147,7 +147,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </label>
 
             {/* YouTube Video Background in Settings */}
-            <div className="p-3.5 rounded-2xl bg-rose-50/70 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800/50 space-y-2.5">
+            <div className="liquid-glass-subtle p-3.5 rounded-2xl border-rose-400/30 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-xs font-extrabold text-rose-900 dark:text-rose-200">
@@ -168,7 +168,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
               </div>
 
               {settings.youtubeBackgroundEnabled && (
-                <div className="pt-2 border-t border-rose-200/60 dark:border-rose-800/40 space-y-2">
+                <div className="pt-2 border-t border-rose-300/30 dark:border-rose-800/40 space-y-2">
                   <input
                     type="text"
                     value={settings.youtubeBackgroundUrl || ''}
@@ -176,7 +176,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onSaveSettings({ ...settings, youtubeBackgroundUrl: e.target.value })
                     }
                     placeholder="Dán link YouTube (https://www.youtube.com/watch?v=...)"
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-rose-300 dark:border-slate-600 rounded-xl text-xs font-medium focus:outline-hidden focus:border-rose-500"
+                    className="liquid-glass-input w-full px-3 py-2 rounded-xl text-xs font-medium"
                   />
                   <div className="flex items-center justify-between text-[11px] text-slate-600 dark:text-slate-300">
                     <span>Âm thanh video lofi:</span>
@@ -185,7 +185,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                       onClick={() =>
                         onSaveSettings({ ...settings, youtubeBackgroundMuted: !settings.youtubeBackgroundMuted })
                       }
-                      className="px-2.5 py-1 bg-white dark:bg-slate-700 border rounded-lg text-xs font-bold"
+                      className="liquid-glass-pill px-2.5 py-1 text-xs font-bold"
                     >
                       {settings.youtubeBackgroundMuted ? '🔇 Đang tắt tiếng' : '🔊 Đang bật tiếng'}
                     </button>
@@ -195,7 +195,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
 
             {/* Google Gemini AI API Key Integration */}
-            <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-700/60 dark:to-slate-700/60 border border-amber-300/80 dark:border-amber-600/50 space-y-3">
+            <div className="liquid-glass-subtle p-4 rounded-3xl border-amber-400/40 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">🤖</span>
@@ -221,7 +221,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     onSaveSettings({ ...settings, geminiApiKey: e.target.value.trim() })
                   }
                   placeholder="Dán mã API Key dạng AIzaSy... vào đây"
-                  className="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-amber-300/70 dark:border-slate-600 rounded-xl text-xs font-mono font-semibold focus:outline-none focus:border-amber-500"
+                  className="liquid-glass-input w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-semibold"
                 />
               </div>
 
@@ -235,7 +235,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   <span>👉 Lấy API Key miễn phí (Google AI Studio) ↗</span>
                 </a>
                 {settings.geminiApiKey?.trim() ? (
-                  <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 dark:bg-emerald-950/80 dark:text-emerald-300 rounded-lg text-[10px] font-black">
+                  <span className="liquid-glass-pill px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/40 text-[10px] font-black">
                     ✓ Đã Kích Hoạt Real AI
                   </span>
                 ) : (
@@ -248,7 +248,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
           </div>
 
           {/* Reset button */}
-          <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
+          <div className="pt-4 border-t border-white/40 dark:border-white/10 flex items-center justify-between">
             <button
               onClick={() => {
                 if (window.confirm('Bạn có chắc muốn khôi phục dữ liệu ban đầu? Tiến độ học sẽ được làm mới.')) {
@@ -256,7 +256,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                   onClose();
                 }
               }}
-              className="flex items-center gap-1.5 px-3.5 py-2 text-rose-600 hover:bg-rose-50 rounded-xl text-xs font-bold transition-colors"
+              className="liquid-glass-subtle flex items-center gap-1.5 px-3.5 py-2 text-rose-500 hover:text-rose-600 rounded-xl text-xs font-bold transition-all cursor-pointer hover:scale-105"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               <span>Khôi phục dữ liệu mẫu</span>
@@ -264,7 +264,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
 
             <button
               onClick={onClose}
-              className="px-6 py-2.5 bg-slate-900 hover:bg-black text-white font-black text-xs rounded-2xl shadow-xs"
+              className="liquid-glass-pill px-6 py-2.5 text-slate-800 dark:text-white font-black text-xs cursor-pointer hover:scale-105"
             >
               Đóng
             </button>

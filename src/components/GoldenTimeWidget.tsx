@@ -56,11 +56,13 @@ export const GoldenTimeWidget: React.FC<GoldenTimeWidgetProps> = ({
   const isGoldenTime = dueCards.length > 0;
 
   return (
-    <div className="w-full bg-white dark:bg-slate-900/90 rounded-3xl p-5 sm:p-7 border border-[#E9E4F0] dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-      <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-[#FFF9E6] dark:bg-amber-900/10 opacity-60 pointer-events-none" />
+    <div className="liquid-glass-card w-full rounded-3xl p-5 sm:p-7 relative overflow-hidden">
+      {/* Specular ambient light refraction */}
+      <div className="absolute -top-16 -right-16 w-56 h-56 rounded-full bg-gradient-to-br from-amber-400/20 via-orange-300/15 to-transparent blur-2xl pointer-events-none" />
+      <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full bg-gradient-to-tr from-rose-400/15 via-purple-300/10 to-transparent blur-2xl pointer-events-none" />
 
       {/* Header & Golden Time Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 relative z-10">
         <div className="flex items-center gap-3.5">
           <Mascot
             mood={isGoldenTime ? 'cheering' : 'proud'}
@@ -69,33 +71,45 @@ export const GoldenTimeWidget: React.FC<GoldenTimeWidgetProps> = ({
           />
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-xl sm:text-2xl font-black text-[#2D221D] dark:text-white tracking-tight">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">
                 Thời Điểm Vàng
               </h2>
-              <span className="px-2 py-0.5 rounded-full text-xs font-black uppercase bg-[#FFF4D4] dark:bg-amber-950/60 text-[#B87503] dark:text-amber-300 border border-[#FFE28A] dark:border-amber-700/60 flex items-center gap-1">
-                <Sparkles className="w-3 h-3 fill-[#F5A623]" /> SRS AI
+              <span className="liquid-glass-subtle px-2.5 py-0.5 rounded-full text-xs font-black uppercase text-amber-600 dark:text-amber-300 border border-amber-300/60 dark:border-amber-500/30 flex items-center gap-1 shadow-2xs">
+                <Sparkles className="w-3 h-3 fill-amber-500 text-amber-500" /> SRS AI
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-[#7A6E66] dark:text-slate-300 font-medium mt-0.5">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-medium mt-0.5">
               Não bộ ghi nhớ sâu nhất khi ôn lại đúng thời điểm Spaced Repetition.
             </p>
           </div>
         </div>
+
+        {/* Action Button: Review Due Cards if available */}
+        {isGoldenTime && onReviewDueCards && (
+          <button
+            onClick={onReviewDueCards}
+            className="liquid-glass-pill self-start md:self-center px-4 py-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white font-black text-xs sm:text-sm rounded-full shadow-lg shadow-orange-500/25 flex items-center gap-2 cursor-pointer border border-white/50"
+          >
+            <Zap className="w-4 h-4 fill-amber-200" />
+            <span>Ôn {dueCards.length} từ đến hạn ngay</span>
+            <span>➔</span>
+          </button>
+        )}
       </div>
 
       {/* 5 Memory Levels Progress Dashboard */}
-      <div>
+      <div className="relative z-10">
         <div className="flex items-center justify-between mb-2.5">
-          <span className="text-xs sm:text-sm font-extrabold text-[#4A3B32] dark:text-slate-200 uppercase tracking-wider">
+          <span className="text-xs sm:text-sm font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
             5 Cấp Độ Ghi Nhớ ({totalCards} từ vựng)
           </span>
-          <span className="text-xs font-bold text-[#8C827A] dark:text-slate-400">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
             Cấp 5: {Math.round(((levelCounts[5] || 0) / (totalCards || 1)) * 100)}% thành thạo
           </span>
         </div>
 
-        {/* Segmented Color Bar */}
-        <div className="w-full h-3.5 bg-[#F1EFF7] dark:bg-slate-700/80 rounded-full overflow-hidden flex p-0.5 gap-0.5 shadow-inner">
+        {/* Segmented Liquid Glass Bar */}
+        <div className="w-full h-3.5 liquid-glass-subtle rounded-full overflow-hidden flex p-0.5 gap-0.5 border border-white/60 dark:border-white/10">
           {([1, 2, 3, 4, 5] as MemoryLevel[]).map((lvl) => {
             const count = levelCounts[lvl];
             const pct = totalCards > 0 ? (count / totalCards) * 100 : 0;
@@ -108,7 +122,7 @@ export const GoldenTimeWidget: React.FC<GoldenTimeWidgetProps> = ({
                   width: `${pct}%`,
                   backgroundColor: info.color,
                 }}
-                className="h-full rounded-full transition-all duration-500 relative group cursor-pointer"
+                className="h-full rounded-full transition-all duration-500 relative group cursor-pointer shadow-xs"
                 title={`${info.name}: ${count} từ (${pct.toFixed(1)}%)`}
               />
             );
@@ -126,16 +140,17 @@ export const GoldenTimeWidget: React.FC<GoldenTimeWidgetProps> = ({
               <div
                 key={lvl}
                 onClick={() => isClickable && onReviewLevel(lvl)}
-                className={`p-3 rounded-2xl border transition-all ${
-                  isClickable ? 'cursor-pointer hover:scale-105 hover:shadow-xs' : ''
+                className={`liquid-glass-subtle p-3 rounded-2xl border transition-all duration-300 ${
+                  isClickable 
+                    ? 'cursor-pointer hover:scale-105 hover:shadow-md hover:border-amber-400/60' 
+                    : 'opacity-85'
                 }`}
                 style={{
-                  backgroundColor: info.bg,
-                  borderColor: info.borderColor,
+                  borderColor: `${info.color}40`,
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-lg">{info.emoji}</span>
+                  <span className="text-lg filter drop-shadow-xs">{info.emoji}</span>
                   <span
                     className="text-lg font-black"
                     style={{ color: info.color }}
@@ -145,12 +160,12 @@ export const GoldenTimeWidget: React.FC<GoldenTimeWidgetProps> = ({
                 </div>
                 <div className="mt-1">
                   <div
-                    className="text-xs font-bold leading-tight"
+                    className="text-xs font-bold leading-tight truncate"
                     style={{ color: info.color }}
                   >
                     {info.name}
                   </div>
-                  <div className="text-[10px] text-slate-500 font-semibold">
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">
                     Cấp {lvl}
                   </div>
                 </div>

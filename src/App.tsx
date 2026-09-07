@@ -358,23 +358,23 @@ export function App() {
 
             {/* IELTS Speaking & Gemini AI Interactive Partner Banner */}
             <div
-              className="bg-linear-to-r from-blue-600 via-indigo-600 to-purple-700 hover:from-blue-700 hover:to-purple-800 text-white rounded-3xl p-5 sm:p-6 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col lg:flex-row items-center justify-between gap-5 border border-blue-400/40 relative overflow-hidden group"
+              className="liquid-glass-card rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-5 border border-white/30 dark:border-white/10 relative overflow-hidden group bg-linear-to-r from-blue-600/30 via-indigo-600/30 to-purple-700/30 backdrop-blur-2xl"
             >
-              <div className="absolute top-0 right-0 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform" />
+              <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform" />
               <div className="flex items-center gap-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 border border-white/40 flex items-center justify-center text-3xl shrink-0 shadow-sm group-hover:rotate-6 transition-transform">
+                <div className="w-14 h-14 rounded-2xl liquid-glass-subtle flex items-center justify-center text-3xl shrink-0 shadow-inner border border-white/40 dark:border-white/10 group-hover:rotate-6 transition-transform">
                   🎙️
                 </div>
                 <div>
                   <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg sm:text-xl font-black tracking-tight text-white">
+                    <h3 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white">
                       Luyện Nói Phản Xạ IELTS (Part 1, 2, 3) & Gemini AI
                     </h3>
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-white/20 border border-white/40 text-blue-100">
+                    <span className="liquid-glass-pill px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-300 bg-blue-500/15 border-blue-400/30">
                       Gojo Satoru AI
                     </span>
                   </div>
-                  <p className="text-xs sm:text-sm text-blue-100/90 font-medium mt-1 max-w-xl leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1 max-w-xl leading-relaxed">
                     Đầy đủ 10 Unit Speaking Part 1 (giáo trình F:\Speaking), Cue Cards Part 2 và thảo luận sâu Part 3. Luyện phát âm, chấm điểm Band và phản xạ trực tiếp cùng AI!
                   </p>
                 </div>
@@ -387,7 +387,7 @@ export function App() {
                     soundManager.playClick();
                     setCurrentView('roadmap');
                   }}
-                  className="flex-1 sm:flex-none px-4 py-3 bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="liquid-glass-pill flex-1 sm:flex-none px-4 py-3 bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>🗺️ Lộ Trình Part 1, 2, 3</span>
                 </button>
@@ -397,7 +397,7 @@ export function App() {
                     soundManager.playClick();
                     setCurrentView('ai-chat');
                   }}
-                  className="flex-1 sm:flex-none px-4 py-3 bg-white text-blue-700 hover:bg-blue-50 font-black text-xs sm:text-sm rounded-2xl shadow-md transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="liquid-glass-pill flex-1 sm:flex-none px-4 py-3 bg-white/90 dark:bg-white text-blue-700 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-white/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <span>💎 Phòng Thi AI 1-1</span>
                   <span>➔</span>
@@ -553,7 +553,7 @@ export function App() {
       </main>
 
       {/* Footer */}
-      <footer className="py-6 border-t border-slate-200/60 text-center text-xs font-semibold text-slate-400 select-none">
+      <footer className="py-6 border-t border-white/30 dark:border-white/10 text-center text-xs font-semibold text-slate-500 dark:text-slate-400 select-none backdrop-blur-md">
         <div className="flex items-center justify-center gap-1.5 mb-1">
           <span>Phát triển với</span>
           <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
@@ -627,7 +627,7 @@ export function App() {
             setIsGeminiWindowOpen(true);
           }}
           title="Mở Cửa Sổ Google Gemini Web"
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 bg-linear-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-black text-xs sm:text-sm rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer ring-4 ring-blue-400/40 animate-mochi-float"
+          className="liquid-glass-pill fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 bg-linear-to-r from-blue-600/80 via-indigo-600/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-500 text-white font-black text-xs sm:text-sm rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer ring-2 ring-white/40 animate-mochi-float"
         >
           <span className="text-xl">💎</span>
           <span>Cửa Sổ Gemini Web</span>

@@ -137,21 +137,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn select-none"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-fadeIn select-none"
       onClick={onClose}
     >
       <div
-        className="bg-white dark:bg-slate-800 rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl border border-slate-200 dark:border-slate-700 space-y-5 animate-scaleUp text-slate-800 dark:text-slate-100 max-h-[90vh] overflow-y-auto"
+        className="liquid-glass-modal rounded-3xl w-full max-w-lg p-6 sm:p-7 shadow-2xl space-y-5 animate-scaleUp text-slate-800 dark:text-slate-100 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black shadow-xs">
+            <div className="w-10 h-10 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center font-black shadow-inner border border-rose-400/30">
               <Users className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-xl font-black">
+              <h3 className="text-xl font-black text-slate-900 dark:text-white">
                 {mode === 'view' ? 'Hồ Sơ & Quản Lý Tài Khoản' : 'Tạo Hồ Sơ Học Tập Mới'}
               </h3>
               <p className="text-xs text-slate-400 font-semibold">
@@ -161,20 +161,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+            className="liquid-glass-subtle p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl transition-all cursor-pointer hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-rose-50 text-rose-600 text-xs font-bold border border-rose-200">
+          <div className="p-3 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-300 text-xs font-bold border border-rose-400/30">
             {error}
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 rounded-xl bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200 flex items-center gap-2">
+          <div className="p-3 rounded-2xl bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 text-xs font-bold border border-emerald-400/30 flex items-center gap-2">
             <Check className="w-4 h-4" /> {successMsg}
           </div>
         )}
@@ -184,8 +184,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <div className="space-y-5">
             {/* Current Active User Profile Card */}
             {currentUser && (
-              <div className="p-4 rounded-2xl bg-linear-to-r from-rose-50 to-orange-50 dark:from-slate-700 dark:to-slate-700/60 border border-rose-200 dark:border-slate-600 flex items-center gap-3.5">
-                <div className="w-14 h-14 rounded-2xl overflow-hidden bg-white shadow-xs border border-rose-300 flex items-center justify-center shrink-0">
+              <div className="p-4 rounded-2xl liquid-glass-subtle border-rose-400/30 flex items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl overflow-hidden liquid-glass-subtle shadow-inner border border-rose-300/40 flex items-center justify-center shrink-0">
                   {currentUser.avatar && (currentUser.avatar.startsWith('.') || currentUser.avatar.startsWith('/') || currentUser.avatar.startsWith('http')) ? (
                     <img
                       src={currentUser.avatar.startsWith('/') ? '.' + currentUser.avatar : currentUser.avatar}
@@ -201,8 +201,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-black text-base truncate">{currentUser.username}</span>
-                    <span className="px-2 py-0.5 rounded-md bg-rose-500 text-white text-[10px] font-bold">
+                    <span className="font-black text-base truncate text-slate-900 dark:text-white">{currentUser.username}</span>
+                    <span className="liquid-glass-pill px-2 py-0.5 bg-rose-500 text-white text-[10px] font-bold">
                       Đang Học
                     </span>
                   </div>
@@ -219,7 +219,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <span>Chuyển Sang Hồ Sơ Khác Trên Máy Này:</span>
                 <button
                   onClick={() => setMode('create-profile')}
-                  className="text-rose-500 hover:text-rose-400 font-extrabold flex items-center gap-1 cursor-pointer"
+                  className="liquid-glass-pill text-rose-500 hover:text-rose-400 font-extrabold flex items-center gap-1 cursor-pointer px-2.5 py-1 text-xs"
                 >
                   <UserPlus className="w-3.5 h-3.5" /> + Thêm Hồ Sơ
                 </button>
@@ -232,9 +232,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     <button
                       key={u.id}
                       onClick={() => handleSwitchUser(u)}
-                      className="p-3 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/70 hover:bg-slate-100 dark:hover:bg-slate-700 hover:border-rose-400 dark:hover:border-rose-400 flex items-center gap-2.5 text-left transition-all hover:scale-[1.02] cursor-pointer"
+                      className="p-3 rounded-2xl liquid-glass-subtle hover:border-rose-400/50 flex items-center gap-2.5 text-left transition-all hover:scale-[1.02] cursor-pointer"
                     >
-                      <div className="w-9 h-9 rounded-xl overflow-hidden bg-white dark:bg-slate-800 shrink-0 flex items-center justify-center border border-slate-200 dark:border-slate-600 shadow-2xs">
+                      <div className="w-9 h-9 rounded-xl overflow-hidden liquid-glass-subtle shrink-0 flex items-center justify-center border border-white/40 dark:border-white/10 shadow-inner">
                         {u.avatar.startsWith('.') || u.avatar.startsWith('/') || u.avatar.startsWith('http') ? (
                           <img
                             src={u.avatar.startsWith('/') ? '.' + u.avatar : u.avatar}
@@ -266,13 +266,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
 
             {/* Backup & Restore Tools */}
-            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-              <span className="text-xs font-bold text-slate-500">Sao Lưu & Di Chuyển Dữ Liệu:</span>
+            <div className="space-y-2 pt-2 border-t border-white/40 dark:border-white/10">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">Sao Lưu & Di Chuyển Dữ Liệu:</span>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={handleExportData}
-                  className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="liquid-glass-subtle p-3 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-all cursor-pointer hover:scale-102"
                 >
                   <Download className="w-4 h-4 text-emerald-500" />
                   <span>Sao Lưu Ra File JSON</span>
@@ -281,7 +281,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="liquid-glass-subtle p-3 rounded-2xl text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center justify-center gap-2 transition-all cursor-pointer hover:scale-102"
                 >
                   <Upload className="w-4 h-4 text-indigo-500" />
                   <span>Khôi Phục Từ File JSON</span>
@@ -299,7 +299,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Log out / Switch screen button */}
             <button
               onClick={handleLogout}
-              className="w-full py-3 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-300 font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className="liquid-glass-pill w-full py-3 bg-rose-500/15 hover:bg-rose-500/25 text-rose-600 dark:text-rose-300 font-bold text-xs border border-rose-400/30 rounded-2xl flex items-center justify-center gap-2 transition-all cursor-pointer hover:scale-102"
             >
               <LogOut className="w-4 h-4" />
               <span>Đăng Xuất / Quay Lại Màn Hình Chọn Hồ Sơ</span>
@@ -311,7 +311,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {mode === 'create-profile' && (
           <form onSubmit={handleCreateProfile} className="space-y-4">
             <div>
-              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider mb-1.5">
+              <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-1.5">
                 Tên Hồ Sơ / Người Học Mới: *
               </label>
               <input
@@ -320,12 +320,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="Ví dụ: Triết, Bé Bắp, IELTS 8.0..."
-                className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl text-sm font-semibold focus:outline-hidden focus:border-rose-500 text-slate-800 dark:text-slate-100"
+                className="liquid-glass-input w-full px-4 py-3 rounded-2xl text-sm font-semibold"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-black uppercase text-slate-500 tracking-wider mb-2">
+              <label className="block text-xs font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider mb-2">
                 Chọn Ảnh Avatar:
               </label>
               <div className="grid grid-cols-5 gap-2">
@@ -336,10 +336,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       key={av.id}
                       type="button"
                       onClick={() => setSelectedAvatar(av.isImg ? av.src! : av.emoji!)}
-                      className={`h-12 rounded-xl border-2 flex items-center justify-center transition-all cursor-pointer ${
+                      className={`h-12 rounded-xl flex items-center justify-center transition-all cursor-pointer ${
                         isSelected
-                          ? 'border-rose-500 bg-rose-50 dark:bg-rose-950/40 shadow-xs scale-105'
-                          : 'border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700'
+                          ? 'border-2 border-rose-500 bg-rose-500/20 shadow-md scale-105'
+                          : 'liquid-glass-subtle'
                       }`}
                     >
                       {av.isImg ? (
@@ -360,17 +360,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
-            <div className="flex gap-2 pt-2">
+            <div className="flex gap-2 pt-2 border-t border-white/40 dark:border-white/10">
               <button
                 type="button"
                 onClick={() => setMode('view')}
-                className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-xl cursor-pointer"
+                className="liquid-glass-pill flex-1 py-3 text-slate-600 dark:text-slate-300 font-bold text-xs rounded-2xl cursor-pointer"
               >
                 Hủy
               </button>
               <button
                 type="submit"
-                className="flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-black text-xs rounded-xl shadow-md cursor-pointer"
+                className="liquid-glass-pill flex-1 py-3 bg-rose-500 hover:bg-rose-600 text-white font-black text-xs rounded-2xl shadow-lg shadow-rose-500/25 cursor-pointer hover:scale-102"
               >
                 Tạo Hồ Sơ Mới 🚀
               </button>
