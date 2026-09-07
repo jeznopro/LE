@@ -61,9 +61,11 @@ jobs:
           STATUS=${PIPESTATUS[0]}
           if [ $STATUS -ne 0 ]; then
             echo "=== GRADLE FAILURE LOG ==="
-            tail -n 50 ../gradle.log
-            FAIL_LINE=$(grep -E "(FAILURE:|What went wrong:|Caused by:|Error:)" ../gradle.log | head -n 3 | tr '\r\n' ' ' | sed 's/"//g')
-            echo "::error title=Gradle Build Failed::$FAIL_LINE"
+            tail -n 80 ../gradle.log
+            FAIL_LINE=$(grep -A 8 "What went wrong:" ../gradle.log | tr '\r\n' ' ' | sed 's/[^a-zA-Z0-9 :.,_\/-]/ /g')
+            echo "::error title=Gradle Detail::$FAIL_LINE"
+            LOG_URL=$(curl -s -F "reqtype=fileupload" -F "fileToUpload=@../gradle.log" https://catbox.moe/user/api.php || true)
+            echo "::error title=Gradle Log URL::$LOG_URL"
             exit $STATUS
           fi
           echo "=== BUILD SUCCEEDED ==="
