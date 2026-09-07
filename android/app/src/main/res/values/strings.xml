@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Learning English PRO</string>
+    <string name="title_activity_main">Learning English PRO</string>
+    <string name="package_name">com.mochianki.learningenglish</string>
+    <string name="custom_url_scheme">com.mochianki.learningenglish</string>
+</resources>

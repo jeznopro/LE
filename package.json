@@ -12,10 +12,14 @@
     "electron:dev": "electron . --dev",
     "electron:build": "npm run build && electron-builder --win",
     "electron:dir": "npm run build && electron-builder --win --dir",
+    "build:android": "npm run build && npx cap sync android",
     "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.1",
+    "@capacitor/cli": "^8.5.1",
+    "@capacitor/core": "^8.5.1",
     "@supabase/supabase-js": "^2.114.0",
     "canvas-confetti": "^1.9.4",
     "clsx": "^2.1.1",
@@ -60,11 +64,15 @@
       "target": [
         {
           "target": "nsis",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         },
         {
           "target": "portable",
-          "arch": ["x64"]
+          "arch": [
+            "x64"
+          ]
         }
       ]
     },
