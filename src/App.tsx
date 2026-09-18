@@ -122,14 +122,18 @@ export function App() {
         );
         if (missingB1Decks.length > 0) {
           currentDecks = [...currentDecks, ...missingB1Decks];
-          const missingB1Cards = INITIAL_CARDS.filter((c) =>
-            missingB1Decks.some((d) => d.id === c.deckId)
-          );
-          currentCards = [...currentCards, ...missingB1Cards];
           if (isSupabaseConfigured) {
             for (const d of missingB1Decks) {
               await cloudSync.saveSingleDeck(currentUser!.id, d);
             }
+          }
+        }
+        const missingB1Cards = INITIAL_CARDS.filter((c) =>
+          c.deckId.startsWith('deck-b1-') && !currentCards.some((cc) => cc.id === c.id)
+        );
+        if (missingB1Cards.length > 0) {
+          currentCards = [...currentCards, ...missingB1Cards];
+          if (isSupabaseConfigured) {
             await cloudSync.saveAllCards(currentUser!.id, missingB1Cards);
           }
         }
@@ -173,10 +177,14 @@ export function App() {
       );
       if (missingB1Decks.length > 0) {
         userDecks = [...userDecks, ...missingB1Decks];
-        const missingB1Cards = INITIAL_CARDS.filter((c) =>
-          missingB1Decks.some((d) => d.id === c.deckId)
-        );
+      }
+      const missingB1Cards = INITIAL_CARDS.filter((c) =>
+        c.deckId.startsWith('deck-b1-') && !userCards.some((uc) => uc.id === c.id)
+      );
+      if (missingB1Cards.length > 0) {
         userCards = [...userCards, ...missingB1Cards];
+      }
+      if (missingB1Decks.length > 0 || missingB1Cards.length > 0) {
         storage.saveDecksForUser(currentUser.id, userDecks);
         storage.saveCardsForUser(currentUser.id, userCards);
       }

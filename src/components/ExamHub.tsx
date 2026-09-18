@@ -95,7 +95,7 @@ export const ExamHub: React.FC<ExamHubProps> = ({
                 Luyện Thi Trực Tuyến
               </span>
               <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                7 Đề Thi • 115 Câu Hỏi
+                {B1_EXAMS.length} Đề Thi • {B1_EXAMS.reduce((acc, e) => acc + e.questions.length, 0)} Câu Hỏi
               </span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1">

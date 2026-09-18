@@ -605,11 +605,15 @@ export const ExamSession: React.FC<ExamSessionProps> = ({
               </div>
             )}
 
-            {currentQuestion.type === 'word-formation' && (
+            {(currentQuestion.type === 'word-formation' || currentQuestion.type === 'fill-blank') && (
               <div className="space-y-3">
                 <div className="text-xs font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
                   <HelpCircle className="w-4 h-4 text-purple-500" />
-                  <span>Hãy biến đổi từ gốc in hoa để điền vào chỗ trống:</span>
+                  <span>
+                    {currentQuestion.type === 'word-formation'
+                      ? 'Hãy biến đổi từ gốc in hoa để điền vào chỗ trống:'
+                      : 'Hãy gõ đáp án điền vào chỗ trống:'}
+                  </span>
                 </div>
                 <input
                   ref={inputRef}

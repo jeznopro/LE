@@ -28,7 +28,16 @@ export const INITIAL_DECKS: Deck[] = [
     createdAt: Date.now() - 86400000 * 2,
     updatedAt: Date.now(),
   },
-  {
+    {
+    id: 'deck-b1-u1',
+    title: 'B1 - Unit 1: Present Simple, Continuous & Stative Verbs',
+    description: 'Trọn bộ ngữ pháp Unit 1 Destination B1: Hiện tại đơn, Hiện tại tiếp diễn, thói quen khó chịu (always + V-ing) và Động từ trạng thái (Stative Verbs).',
+    emoji: '📘',
+    color: '#2563EB',
+    createdAt: Date.now() - 86400000 * 2,
+    updatedAt: Date.now(),
+  },
+{
     id: 'deck-b1-u3',
     title: 'B1 - Unit 3: Travel & Transport',
     description: 'Du lịch & Giao thông: Phân biệt voyage/journey/trip, phrasal verbs catch up with/set off, cụm giới từ và word formation.',
@@ -383,6 +392,184 @@ export const INITIAL_CARDS: Card[] = [
     createdAt: Date.now() - 86400000 * 10,
   },
   // ================= Destination B1 Dedicated Unit Decks =================
+  // Unit 1 Grammar Flashcards
+  {
+    "id": "card-b1-u1-1",
+    "deckId": "deck-b1-u1",
+    "front": "Present Simple (Hiện tại đơn)",
+    "back": "S + V(s/es). Dùng cho: Thói quen, hành động lặp lại (every day, often), sự thật hiển nhiên (Water boils at 100°C), lịch trình cố định (The train leaves at 6 pm).",
+    "phonetic": "/ˈprez.ənt ˈsɪm.pəl/",
+    "partOfSpeech": "Grammar Rule",
+    "example": "Every day, Helen gets up at half past seven.",
+    "exampleMeaning": "Mỗi ngày, Helen thức dậy lúc bảy giờ rưỡi sáng.",
+    "hint": "Dấu hiệu: always, usually, often, sometimes, rarely, never, every day/week, once a week...",
+    "tags": [
+        "Ngữ pháp cơ bản",
+        "B1 - Unit 1"
+    ],
+    "level": 2,
+    "interval": 1,
+    "easeFactor": 2.5,
+    "repetitions": 1,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-2",
+    "deckId": "deck-b1-u1",
+    "front": "Present Continuous (Hiện tại tiếp diễn)",
+    "back": "S + am/is/are + V-ing. Dùng cho: Hành động đang diễn ra tại thời điểm nói (now, at the moment), tình huống tạm thời (this week, for the summer), sự biến đổi.",
+    "phonetic": "/ˈprez.ənt kənˈtɪn.ju.əs/",
+    "partOfSpeech": "Grammar Rule",
+    "example": "Gordon is writing a letter at the moment.",
+    "exampleMeaning": "Ngay lúc này Gordon đang ngồi viết một bức thư.",
+    "hint": "Dấu hiệu: now, right now, at the moment, currently, this week...",
+    "tags": [
+        "Ngữ pháp cơ bản",
+        "B1 - Unit 1"
+    ],
+    "level": 2,
+    "interval": 1,
+    "easeFactor": 2.5,
+    "repetitions": 1,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-3",
+    "deckId": "deck-b1-u1",
+    "front": "Always + V-ing (Thói quen gây khó chịu)",
+    "back": "S + am/is/are + ALWAYS + V-ing. Dùng để phàn nàn, bực bội về một hành vi xấu cứ lặp đi lặp lại.",
+    "phonetic": "/ˈɔːl.weɪz/",
+    "partOfSpeech": "Special Structure",
+    "example": "Josh is always using my bike! It's so annoying.",
+    "exampleMeaning": "Thằng Josh cứ mượn xe đạp của tôi suốt! Bực mình thật sự.",
+    "hint": "Khác với 'always + V-nguyên thể' thông thường (chỉ thói quen trung tính).",
+    "tags": [
+        "Cấu trúc đặc biệt",
+        "B1 - Unit 1"
+    ],
+    "level": 3,
+    "interval": 2,
+    "easeFactor": 2.5,
+    "repetitions": 2,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-4",
+    "deckId": "deck-b1-u1",
+    "front": "Stative Verbs (Động từ trạng thái)",
+    "back": "Nhóm động từ chỉ trạng thái, cảm xúc, nhận thức, giác quan và sở hữu. QUY TẮC: Thường KHÔNG chia ở các thì tiếp diễn (không dùng V-ing).",
+    "phonetic": "/ˈsteɪ.tɪv vɜːbz/",
+    "partOfSpeech": "Grammar Concept",
+    "example": "A good friend knows when you're upset. (Không dùng: is knowing)",
+    "exampleMeaning": "Một người bạn tốt luôn biết khi nào bạn đang có chuyện buồn phiền.",
+    "hint": "Bao gồm: know, understand, believe, love, hate, want, need, belong, resemble...",
+    "tags": [
+        "Động từ trạng thái",
+        "B1 - Unit 1"
+    ],
+    "level": 3,
+    "interval": 2,
+    "easeFactor": 2.5,
+    "repetitions": 2,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-5",
+    "deckId": "deck-b1-u1",
+    "front": "Stative Verbs: Thinking & Feeling",
+    "back": "agree, believe, doubt, forget, know, mean, notice, recognize, remember, understand, think (opinion).\nlike, love, hate, prefer, adore, dislike, wish, want, care.",
+    "phonetic": "/ˈθɪŋ.kɪŋ ænd ˈfiː.lɪŋ/",
+    "partOfSpeech": "Vocabulary Group",
+    "example": "Some people prefer chess, but I don't understand that game.",
+    "exampleMeaning": "Vài người thích chơi cờ vua hơn, nhưng tôi thì không hiểu nổi trò đó.",
+    "hint": "Không nói: 'I am not understanding' -> Phải nói: 'I don't understand'.",
+    "tags": [
+        "Động từ trạng thái",
+        "B1 - Unit 1"
+    ],
+    "level": 2,
+    "interval": 1,
+    "easeFactor": 2.5,
+    "repetitions": 1,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-6",
+    "deckId": "deck-b1-u1",
+    "front": "Stative Verbs: Possession & Senses",
+    "back": "Sở hữu: belong to, have (có), own, possess, contain.\nGiác quan/Hình thức: appear, look, seem, sound, smell, taste.",
+    "phonetic": "/pəˈzeʃ.ən ænd ˈsen.sɪz/",
+    "partOfSpeech": "Vocabulary Group",
+    "example": "Dad belongs to the local astronomy club. / It seems quite easy.",
+    "exampleMeaning": "Bố là thành viên của câu lạc bộ thiên văn địa phương. / Trò chơi có vẻ khá dễ dàng.",
+    "hint": "Không nói: 'is belonging' hay 'is seeming'.",
+    "tags": [
+        "Động từ trạng thái",
+        "B1 - Unit 1"
+    ],
+    "level": 2,
+    "interval": 1,
+    "easeFactor": 2.5,
+    "repetitions": 1,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-7",
+    "deckId": "deck-b1-u1",
+    "front": "Dual-meaning Verb: THINK",
+    "back": "1. Think = Có quan điểm/nghĩ rằng -> Hiện tại đơn (I think it's great).\n2. Think = Đang suy tính/cân nhắc trong đầu -> Tiếp diễn (I'm thinking about moving).",
+    "phonetic": "/θɪŋk/",
+    "partOfSpeech": "Dual Verb",
+    "example": "What do you think of this? / Shh, I am thinking!",
+    "exampleMeaning": "Bạn nghĩ sao về điều này? / Suỵt, tôi đang tập trung suy nghĩ!",
+    "hint": "Khi hỏi ý kiến: What do you think? (không dùng are you thinking).",
+    "tags": [
+        "Động từ đa nghĩa",
+        "B1 - Unit 1"
+    ],
+    "level": 3,
+    "interval": 2,
+    "easeFactor": 2.5,
+    "repetitions": 2,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+  {
+    "id": "card-b1-u1-8",
+    "deckId": "deck-b1-u1",
+    "front": "Dual-meaning Verb: HAVE",
+    "back": "1. Have = Sở hữu -> Hiện tại đơn (I have a car).\n2. Have = Ăn uống, tắm rửa, tham gia hoạt động -> Tiếp diễn (I am having lunch / a shower).",
+    "phonetic": "/hæv/",
+    "partOfSpeech": "Dual Verb",
+    "example": "Right now, Margaret is having a shower.",
+    "exampleMeaning": "Ngay bây giờ, Margaret đang tắm trong phòng tắm.",
+    "hint": "'have breakfast/lunch/dinner/shower/party' chia được ở thì tiếp diễn!",
+    "tags": [
+        "Động từ đa nghĩa",
+        "B1 - Unit 1"
+    ],
+    "level": 3,
+    "interval": 2,
+    "easeFactor": 2.5,
+    "repetitions": 2,
+    "lapses": 0,
+    "nextReview": 1789738199151,
+    "createdAt": 1789738199151
+},
+
   {
     id: "card-b1-u3-1",
     deckId: "deck-b1-u3",

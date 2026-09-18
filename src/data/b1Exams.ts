@@ -1,6 +1,1544 @@
 import { Exam } from '../types';
 
 export const B1_EXAMS: Exam[] = [
+  // ================= UNIT 1 EXAMS (DESTINATION B1 PAGES 7 & 8) =================
+  {
+  "id": "exam-b1-u1",
+  "unitId": "deck-b1-u1",
+  "title": "Trọn Bộ Bài Tập Unit 1: Present Simple, Continuous & Stative Verbs",
+  "unit": "Unit 1",
+  "description": "Đầy đủ 50 câu hỏi nguyên bản từ sách Destination B1: Bài A, B, C, D, E, F (Trang 7 & 8) luyện sâu các thì hiện tại & động từ trạng thái.",
+  "durationMinutes": 45,
+  "emoji": "📘",
+  "color": "#2563EB",
+  "questions": [
+    {
+      "id": "q-u1-1",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 1: Every day, Helen ______ at half past seven.",
+      "options": [
+        "gets up",
+        "is getting up",
+        "get up",
+        "getting up"
+      ],
+      "correctAnswer": "gets up",
+      "explanation": "👉 Thói quen lặp lại hàng ngày (Every day) dùng thì Hiện tại đơn (Present Simple). Chủ ngữ Helen (ngôi thứ 3 số ít) nên động từ thêm \"s\": gets up."
+    },
+    {
+      "id": "q-u1-2",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 2: Helen often ______ fast food for lunch.",
+      "options": [
+        "eats",
+        "is eating",
+        "eat",
+        "has eaten"
+      ],
+      "correctAnswer": "eats",
+      "explanation": "👉 Trạng từ tần suất \"often\" đứng trước động từ thường ở thì Hiện tại đơn: Helen often eats."
+    },
+    {
+      "id": "q-u1-3",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 3: In the evening, Helen usually ______ her friends for coffee.",
+      "options": [
+        "meets",
+        "is meeting",
+        "meet",
+        "meeting"
+      ],
+      "correctAnswer": "meets",
+      "explanation": "👉 Trạng từ tần suất \"usually\" chỉ thói quen vào buổi tối -> chia thì Hiện tại đơn với chủ ngữ Helen: meets."
+    },
+    {
+      "id": "q-u1-4",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 4: Once a week, Helen ______ a film at the cinema.",
+      "options": [
+        "watches",
+        "is watching",
+        "watch",
+        "watchs"
+      ],
+      "correctAnswer": "watches",
+      "explanation": "👉 Cụm từ chỉ tần suất \"Once a week\" diễn tả thói quen -> Hiện tại đơn. Động từ tận cùng \"ch\" thêm \"es\": watches."
+    },
+    {
+      "id": "q-u1-5",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 5: Helen rarely ______ to the gym.",
+      "options": [
+        "goes",
+        "is going",
+        "go",
+        "gone"
+      ],
+      "correctAnswer": "goes",
+      "explanation": "👉 Trạng từ tần suất \"rarely\" (hiếm khi) -> Hiện tại đơn: goes (thêm \"es\" sau nguyên âm \"o\")."
+    },
+    {
+      "id": "q-u1-6",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 6: Helen ______ a driving lesson twice a week.",
+      "options": [
+        "has",
+        "is having",
+        "have",
+        "having"
+      ],
+      "correctAnswer": "has",
+      "explanation": "👉 Cụm chỉ tần suất \"twice a week\" chỉ lịch trình định kỳ -> Hiện tại đơn. Ngôi thứ 3 số ít của \"have\" là \"has\"."
+    },
+    {
+      "id": "q-u1-7",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Gordon? I think he ______ (write) a letter at the moment.",
+      "options": [
+        "is writing",
+        "writes",
+        "writing",
+        "is write"
+      ],
+      "correctAnswer": "is writing",
+      "explanation": "👉 Dấu hiệu \"at the moment\" (ngay lúc này) -> chia thì Hiện tại tiếp diễn: S + is + V-ing -> is writing."
+    },
+    {
+      "id": "q-u1-8",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Yes, the match is on TV now, but we ______ (lose).",
+      "options": [
+        "are losing",
+        "lose",
+        "are loosing",
+        "losing"
+      ],
+      "correctAnswer": "are losing",
+      "explanation": "👉 Trận đấu đang phát sóng lúc này (\"now\") -> hành động đang diễn ra: \"we are losing\" (đang bị dẫn trước/thua)."
+    },
+    {
+      "id": "q-u1-9",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Right now, Margaret ______ (have) a shower. Do you want to ring later?",
+      "options": [
+        "is having",
+        "has",
+        "having",
+        "is had"
+      ],
+      "correctAnswer": "is having",
+      "explanation": "👉 Dấu hiệu \"Right now\" (ngay bây giờ). Cụm \"have a shower\" (đang tắm) là hành động thể chất đang diễn ra -> dùng tiếp diễn: is having."
+    },
+    {
+      "id": "q-u1-10",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Sally ______ (stay) with her aunt for a few days.",
+      "options": [
+        "is staying",
+        "stays",
+        "staying",
+        "is stayed"
+      ],
+      "correctAnswer": "is staying",
+      "explanation": "👉 Tình huống tạm thời trong vài ngày (\"for a few days\") -> dùng Hiện tại tiếp diễn: is staying."
+    },
+    {
+      "id": "q-u1-11",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "I ______ (lie)! It's true! I did see Madonna at the supermarket.",
+      "options": [
+        "am not lying",
+        "am not lieing",
+        "don't lie",
+        "am lying"
+      ],
+      "correctAnswer": "am not lying",
+      "explanation": "👉 Ngữ cảnh: \"Đó là sự thật! Tôi có thấy Madonna mà!\" -> ý nói \"Tôi không hề nói dối!\". Động từ \"lie\" đổi \"ie\" thành \"y\" rồi thêm \"ing\" -> am not lying."
+    },
+    {
+      "id": "q-u1-12",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Josh ______ (always / use) my bike! It's so annoying.",
+      "options": [
+        "is always using",
+        "always uses",
+        "always using",
+        "is using always"
+      ],
+      "correctAnswer": "is always using",
+      "explanation": "👉 Cấu trúc \"be + always + V-ing\" dùng để phàn nàn về một thói quen xấu lặp đi lặp lại gây bực mình (\"It's so annoying\")."
+    },
+    {
+      "id": "q-u1-13",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "We ______ (have) lunch, but I can come round and help you later.",
+      "options": [
+        "are having",
+        "have",
+        "having",
+        "had"
+      ],
+      "correctAnswer": "are having",
+      "explanation": "👉 Hành động đang ăn trưa tại thời điểm nói (\"we are having lunch\"), sau đó mới qua giúp được."
+    },
+    {
+      "id": "q-u1-14",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "______ (you / play) music up there? It's really noisy!",
+      "options": [
+        "Are you playing",
+        "Do you play",
+        "Did you play",
+        "You are playing"
+      ],
+      "correctAnswer": "Are you playing",
+      "explanation": "👉 Hỏi về hành động đang phát ra tiếng ồn trên lầu (\"It's really noisy!\") -> Câu hỏi Hiện tại tiếp diễn: Are you playing...?"
+    },
+    {
+      "id": "q-u1-15",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Are top musicians studying for many years?\"",
+      "options": [
+        "Do top musicians study",
+        "Are top musicians study",
+        "Top musicians study",
+        "Does top musicians study"
+      ],
+      "correctAnswer": "Do top musicians study",
+      "explanation": "👉 Hỏi về một thực tế khách quan, quá trình rèn luyện chung của các nhạc sĩ -> dùng Hiện tại đơn dạng nghi vấn: Do top musicians study...?"
+    },
+    {
+      "id": "q-u1-16",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"What's going on? I hope you don't touch my things!\"",
+      "options": [
+        "aren't touching",
+        "haven't touched",
+        "not touching",
+        "doesn't touch"
+      ],
+      "correctAnswer": "aren't touching",
+      "explanation": "👉 \"Chuyện gì đang xảy ra vậy?\" (What's going on?) -> người nói lo lắng người kia đang chạm vào đồ của mình ngay lúc này -> sửa thành Hiện tại tiếp diễn phủ định: aren't touching."
+    },
+    {
+      "id": "q-u1-17",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"It's a small business, so each person is doing lots of different jobs.\"",
+      "options": [
+        "does",
+        "do",
+        "doing",
+        "is done"
+      ],
+      "correctAnswer": "does",
+      "explanation": "👉 Diễn tả công việc thực tế cố định trong doanh nghiệp nhỏ -> Hiện tại đơn. Chủ ngữ số ít \"each person\" -> does."
+    },
+    {
+      "id": "q-u1-18",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Does Christine listen to the radio, or is that the TV I can hear?\"",
+      "options": [
+        "Is Christine listening",
+        "Christine is listening",
+        "Are Christine listening",
+        "Do Christine listen"
+      ],
+      "correctAnswer": "Is Christine listening",
+      "explanation": "👉 Ngữ cảnh đang nghe thấy tiếng động ngay lúc nói (\"or is that the TV I can hear?\") -> dùng Hiện tại tiếp diễn: Is Christine listening...?"
+    },
+    {
+      "id": "q-u1-19",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"I am usually buying a special ticket each week for the bus because it's cheaper.\"",
+      "options": [
+        "usually buy",
+        "am buying usually",
+        "buy usually",
+        "usually buying"
+      ],
+      "correctAnswer": "usually buy",
+      "explanation": "👉 Thói quen mua vé tiết kiệm mỗi tuần (\"usually\", \"each week\") -> dùng Hiện tại đơn: usually buy."
+    },
+    {
+      "id": "q-u1-20",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Our washing machine is starting when you press this button.\"",
+      "options": [
+        "starts",
+        "start",
+        "is start",
+        "starting"
+      ],
+      "correctAnswer": "starts",
+      "explanation": "👉 Quy luật vận hành máy móc, sự thật hiển nhiên (khi nhấn nút thì máy khởi động) -> Hiện tại đơn: starts."
+    },
+    {
+      "id": "q-u1-21",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"How's the match going? Does our team win?\"",
+      "options": [
+        "Is our team winning",
+        "Our team is winning",
+        "Does our team winning",
+        "Is our team win"
+      ],
+      "correctAnswer": "Is our team winning",
+      "explanation": "👉 Trận đấu đang diễn ra (\"How's the match going?\") -> hỏi xem đội có đang dẫn trước/chiến thắng không -> Hiện tại tiếp diễn: Is our team winning?"
+    },
+    {
+      "id": "q-u1-22",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Many people are enjoying spending time on the beach on holiday.\"",
+      "options": [
+        "enjoy",
+        "enjoys",
+        "are enjoy",
+        "enjoying"
+      ],
+      "correctAnswer": "enjoy",
+      "explanation": "👉 \"enjoy\" là động từ chỉ sở thích/trạng thái cảm xúc, nói về thói quen kỳ nghỉ của mọi người nói chung -> Hiện tại đơn: enjoy."
+    },
+    {
+      "id": "q-u1-23",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "I ______ at the local library for the summer.",
+      "options": [
+        "am working",
+        "work",
+        "working",
+        "am work"
+      ],
+      "correctAnswer": "am working",
+      "explanation": "👉 \"for the summer\" là công việc làm thêm tạm thời trong kỳ nghỉ hè -> dùng thì Hiện tại tiếp diễn: am working."
+    },
+    {
+      "id": "q-u1-24",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "We ______ to the theatre very often.",
+      "options": [
+        "don't go",
+        "aren't going",
+        "not go",
+        "haven't gone"
+      ],
+      "correctAnswer": "don't go",
+      "explanation": "👉 \"very often\" (rất thường xuyên) chỉ tần suất của thói quen -> Hiện tại đơn phủ định: don't go."
+    },
+    {
+      "id": "q-u1-25",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "Stacy ______ ready for school, so she can't come to the phone.",
+      "options": [
+        "is getting",
+        "gets",
+        "getting",
+        "is get"
+      ],
+      "correctAnswer": "is getting",
+      "explanation": "👉 Stacy không thể nghe điện thoại lúc này vì cô ấy đang chuẩn bị đi học -> hành động đang diễn ra -> is getting."
+    },
+    {
+      "id": "q-u1-26",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "______ about his expedition to the Amazon jungle?",
+      "options": [
+        "Does Gary ever talk",
+        "Is Gary ever talking",
+        "Gary ever talks",
+        "Does Gary ever talking"
+      ],
+      "correctAnswer": "Does Gary ever talk",
+      "explanation": "👉 \"ever\" hỏi về thói quen / việc có từng hay kể về chuyến đi thám hiểm không -> Hiện tại đơn: Does Gary ever talk...?"
+    },
+    {
+      "id": "q-u1-27",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "In squash, you ______ a ball against a wall.",
+      "options": [
+        "hit",
+        "are hitting",
+        "hitting",
+        "hits"
+      ],
+      "correctAnswer": "hit",
+      "explanation": "👉 Mô tả luật chơi thể thao (môn squash - bóng quần), chân lý cố định -> Hiện tại đơn: hit."
+    },
+    {
+      "id": "q-u1-28",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "I ______ a newspaper at least once a week.",
+      "options": [
+        "read",
+        "am reading",
+        "reads",
+        "reading"
+      ],
+      "correctAnswer": "read",
+      "explanation": "👉 \"at least once a week\" (ít nhất một lần mỗi tuần) chỉ thói quen đọc báo định kỳ -> Hiện tại đơn: read."
+    },
+    {
+      "id": "q-u1-29",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "______ the piano for two hours every day?",
+      "options": [
+        "Do you practise",
+        "Are you practising",
+        "Did you practise",
+        "Have you practised"
+      ],
+      "correctAnswer": "Do you practise",
+      "explanation": "👉 \"every day\" chỉ thời gian biểu luyện tập đàn thường xuyên -> Hiện tại đơn nghi vấn: Do you practise...?"
+    },
+    {
+      "id": "q-u1-30",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "Nadine and Claire ______ quite well at school at the moment.",
+      "options": [
+        "are doing",
+        "do",
+        "doing",
+        "does"
+      ],
+      "correctAnswer": "are doing",
+      "explanation": "👉 \"at the moment\" (dạo này / ngay lúc này) chỉ tình trạng đang diễn ra -> chia Hiện tại tiếp diễn: are doing."
+    },
+    {
+      "id": "q-u1-31",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "A good friend ______ when you're upset about something.",
+      "options": [
+        "knows",
+        "is knowing",
+        "know",
+        "knowing"
+      ],
+      "correctAnswer": "knows",
+      "explanation": "👉 \"know\" là động từ trạng thái (stative verb) chỉ nhận thức, không chia ở thì tiếp diễn -> Hiện tại đơn ngôi thứ 3 số ít: knows."
+    },
+    {
+      "id": "q-u1-32",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "How ______ your name?",
+      "options": [
+        "do you spell",
+        "are you spelling",
+        "did you spell",
+        "you spell"
+      ],
+      "correctAnswer": "do you spell",
+      "explanation": "👉 Hỏi cách đánh vần tên (sự thật cố định, chân lý) -> Hiện tại đơn: do you spell."
+    },
+    {
+      "id": "q-u1-33",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "In Monopoly, you ______ around the board, buying houses and hotels.",
+      "options": [
+        "move",
+        "are moving",
+        "moves",
+        "moved"
+      ],
+      "correctAnswer": "move",
+      "explanation": "👉 Luật chơi trò chơi Cờ tỷ phú (Monopoly) -> dùng thì Hiện tại đơn với chủ ngữ \"you\": move."
+    },
+    {
+      "id": "q-u1-34",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ you ______ this programme or can I turn the TV off?",
+      "options": [
+        "Are ... watching",
+        "Do ... watch",
+        "Have ... watched",
+        "Will ... watch"
+      ],
+      "correctAnswer": "Are ... watching",
+      "explanation": "👉 Người nói hỏi xem bạn có đang xem chương trình đó lúc này không để tắt TV -> Hiện tại tiếp diễn: Are you watching...?"
+    },
+    {
+      "id": "q-u1-35",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "Regular exercise ______ you to stay healthy.",
+      "options": [
+        "helps",
+        "is helping",
+        "help",
+        "helped"
+      ],
+      "correctAnswer": "helps",
+      "explanation": "👉 Sự thật khoa học: tập thể dục đều đặn giúp con người khỏe mạnh. \"Regular exercise\" là danh từ không đếm được -> Hiện tại đơn: helps."
+    },
+    {
+      "id": "q-u1-36",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "I ______ my brother's guitar until I get a new one.",
+      "options": [
+        "am using",
+        "use",
+        "using",
+        "used"
+      ],
+      "correctAnswer": "am using",
+      "explanation": "👉 Việc mượn đàn của anh trai là tạm thời cho đến khi có đàn mới (\"until I get a new one\") -> Hiện tại tiếp diễn: am using."
+    },
+    {
+      "id": "q-u1-37",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ Simon always ______ the washing-up after lunch?",
+      "options": [
+        "Does ... do",
+        "Is ... doing",
+        "Did ... do",
+        "Has ... done"
+      ],
+      "correctAnswer": "Does ... do",
+      "explanation": "👉 Hỏi về thói quen luôn rửa chén sau bữa trưa (\"always\", \"after lunch\") -> Hiện tại đơn: Does Simon always do...?"
+    },
+    {
+      "id": "q-u1-38",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ you ______ any sweaters in a larger size?",
+      "options": [
+        "Do you have",
+        "Are you having",
+        "Have you having",
+        "Did you have"
+      ],
+      "correctAnswer": "Do you have",
+      "explanation": "👉 \"have\" mang nghĩa sở hữu/có hàng hóa trong cửa hàng là động từ trạng thái -> không dùng tiếp diễn -> Hiện tại đơn: Do you have...?"
+    },
+    {
+      "id": "q-u1-39",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "You ______ the kite right. Let me show you.",
+      "options": [
+        "aren't holding",
+        "don't hold",
+        "not holding",
+        "haven't held"
+      ],
+      "correctAnswer": "aren't holding",
+      "explanation": "👉 Người nói thấy bạn mình đang cầm diều sai cách ngay lúc thả diều và bảo \"để mình chỉ cho\" -> Hiện tại tiếp diễn phủ định: aren't holding."
+    },
+    {
+      "id": "q-u1-40",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "Dad ______ to the local astronomy club.",
+      "options": [
+        "belongs",
+        "is belonging",
+        "belong",
+        "belonged"
+      ],
+      "correctAnswer": "belongs",
+      "explanation": "👉 \"belong to\" (thuộc về / là thành viên của) là động từ trạng thái không chia tiếp diễn -> Hiện tại đơn số ít: belongs."
+    },
+    {
+      "id": "q-u1-41",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (1): Sửa động từ \"am loving\" trong câu: \"One game I am loving is backgammon.\"",
+      "options": [
+        "love",
+        "loved",
+        "am love",
+        "loves"
+      ],
+      "correctAnswer": "love",
+      "explanation": "👉 \"love\" là động từ trạng thái chỉ cảm xúc, sở thích -> không chia tiếp diễn -> sửa thành Hiện tại đơn: love."
+    },
+    {
+      "id": "q-u1-42",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (2): Sửa động từ \"are throwing\" trong câu: \"You are throwing the dice and then you move your pieces around the board.\"",
+      "options": [
+        "throw",
+        "throws",
+        "throwing",
+        "are throw"
+      ],
+      "correctAnswer": "throw",
+      "explanation": "👉 Mô tả các bước và luật chơi một trò chơi board game -> dùng thì Hiện tại đơn: throw."
+    },
+    {
+      "id": "q-u1-43",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (3): Sửa động từ \"is seeming\" trong câu: \"It is seeming quite easy, but in fact...\"",
+      "options": [
+        "seems",
+        "seem",
+        "seemed",
+        "is seem"
+      ],
+      "correctAnswer": "seems",
+      "explanation": "👉 \"seem\" (có vẻ như) là động từ trạng thái chỉ nhận định -> không chia tiếp diễn -> sửa thành: seems."
+    },
+    {
+      "id": "q-u1-44",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (4): Sửa động từ \"are needing\" trong câu: \"...but in fact you are needing to be quite careful.\"",
+      "options": [
+        "need",
+        "needs",
+        "needing",
+        "is need"
+      ],
+      "correctAnswer": "need",
+      "explanation": "👉 \"need\" (cần) là động từ trạng thái chỉ nhu cầu -> không chia tiếp diễn -> sửa thành: need."
+    },
+    {
+      "id": "q-u1-45",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (5): Sửa động từ \"are taking\" trong câu: \"When your piece lands on one of the other person's pieces, you are taking it off the board...\"",
+      "options": [
+        "take",
+        "takes",
+        "taking",
+        "are take"
+      ],
+      "correctAnswer": "take",
+      "explanation": "👉 Luật chơi trò chơi: \"When your piece lands... you take it off...\" -> chia Hiện tại đơn: take."
+    },
+    {
+      "id": "q-u1-46",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (6): Sửa động từ \"are winning\" trong câu: \"You are winning by getting all your pieces to the end and off the board.\"",
+      "options": [
+        "win",
+        "wins",
+        "winning",
+        "are win"
+      ],
+      "correctAnswer": "win",
+      "explanation": "👉 Mô tả điều kiện chiến thắng trong trò chơi -> dùng Hiện tại đơn: win."
+    },
+    {
+      "id": "q-u1-47",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (7): Sửa động từ \"are preferring\" trong câu: \"Some people are preferring chess, but I am not understanding that game.\"",
+      "options": [
+        "prefer",
+        "prefers",
+        "preferring",
+        "are prefer"
+      ],
+      "correctAnswer": "prefer",
+      "explanation": "👉 \"prefer\" (thích hơn) là động từ trạng thái chỉ sở thích -> không chia tiếp diễn -> sửa thành: prefer."
+    },
+    {
+      "id": "q-u1-48",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (8): Sửa động từ \"am not understanding\" trong câu: \"...but I am not understanding that game.\"",
+      "options": [
+        "don't understand",
+        "not understand",
+        "doesn't understand",
+        "am not understood"
+      ],
+      "correctAnswer": "don't understand",
+      "explanation": "👉 \"understand\" (hiểu) là động từ trạng thái chỉ nhận thức trí tuệ -> không chia tiếp diễn -> phủ định Hiện tại đơn: don't understand."
+    },
+    {
+      "id": "q-u1-49",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (9): Sửa động từ \"wait\" trong câu: \"Right now, I wait to have a game with my brother.\"",
+      "options": [
+        "am waiting",
+        "waiting",
+        "waited",
+        "waits"
+      ],
+      "correctAnswer": "am waiting",
+      "explanation": "👉 \"Right now\" (ngay lúc này) chỉ hành động đang diễn ra trong thực tế -> dùng thì Hiện tại tiếp diễn: am waiting."
+    },
+    {
+      "id": "q-u1-50",
+      "examId": "exam-b1-u1",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (10): Sửa động từ \"does\" trong câu: \"He does his homework.\"",
+      "options": [
+        "is doing",
+        "doing",
+        "does do",
+        "did"
+      ],
+      "correctAnswer": "is doing",
+      "explanation": "👉 Người em đang bận làm bài tập về nhà ngay lúc này (vì thế người nói mới phải ngồi chờ) -> dùng Hiện tại tiếp diễn: is doing."
+    }
+  ]
+},
+  {
+  "id": "exam-b1-u1-part1",
+  "unitId": "deck-b1-u1",
+  "title": "Unit 1 - Phần 1: Bài Tập A, B, C (Trang 7)",
+  "unit": "Unit 1",
+  "description": "22 câu hỏi Bài A (Thói quen của Helen), Bài B (Hiện tại tiếp diễn) và Bài C (Sửa lại câu sai) theo đúng bài tập sách Destination B1.",
+  "durationMinutes": 20,
+  "emoji": "⚡",
+  "color": "#06B6D4",
+  "questions": [
+    {
+      "id": "q-u1-1-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 1: Every day, Helen ______ at half past seven.",
+      "options": [
+        "gets up",
+        "is getting up",
+        "get up",
+        "getting up"
+      ],
+      "correctAnswer": "gets up",
+      "explanation": "👉 Thói quen lặp lại hàng ngày (Every day) dùng thì Hiện tại đơn (Present Simple). Chủ ngữ Helen (ngôi thứ 3 số ít) nên động từ thêm \"s\": gets up."
+    },
+    {
+      "id": "q-u1-2-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 2: Helen often ______ fast food for lunch.",
+      "options": [
+        "eats",
+        "is eating",
+        "eat",
+        "has eaten"
+      ],
+      "correctAnswer": "eats",
+      "explanation": "👉 Trạng từ tần suất \"often\" đứng trước động từ thường ở thì Hiện tại đơn: Helen often eats."
+    },
+    {
+      "id": "q-u1-3-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 3: In the evening, Helen usually ______ her friends for coffee.",
+      "options": [
+        "meets",
+        "is meeting",
+        "meet",
+        "meeting"
+      ],
+      "correctAnswer": "meets",
+      "explanation": "👉 Trạng từ tần suất \"usually\" chỉ thói quen vào buổi tối -> chia thì Hiện tại đơn với chủ ngữ Helen: meets."
+    },
+    {
+      "id": "q-u1-4-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 4: Once a week, Helen ______ a film at the cinema.",
+      "options": [
+        "watches",
+        "is watching",
+        "watch",
+        "watchs"
+      ],
+      "correctAnswer": "watches",
+      "explanation": "👉 Cụm từ chỉ tần suất \"Once a week\" diễn tả thói quen -> Hiện tại đơn. Động từ tận cùng \"ch\" thêm \"es\": watches."
+    },
+    {
+      "id": "q-u1-5-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 5: Helen rarely ______ to the gym.",
+      "options": [
+        "goes",
+        "is going",
+        "go",
+        "gone"
+      ],
+      "correctAnswer": "goes",
+      "explanation": "👉 Trạng từ tần suất \"rarely\" (hiếm khi) -> Hiện tại đơn: goes (thêm \"es\" sau nguyên âm \"o\")."
+    },
+    {
+      "id": "q-u1-6-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài A: Thói quen & Hiện tại đơn",
+      "question": "Look at Picture 6: Helen ______ a driving lesson twice a week.",
+      "options": [
+        "has",
+        "is having",
+        "have",
+        "having"
+      ],
+      "correctAnswer": "has",
+      "explanation": "👉 Cụm chỉ tần suất \"twice a week\" chỉ lịch trình định kỳ -> Hiện tại đơn. Ngôi thứ 3 số ít của \"have\" là \"has\"."
+    },
+    {
+      "id": "q-u1-7-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Gordon? I think he ______ (write) a letter at the moment.",
+      "options": [
+        "is writing",
+        "writes",
+        "writing",
+        "is write"
+      ],
+      "correctAnswer": "is writing",
+      "explanation": "👉 Dấu hiệu \"at the moment\" (ngay lúc này) -> chia thì Hiện tại tiếp diễn: S + is + V-ing -> is writing."
+    },
+    {
+      "id": "q-u1-8-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Yes, the match is on TV now, but we ______ (lose).",
+      "options": [
+        "are losing",
+        "lose",
+        "are loosing",
+        "losing"
+      ],
+      "correctAnswer": "are losing",
+      "explanation": "👉 Trận đấu đang phát sóng lúc này (\"now\") -> hành động đang diễn ra: \"we are losing\" (đang bị dẫn trước/thua)."
+    },
+    {
+      "id": "q-u1-9-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Right now, Margaret ______ (have) a shower. Do you want to ring later?",
+      "options": [
+        "is having",
+        "has",
+        "having",
+        "is had"
+      ],
+      "correctAnswer": "is having",
+      "explanation": "👉 Dấu hiệu \"Right now\" (ngay bây giờ). Cụm \"have a shower\" (đang tắm) là hành động thể chất đang diễn ra -> dùng tiếp diễn: is having."
+    },
+    {
+      "id": "q-u1-10-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Sally ______ (stay) with her aunt for a few days.",
+      "options": [
+        "is staying",
+        "stays",
+        "staying",
+        "is stayed"
+      ],
+      "correctAnswer": "is staying",
+      "explanation": "👉 Tình huống tạm thời trong vài ngày (\"for a few days\") -> dùng Hiện tại tiếp diễn: is staying."
+    },
+    {
+      "id": "q-u1-11-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "I ______ (lie)! It's true! I did see Madonna at the supermarket.",
+      "options": [
+        "am not lying",
+        "am not lieing",
+        "don't lie",
+        "am lying"
+      ],
+      "correctAnswer": "am not lying",
+      "explanation": "👉 Ngữ cảnh: \"Đó là sự thật! Tôi có thấy Madonna mà!\" -> ý nói \"Tôi không hề nói dối!\". Động từ \"lie\" đổi \"ie\" thành \"y\" rồi thêm \"ing\" -> am not lying."
+    },
+    {
+      "id": "q-u1-12-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "Josh ______ (always / use) my bike! It's so annoying.",
+      "options": [
+        "is always using",
+        "always uses",
+        "always using",
+        "is using always"
+      ],
+      "correctAnswer": "is always using",
+      "explanation": "👉 Cấu trúc \"be + always + V-ing\" dùng để phàn nàn về một thói quen xấu lặp đi lặp lại gây bực mình (\"It's so annoying\")."
+    },
+    {
+      "id": "q-u1-13-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "We ______ (have) lunch, but I can come round and help you later.",
+      "options": [
+        "are having",
+        "have",
+        "having",
+        "had"
+      ],
+      "correctAnswer": "are having",
+      "explanation": "👉 Hành động đang ăn trưa tại thời điểm nói (\"we are having lunch\"), sau đó mới qua giúp được."
+    },
+    {
+      "id": "q-u1-14-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài B: Hiện tại tiếp diễn",
+      "question": "______ (you / play) music up there? It's really noisy!",
+      "options": [
+        "Are you playing",
+        "Do you play",
+        "Did you play",
+        "You are playing"
+      ],
+      "correctAnswer": "Are you playing",
+      "explanation": "👉 Hỏi về hành động đang phát ra tiếng ồn trên lầu (\"It's really noisy!\") -> Câu hỏi Hiện tại tiếp diễn: Are you playing...?"
+    },
+    {
+      "id": "q-u1-15-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Are top musicians studying for many years?\"",
+      "options": [
+        "Do top musicians study",
+        "Are top musicians study",
+        "Top musicians study",
+        "Does top musicians study"
+      ],
+      "correctAnswer": "Do top musicians study",
+      "explanation": "👉 Hỏi về một thực tế khách quan, quá trình rèn luyện chung của các nhạc sĩ -> dùng Hiện tại đơn dạng nghi vấn: Do top musicians study...?"
+    },
+    {
+      "id": "q-u1-16-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"What's going on? I hope you don't touch my things!\"",
+      "options": [
+        "aren't touching",
+        "haven't touched",
+        "not touching",
+        "doesn't touch"
+      ],
+      "correctAnswer": "aren't touching",
+      "explanation": "👉 \"Chuyện gì đang xảy ra vậy?\" (What's going on?) -> người nói lo lắng người kia đang chạm vào đồ của mình ngay lúc này -> sửa thành Hiện tại tiếp diễn phủ định: aren't touching."
+    },
+    {
+      "id": "q-u1-17-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"It's a small business, so each person is doing lots of different jobs.\"",
+      "options": [
+        "does",
+        "do",
+        "doing",
+        "is done"
+      ],
+      "correctAnswer": "does",
+      "explanation": "👉 Diễn tả công việc thực tế cố định trong doanh nghiệp nhỏ -> Hiện tại đơn. Chủ ngữ số ít \"each person\" -> does."
+    },
+    {
+      "id": "q-u1-18-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Does Christine listen to the radio, or is that the TV I can hear?\"",
+      "options": [
+        "Is Christine listening",
+        "Christine is listening",
+        "Are Christine listening",
+        "Do Christine listen"
+      ],
+      "correctAnswer": "Is Christine listening",
+      "explanation": "👉 Ngữ cảnh đang nghe thấy tiếng động ngay lúc nói (\"or is that the TV I can hear?\") -> dùng Hiện tại tiếp diễn: Is Christine listening...?"
+    },
+    {
+      "id": "q-u1-19-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"I am usually buying a special ticket each week for the bus because it's cheaper.\"",
+      "options": [
+        "usually buy",
+        "am buying usually",
+        "buy usually",
+        "usually buying"
+      ],
+      "correctAnswer": "usually buy",
+      "explanation": "👉 Thói quen mua vé tiết kiệm mỗi tuần (\"usually\", \"each week\") -> dùng Hiện tại đơn: usually buy."
+    },
+    {
+      "id": "q-u1-20-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Our washing machine is starting when you press this button.\"",
+      "options": [
+        "starts",
+        "start",
+        "is start",
+        "starting"
+      ],
+      "correctAnswer": "starts",
+      "explanation": "👉 Quy luật vận hành máy móc, sự thật hiển nhiên (khi nhấn nút thì máy khởi động) -> Hiện tại đơn: starts."
+    },
+    {
+      "id": "q-u1-21-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"How's the match going? Does our team win?\"",
+      "options": [
+        "Is our team winning",
+        "Our team is winning",
+        "Does our team winning",
+        "Is our team win"
+      ],
+      "correctAnswer": "Is our team winning",
+      "explanation": "👉 Trận đấu đang diễn ra (\"How's the match going?\") -> hỏi xem đội có đang dẫn trước/chiến thắng không -> Hiện tại tiếp diễn: Is our team winning?"
+    },
+    {
+      "id": "q-u1-22-p1",
+      "examId": "exam-b1-u1-part1",
+      "type": "multiple-choice",
+      "dạng": "Bài C: Sửa lại câu sai",
+      "question": "Rewrite correctly: \"Many people are enjoying spending time on the beach on holiday.\"",
+      "options": [
+        "enjoy",
+        "enjoys",
+        "are enjoy",
+        "enjoying"
+      ],
+      "correctAnswer": "enjoy",
+      "explanation": "👉 \"enjoy\" là động từ chỉ sở thích/trạng thái cảm xúc, nói về thói quen kỳ nghỉ của mọi người nói chung -> Hiện tại đơn: enjoy."
+    }
+  ]
+},
+  {
+  "id": "exam-b1-u1-part2",
+  "unitId": "deck-b1-u1",
+  "title": "Unit 1 - Phần 2: Bài Tập D, E, F (Trang 8)",
+  "unit": "Unit 1",
+  "description": "28 câu hỏi Bài D (Khoanh chọn dạng đúng), Bài E (Điền từ theo hộp) và Bài F (Tìm 10 lỗi sai trong đoạn văn Backgammon).",
+  "durationMinutes": 25,
+  "emoji": "🎯",
+  "color": "#8B5CF6",
+  "questions": [
+    {
+      "id": "q-u1-23-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "I ______ at the local library for the summer.",
+      "options": [
+        "am working",
+        "work",
+        "working",
+        "am work"
+      ],
+      "correctAnswer": "am working",
+      "explanation": "👉 \"for the summer\" là công việc làm thêm tạm thời trong kỳ nghỉ hè -> dùng thì Hiện tại tiếp diễn: am working."
+    },
+    {
+      "id": "q-u1-24-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "We ______ to the theatre very often.",
+      "options": [
+        "don't go",
+        "aren't going",
+        "not go",
+        "haven't gone"
+      ],
+      "correctAnswer": "don't go",
+      "explanation": "👉 \"very often\" (rất thường xuyên) chỉ tần suất của thói quen -> Hiện tại đơn phủ định: don't go."
+    },
+    {
+      "id": "q-u1-25-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "Stacy ______ ready for school, so she can't come to the phone.",
+      "options": [
+        "is getting",
+        "gets",
+        "getting",
+        "is get"
+      ],
+      "correctAnswer": "is getting",
+      "explanation": "👉 Stacy không thể nghe điện thoại lúc này vì cô ấy đang chuẩn bị đi học -> hành động đang diễn ra -> is getting."
+    },
+    {
+      "id": "q-u1-26-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "______ about his expedition to the Amazon jungle?",
+      "options": [
+        "Does Gary ever talk",
+        "Is Gary ever talking",
+        "Gary ever talks",
+        "Does Gary ever talking"
+      ],
+      "correctAnswer": "Does Gary ever talk",
+      "explanation": "👉 \"ever\" hỏi về thói quen / việc có từng hay kể về chuyến đi thám hiểm không -> Hiện tại đơn: Does Gary ever talk...?"
+    },
+    {
+      "id": "q-u1-27-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "In squash, you ______ a ball against a wall.",
+      "options": [
+        "hit",
+        "are hitting",
+        "hitting",
+        "hits"
+      ],
+      "correctAnswer": "hit",
+      "explanation": "👉 Mô tả luật chơi thể thao (môn squash - bóng quần), chân lý cố định -> Hiện tại đơn: hit."
+    },
+    {
+      "id": "q-u1-28-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "I ______ a newspaper at least once a week.",
+      "options": [
+        "read",
+        "am reading",
+        "reads",
+        "reading"
+      ],
+      "correctAnswer": "read",
+      "explanation": "👉 \"at least once a week\" (ít nhất một lần mỗi tuần) chỉ thói quen đọc báo định kỳ -> Hiện tại đơn: read."
+    },
+    {
+      "id": "q-u1-29-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "______ the piano for two hours every day?",
+      "options": [
+        "Do you practise",
+        "Are you practising",
+        "Did you practise",
+        "Have you practised"
+      ],
+      "correctAnswer": "Do you practise",
+      "explanation": "👉 \"every day\" chỉ thời gian biểu luyện tập đàn thường xuyên -> Hiện tại đơn nghi vấn: Do you practise...?"
+    },
+    {
+      "id": "q-u1-30-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "Nadine and Claire ______ quite well at school at the moment.",
+      "options": [
+        "are doing",
+        "do",
+        "doing",
+        "does"
+      ],
+      "correctAnswer": "are doing",
+      "explanation": "👉 \"at the moment\" (dạo này / ngay lúc này) chỉ tình trạng đang diễn ra -> chia Hiện tại tiếp diễn: are doing."
+    },
+    {
+      "id": "q-u1-31-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "A good friend ______ when you're upset about something.",
+      "options": [
+        "knows",
+        "is knowing",
+        "know",
+        "knowing"
+      ],
+      "correctAnswer": "knows",
+      "explanation": "👉 \"know\" là động từ trạng thái (stative verb) chỉ nhận thức, không chia ở thì tiếp diễn -> Hiện tại đơn ngôi thứ 3 số ít: knows."
+    },
+    {
+      "id": "q-u1-32-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài D: Phân biệt thì Hiện tại",
+      "question": "How ______ your name?",
+      "options": [
+        "do you spell",
+        "are you spelling",
+        "did you spell",
+        "you spell"
+      ],
+      "correctAnswer": "do you spell",
+      "explanation": "👉 Hỏi cách đánh vần tên (sự thật cố định, chân lý) -> Hiện tại đơn: do you spell."
+    },
+    {
+      "id": "q-u1-33-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "In Monopoly, you ______ around the board, buying houses and hotels.",
+      "options": [
+        "move",
+        "are moving",
+        "moves",
+        "moved"
+      ],
+      "correctAnswer": "move",
+      "explanation": "👉 Luật chơi trò chơi Cờ tỷ phú (Monopoly) -> dùng thì Hiện tại đơn với chủ ngữ \"you\": move."
+    },
+    {
+      "id": "q-u1-34-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ you ______ this programme or can I turn the TV off?",
+      "options": [
+        "Are ... watching",
+        "Do ... watch",
+        "Have ... watched",
+        "Will ... watch"
+      ],
+      "correctAnswer": "Are ... watching",
+      "explanation": "👉 Người nói hỏi xem bạn có đang xem chương trình đó lúc này không để tắt TV -> Hiện tại tiếp diễn: Are you watching...?"
+    },
+    {
+      "id": "q-u1-35-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "Regular exercise ______ you to stay healthy.",
+      "options": [
+        "helps",
+        "is helping",
+        "help",
+        "helped"
+      ],
+      "correctAnswer": "helps",
+      "explanation": "👉 Sự thật khoa học: tập thể dục đều đặn giúp con người khỏe mạnh. \"Regular exercise\" là danh từ không đếm được -> Hiện tại đơn: helps."
+    },
+    {
+      "id": "q-u1-36-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "I ______ my brother's guitar until I get a new one.",
+      "options": [
+        "am using",
+        "use",
+        "using",
+        "used"
+      ],
+      "correctAnswer": "am using",
+      "explanation": "👉 Việc mượn đàn của anh trai là tạm thời cho đến khi có đàn mới (\"until I get a new one\") -> Hiện tại tiếp diễn: am using."
+    },
+    {
+      "id": "q-u1-37-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ Simon always ______ the washing-up after lunch?",
+      "options": [
+        "Does ... do",
+        "Is ... doing",
+        "Did ... do",
+        "Has ... done"
+      ],
+      "correctAnswer": "Does ... do",
+      "explanation": "👉 Hỏi về thói quen luôn rửa chén sau bữa trưa (\"always\", \"after lunch\") -> Hiện tại đơn: Does Simon always do...?"
+    },
+    {
+      "id": "q-u1-38-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "______ you ______ any sweaters in a larger size?",
+      "options": [
+        "Do you have",
+        "Are you having",
+        "Have you having",
+        "Did you have"
+      ],
+      "correctAnswer": "Do you have",
+      "explanation": "👉 \"have\" mang nghĩa sở hữu/có hàng hóa trong cửa hàng là động từ trạng thái -> không dùng tiếp diễn -> Hiện tại đơn: Do you have...?"
+    },
+    {
+      "id": "q-u1-39-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "You ______ the kite right. Let me show you.",
+      "options": [
+        "aren't holding",
+        "don't hold",
+        "not holding",
+        "haven't held"
+      ],
+      "correctAnswer": "aren't holding",
+      "explanation": "👉 Người nói thấy bạn mình đang cầm diều sai cách ngay lúc thả diều và bảo \"để mình chỉ cho\" -> Hiện tại tiếp diễn phủ định: aren't holding."
+    },
+    {
+      "id": "q-u1-40-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài E: Điền từ theo ngữ cảnh",
+      "question": "Dad ______ to the local astronomy club.",
+      "options": [
+        "belongs",
+        "is belonging",
+        "belong",
+        "belonged"
+      ],
+      "correctAnswer": "belongs",
+      "explanation": "👉 \"belong to\" (thuộc về / là thành viên của) là động từ trạng thái không chia tiếp diễn -> Hiện tại đơn số ít: belongs."
+    },
+    {
+      "id": "q-u1-41-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (1): Sửa động từ \"am loving\" trong câu: \"One game I am loving is backgammon.\"",
+      "options": [
+        "love",
+        "loved",
+        "am love",
+        "loves"
+      ],
+      "correctAnswer": "love",
+      "explanation": "👉 \"love\" là động từ trạng thái chỉ cảm xúc, sở thích -> không chia tiếp diễn -> sửa thành Hiện tại đơn: love."
+    },
+    {
+      "id": "q-u1-42-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (2): Sửa động từ \"are throwing\" trong câu: \"You are throwing the dice and then you move your pieces around the board.\"",
+      "options": [
+        "throw",
+        "throws",
+        "throwing",
+        "are throw"
+      ],
+      "correctAnswer": "throw",
+      "explanation": "👉 Mô tả các bước và luật chơi một trò chơi board game -> dùng thì Hiện tại đơn: throw."
+    },
+    {
+      "id": "q-u1-43-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (3): Sửa động từ \"is seeming\" trong câu: \"It is seeming quite easy, but in fact...\"",
+      "options": [
+        "seems",
+        "seem",
+        "seemed",
+        "is seem"
+      ],
+      "correctAnswer": "seems",
+      "explanation": "👉 \"seem\" (có vẻ như) là động từ trạng thái chỉ nhận định -> không chia tiếp diễn -> sửa thành: seems."
+    },
+    {
+      "id": "q-u1-44-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (4): Sửa động từ \"are needing\" trong câu: \"...but in fact you are needing to be quite careful.\"",
+      "options": [
+        "need",
+        "needs",
+        "needing",
+        "is need"
+      ],
+      "correctAnswer": "need",
+      "explanation": "👉 \"need\" (cần) là động từ trạng thái chỉ nhu cầu -> không chia tiếp diễn -> sửa thành: need."
+    },
+    {
+      "id": "q-u1-45-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (5): Sửa động từ \"are taking\" trong câu: \"When your piece lands on one of the other person's pieces, you are taking it off the board...\"",
+      "options": [
+        "take",
+        "takes",
+        "taking",
+        "are take"
+      ],
+      "correctAnswer": "take",
+      "explanation": "👉 Luật chơi trò chơi: \"When your piece lands... you take it off...\" -> chia Hiện tại đơn: take."
+    },
+    {
+      "id": "q-u1-46-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (6): Sửa động từ \"are winning\" trong câu: \"You are winning by getting all your pieces to the end and off the board.\"",
+      "options": [
+        "win",
+        "wins",
+        "winning",
+        "are win"
+      ],
+      "correctAnswer": "win",
+      "explanation": "👉 Mô tả điều kiện chiến thắng trong trò chơi -> dùng Hiện tại đơn: win."
+    },
+    {
+      "id": "q-u1-47-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (7): Sửa động từ \"are preferring\" trong câu: \"Some people are preferring chess, but I am not understanding that game.\"",
+      "options": [
+        "prefer",
+        "prefers",
+        "preferring",
+        "are prefer"
+      ],
+      "correctAnswer": "prefer",
+      "explanation": "👉 \"prefer\" (thích hơn) là động từ trạng thái chỉ sở thích -> không chia tiếp diễn -> sửa thành: prefer."
+    },
+    {
+      "id": "q-u1-48-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (8): Sửa động từ \"am not understanding\" trong câu: \"...but I am not understanding that game.\"",
+      "options": [
+        "don't understand",
+        "not understand",
+        "doesn't understand",
+        "am not understood"
+      ],
+      "correctAnswer": "don't understand",
+      "explanation": "👉 \"understand\" (hiểu) là động từ trạng thái chỉ nhận thức trí tuệ -> không chia tiếp diễn -> phủ định Hiện tại đơn: don't understand."
+    },
+    {
+      "id": "q-u1-49-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (9): Sửa động từ \"wait\" trong câu: \"Right now, I wait to have a game with my brother.\"",
+      "options": [
+        "am waiting",
+        "waiting",
+        "waited",
+        "waits"
+      ],
+      "correctAnswer": "am waiting",
+      "explanation": "👉 \"Right now\" (ngay lúc này) chỉ hành động đang diễn ra trong thực tế -> dùng thì Hiện tại tiếp diễn: am waiting."
+    },
+    {
+      "id": "q-u1-50-p2",
+      "examId": "exam-b1-u1-part2",
+      "type": "multiple-choice",
+      "dạng": "Bài F: Sửa lỗi sai đoạn văn Backgammon",
+      "question": "Đoạn văn Backgammon (10): Sửa động từ \"does\" trong câu: \"He does his homework.\"",
+      "options": [
+        "is doing",
+        "doing",
+        "does do",
+        "did"
+      ],
+      "correctAnswer": "is doing",
+      "explanation": "👉 Người em đang bận làm bài tập về nhà ngay lúc này (vì thế người nói mới phải ngồi chờ) -> dùng Hiện tại tiếp diễn: is doing."
+    }
+  ]
+},
+
   // ================= UNIT 3 EXAM =================
   {
     id: 'exam-b1-u3',
