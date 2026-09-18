@@ -1,4 +1,4 @@
-import { Card, Deck, UserSettings, UserStats, UserAccount } from '../types';
+import { Card, Deck, UserSettings, UserStats, UserAccount, ExamResult } from '../types';
 import { INITIAL_CARDS, INITIAL_DECKS } from '../data/sampleDecks';
 
 const STORAGE_KEYS = {
@@ -336,5 +336,31 @@ export const storage = {
   resetStatsToZero() {
     this.saveStats(DEFAULT_STATS);
     return DEFAULT_STATS;
-  }
+  },
+
+  getExamResults(userId: string): ExamResult[] {
+    try {
+      const data = localStorage.getItem(`mochi_exam_results_${userId}`);
+      if (!data) return [];
+      return JSON.parse(data);
+    } catch {
+      return [];
+    }
+  },
+
+  saveExamResult(userId: string, result: ExamResult): void {
+    try {
+      const history = this.getExamResults(userId);
+      const updated = [result, ...history].slice(0, 50); // Keep latest 50 results
+      localStorage.setItem(`mochi_exam_results_${userId}`, JSON.stringify(updated));
+    } catch (e) {
+      console.error('Error saving exam result:', e);
+    }
+  },
+
+  getBestExamScore(userId: string, examId: string): ExamResult | null {
+    const history = this.getExamResults(userId).filter((r) => r.examId === examId);
+    if (history.length === 0) return null;
+    return history.reduce((best, curr) => (curr.score > best.score ? curr : best), history[0]);
+  },
 };

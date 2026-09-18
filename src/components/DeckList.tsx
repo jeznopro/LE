@@ -26,6 +26,7 @@ interface DeckListProps {
   onDeleteDeck: (deckId: string) => void;
   onEditDeck: (deck: Deck) => void;
   onClearAllDecks?: () => void;
+  onOpenExamHub?: () => void;
 }
 
 export const DeckList: React.FC<DeckListProps> = ({
@@ -38,6 +39,7 @@ export const DeckList: React.FC<DeckListProps> = ({
   onDeleteDeck,
   onEditDeck,
   onClearAllDecks,
+  onOpenExamHub,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
@@ -75,6 +77,41 @@ export const DeckList: React.FC<DeckListProps> = ({
 
   return (
     <div className="w-full space-y-6">
+      {/* Destination B1 Exam Practice Banner */}
+      {onOpenExamHub && (
+        <div className="liquid-glass-card rounded-3xl p-5 sm:p-6 border-2 border-amber-400/40 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-4 bg-linear-to-r from-amber-500/10 via-orange-500/10 to-pink-500/10 shadow-lg hover:shadow-xl transition-all">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-linear-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-3xl shadow-md shrink-0 border border-white/40">
+              📝
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-red-500 text-white animate-pulse">
+                  Chức Năng Mới
+                </span>
+                <span className="text-xs font-bold text-amber-800 dark:text-amber-300">
+                  Destination B1 Online
+                </span>
+              </div>
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mt-0.5">
+                Phòng Luyện Đề & Bài Tập Trực Tuyến
+              </h3>
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                Làm bài tập trắc nghiệm, điền phrasal verbs, giới từ và word formation kèm chấm điểm & giải thích chi tiết!
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenExamHub}
+            className="liquid-glass-pill shrink-0 w-full sm:w-auto px-5 py-2.5 bg-linear-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-orange-400 text-amber-950 font-black text-xs sm:text-sm rounded-2xl shadow-md shadow-amber-500/20 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center gap-2"
+          >
+            <Play className="w-4 h-4 fill-amber-950" />
+            <span>Vào Thi Ngay</span>
+          </button>
+        </div>
+      )}
+
       {/* Search & Actions Bar */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
         {/* Search */}

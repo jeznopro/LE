@@ -24,9 +24,21 @@ import { MasterPinLockScreen, PIN_STORAGE_KEY } from './components/MasterPinLock
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { cloudSync } from './utils/cloudSync';
 import { INITIAL_CARDS, INITIAL_DECKS } from './data/sampleDecks';
+import { ExamHub } from './components/ExamHub';
+import { ExamSession } from './components/ExamSession';
+import { Exam, ExamResult } from './types';
+import { B1_EXAMS } from './data/b1Exams';
 import { Heart } from 'lucide-react';
 
-type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-mochi';
+type ViewMode =
+  | 'dashboard'
+  | 'deck-detail'
+  | 'study-flashcard'
+  | 'study-quiz'
+  | 'study-typing'
+  | 'study-mochi'
+  | 'exam-hub'
+  | 'exam-session';
 
 export function App() {
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
@@ -52,6 +64,7 @@ export function App() {
   const [activeDeckId, setActiveDeckId] = useState<string | null>(null);
   const [studyCards, setStudyCards] = useState<Card[]>([]);
   const [studyDeckTitle, setStudyDeckTitle] = useState('');
+  const [activeExam, setActiveExam] = useState<Exam | null>(null);
 
   // Modals
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -314,6 +327,34 @@ export function App() {
     setCurrentView(returnView);
   };
 
+  // Exam Practice Handlers
+  const handleOpenExamHub = () => {
+    soundManager.playClick();
+    setCurrentView('exam-hub');
+  };
+
+  const handleSelectExam = (exam: Exam) => {
+    soundManager.playClick();
+    setActiveExam(exam);
+    setCurrentView('exam-session');
+  };
+
+  const handleOpenExamById = (examId: string) => {
+    const found = B1_EXAMS.find((e) => e.id === examId);
+    if (found) {
+      handleSelectExam(found);
+    } else {
+      handleOpenExamHub();
+    }
+  };
+
+  const handleExamCompleted = (_result: ExamResult) => {
+    if (currentUser) {
+      const updatedStats = storage.getStatsForUser(currentUser.id);
+      setStats(updatedStats);
+    }
+  };
+
   // Import new deck handler
   const handleImportComplete = (importedDecks: Deck[], importedCards: Card[]) => {
     updateDecks([...decks, ...importedDecks]);
@@ -456,6 +497,7 @@ export function App() {
           setIsDeckModalOpen(true);
         }}
         onGoHome={() => setCurrentView('dashboard')}
+        onOpenExamHub={handleOpenExamHub}
         currentView={currentView}
       />
 
@@ -492,6 +534,7 @@ export function App() {
                 setIsDeckModalOpen(true);
               }}
               onClearAllDecks={handleClearAllDecks}
+              onOpenExamHub={handleOpenExamHub}
             />
           </div>
         )}
@@ -512,6 +555,7 @@ export function App() {
               setIsCardModalOpen(true);
             }}
             onDeleteCard={handleDeleteCard}
+            onOpenExam={handleOpenExamById}
           />
         )}
 
@@ -566,6 +610,25 @@ export function App() {
             }}
             onFinishSession={handleFinishFlashcard}
             onExit={() => setCurrentView(returnView)}
+          />
+        )}
+
+        {/* VIEW 8: Destination B1 Exam Hub */}
+        {currentView === 'exam-hub' && (
+          <ExamHub
+            currentUser={currentUser}
+            onBack={() => setCurrentView('dashboard')}
+            onSelectExam={handleSelectExam}
+          />
+        )}
+
+        {/* VIEW 9: Destination B1 Exam Session (Active Test Simulator) */}
+        {currentView === 'exam-session' && activeExam && (
+          <ExamSession
+            exam={activeExam}
+            currentUser={currentUser}
+            onExit={() => setCurrentView('exam-hub')}
+            onExamCompleted={handleExamCompleted}
           />
         )}
       </main>

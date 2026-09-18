@@ -16,6 +16,7 @@ interface NavbarProps {
   onOpenNewDeck: () => void;
   onLockApp?: () => void;
   onGoHome: () => void;
+  onOpenExamHub?: () => void;
   currentView: string;
 }
 
@@ -33,7 +34,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenNewDeck: _onOpenNewDeck,
   onLockApp,
   onGoHome,
-  currentView: _currentView,
+  onOpenExamHub,
+  currentView,
 }) => {
   return (
     <header className="sticky top-2 sm:top-3 z-30 max-w-6xl w-[96%] sm:w-full mx-auto px-2 sm:px-4 transition-all duration-300">
@@ -92,6 +94,25 @@ export const Navbar: React.FC<NavbarProps> = ({
               {stats.xp} <span className="text-[11px] font-bold hidden md:inline">XP</span>
             </span>
           </div>
+
+          {/* Luyện Đề Button */}
+          {onOpenExamHub && (
+            <button
+              onClick={onOpenExamHub}
+              title="Phòng Luyện Đề & Bài Tập Destination B1"
+              className={`liquid-glass-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full cursor-pointer transition-all hover:scale-105 active:scale-95 border ${
+                currentView === 'exam-hub' || currentView === 'exam-session'
+                  ? 'bg-amber-500 text-white font-black shadow-md border-amber-400'
+                  : 'bg-linear-to-r from-amber-400/90 to-orange-500/90 hover:from-amber-300 hover:to-orange-400 text-amber-950 font-black border-amber-300/70 shadow-sm'
+              }`}
+            >
+              <span className="text-xs">📝</span>
+              <span className="text-xs font-black hidden sm:inline">Luyện Đề</span>
+              <span className="px-1.5 py-0.2 text-[9px] font-black uppercase rounded-full bg-red-500 text-white animate-pulse">
+                MỚI
+              </span>
+            </button>
+          )}
 
           {/* Action Quick Buttons */}
           <div className="flex items-center gap-1 pl-1 border-l border-white/60 dark:border-white/10">

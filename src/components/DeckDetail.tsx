@@ -23,6 +23,7 @@ interface DeckDetailProps {
   onAddCard: (deckId: string) => void;
   onEditCard: (card: Card) => void;
   onDeleteCard: (cardId: string) => void;
+  onOpenExam?: (examId: string) => void;
 }
 
 export const DeckDetail: React.FC<DeckDetailProps> = ({
@@ -33,6 +34,7 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
   onAddCard,
   onEditCard,
   onDeleteCard,
+  onOpenExam,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
@@ -145,6 +147,16 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
             <Play className="w-5 h-5 fill-amber-950" />
             <span>Lật Thẻ SRS</span>
           </button>
+
+          {onOpenExam && deck.id.startsWith('deck-b1-') && (
+            <button
+              onClick={() => onOpenExam(deck.id.replace('deck-', 'exam-'))}
+              className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-3.5 bg-linear-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-black text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <span className="text-xl">📝</span>
+              <span>Luyện Đề Unit Này</span>
+            </button>
+          )}
         </div>
       </div>
 

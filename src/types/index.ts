@@ -98,4 +98,53 @@ export interface UserSettings {
   youtubeBackgroundMuted?: boolean;
 }
 
+export type ExamQuestionType = 'multiple-choice' | 'word-formation' | 'fill-blank';
+
+export interface ExamQuestion {
+  id: string;
+  examId: string;
+  type: ExamQuestionType;
+  dạng: string; // e.g. 'Dạng 1: Phân biệt từ', 'Dạng 2: Cụm động từ', 'Dạng 3: Cụm giới từ', 'Dạng 4: Cấu tạo từ', 'Dạng 5: Cụm từ đi kèm'
+  question: string; // The prompt text with blank '______'
+  options?: string[]; // For multiple-choice (usually 4 choices)
+  correctAnswer: string; // Correct word or phrase
+  rootWord?: string; // For word formation, e.g. 'ARRANGE'
+  hint?: string;
+  explanation: string; // Comprehensive explanation with translation & Destination B1 notes
+}
+
+export interface Exam {
+  id: string;
+  unitId?: string; // e.g. 'deck-b1-u3'
+  title: string;
+  unit: string; // e.g. 'Unit 3'
+  description: string;
+  durationMinutes: number;
+  emoji: string;
+  color: string;
+  questions: ExamQuestion[];
+}
+
+export interface ExamUserAnswer {
+  questionId: string;
+  userAnswer: string;
+  isCorrect: boolean;
+  isFlagged?: boolean;
+}
+
+export interface ExamResult {
+  id: string;
+  examId: string;
+  examTitle: string;
+  userId: string;
+  score: number;
+  totalQuestions: number;
+  percentage: number;
+  timeSpentSeconds: number;
+  completedAt: number;
+  answers: Record<string, ExamUserAnswer>;
+  xpGained: number;
+  dạngBreakdown: Record<string, { total: number; correct: number }>;
+}
+
 
