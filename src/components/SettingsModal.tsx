@@ -193,58 +193,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 </div>
               )}
             </div>
-
-            {/* Google Gemini AI API Key Integration */}
-            <div className="liquid-glass-subtle p-4 rounded-3xl border-amber-400/40 space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">🤖</span>
-                  <div>
-                    <h3 className="text-xs font-black text-amber-950 dark:text-amber-200">
-                      Tích Hợp Trí Tuệ Nhân Tạo Google Gemini (Miễn Phí)
-                    </h3>
-                    <p className="text-[11px] text-amber-800/80 dark:text-amber-300/80">
-                      Kích hoạt mô hình Gemini 2.0 Flash để Giám khảo Gojo trò chuyện như người thật
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 dark:text-slate-200 mb-1">
-                  Gemini API Key:
-                </label>
-                <input
-                  type="password"
-                  value={settings.geminiApiKey || ''}
-                  onChange={(e) =>
-                    onSaveSettings({ ...settings, geminiApiKey: e.target.value.trim() })
-                  }
-                  placeholder="Dán mã API Key dạng AIzaSy... vào đây"
-                  className="liquid-glass-input w-full px-3.5 py-2.5 rounded-xl text-xs font-mono font-semibold"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-1">
-                <a
-                  href="https://aistudio.google.com/apikey"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[11px] font-bold text-amber-700 dark:text-amber-300 hover:underline flex items-center gap-1"
-                >
-                  <span>👉 Lấy API Key miễn phí (Google AI Studio) ↗</span>
-                </a>
-                {settings.geminiApiKey?.trim() ? (
-                  <span className="liquid-glass-pill px-2 py-0.5 bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-400/40 text-[10px] font-black">
-                    ✓ Đã Kích Hoạt Real AI
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400">
-                    Đang dùng AI mô phỏng
-                  </span>
-                )}
-              </div>
-            </div>
           </div>
 
           {/* Reset button */}

@@ -22,7 +22,6 @@ const DEFAULT_SETTINGS: UserSettings = {
   youtubeBackgroundEnabled: false,
   youtubeBackgroundOpacity: 0.35,
   youtubeBackgroundMuted: true,
-  geminiApiKey: 'AIzaSyDhC-KbOgI_m6W-TW7n4-tXeKkwbue57iM',
 };
 
 // All stats reset cleanly to 0
@@ -150,9 +149,6 @@ export const storage = {
         return DEFAULT_SETTINGS;
       }
       const parsed = JSON.parse(data);
-      if (!parsed.geminiApiKey) {
-        parsed.geminiApiKey = DEFAULT_SETTINGS.geminiApiKey;
-      }
       return { ...DEFAULT_SETTINGS, ...parsed };
     } catch {
       return DEFAULT_SETTINGS;
@@ -228,7 +224,7 @@ export const storage = {
     const newUser: UserAccount = {
       id: `user-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
       username: username.trim(),
-      avatar: avatar || './gojo.png',
+      avatar: avatar || './we_bare_bears_avatar.png',
       email: email?.trim(),
       pin: pin?.trim(),
       createdAt: Date.now(),
@@ -272,7 +268,7 @@ export const storage = {
     const cards = this.getCardsForUser(userId);
     const stats = this.getStatsForUser(userId);
     const payload = {
-      app: 'Mochi Anki - Learning English',
+      app: 'We Bare Bears Anki - Learning English',
       version: 1,
       exportedAt: Date.now(),
       user,
@@ -294,7 +290,7 @@ export const storage = {
       const importedUser: UserAccount = {
         id: newUserId,
         username: rawUser.username ? `${rawUser.username} (Sao Lưu)` : 'Học Viên Mới',
-        avatar: rawUser.avatar || './gojo.png',
+        avatar: rawUser.avatar || './we_bare_bears_avatar.png',
         createdAt: Date.now(),
       };
 

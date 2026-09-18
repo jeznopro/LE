@@ -18,7 +18,11 @@ import {
 } from 'lucide-react';
 
 const AVATAR_OPTIONS = [
-  { id: 'gojo', label: 'Gojo Satoru', src: './gojo.png', isImg: true },
+  { id: 'bears_all', label: 'We Bare Bears', src: './we_bare_bears_avatar.png', isImg: true },
+  { id: 'bears_peek', label: 'Bears Peeking', src: './we_bare_bears_peeking.png', isImg: true },
+  { id: 'grizzly', label: 'Grizzly (Gấu Xám)', emoji: '🐻' },
+  { id: 'panda', label: 'Panda (Gấu Trúc)', emoji: '🐼' },
+  { id: 'icebear', label: 'Ice Bear (Gấu Trắng)', emoji: '❄️' },
   { id: 'ninja', label: 'Ninja', emoji: '🥷' },
   { id: 'samurai', label: 'Samurai', emoji: '⚔️' },
   { id: 'wizard', label: 'Phù Thủy', emoji: '🧙‍♂️' },
@@ -45,7 +49,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const [mode, setMode] = useState<'view' | 'create-profile'>('view');
   const [newUsername, setNewUsername] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('./gojo.png');
+  const [selectedAvatar, setSelectedAvatar] = useState('./we_bare_bears_avatar.png');
   const [newPin, setNewPin] = useState('');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -101,7 +105,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `MochiAnki_${currentUser.username.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `WeBareBearsAnki_${currentUser.username.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

@@ -1,12 +1,12 @@
-﻿import { Card, Deck } from '../types';
+import { Card, Deck } from '../types';
 
 export const INITIAL_DECKS: Deck[] = [
   {
     id: 'deck-daily-essential',
-    title: 'Mochi 100 Từ Giao Tiếp Hàng Ngày',
-    description: 'Bộ từ vựng giao tiếp tự nhiên, gần gũi nhất trong đời sống thường ngày.',
-    emoji: '🍡',
-    color: '#FFD84D', // Mochi yellow
+    title: 'We Bare Bears 100 Từ Giao Tiếp Hàng Ngày',
+    description: 'Bộ từ vựng giao tiếp tự nhiên, gần gũi nhất trong đời sống thường ngày cùng We Bare Bears.',
+    emoji: '🐻',
+    color: '#FFD84D', // Bears yellow
     createdAt: Date.now() - 86400000 * 5,
     updatedAt: Date.now(),
   },
@@ -31,7 +31,7 @@ export const INITIAL_DECKS: Deck[] = [
 ];
 
 export const INITIAL_CARDS: Card[] = [
-  // Mochi Daily Essential
+  // We Bare Bears Daily Essential
   {
     id: 'card-1',
     deckId: 'deck-daily-essential',

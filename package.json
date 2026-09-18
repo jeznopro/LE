@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "main": "electron/main.cjs",
-  "author": "Mochi Anki",
+  "author": "We Bare Bears Anki",
   "description": "Phần mềm học từ vựng Anki Spaced Repetition",
   "scripts": {
     "dev": "vite",
@@ -51,7 +51,7 @@
   },
   "build": {
     "appId": "com.mochianki.learningenglish",
-    "productName": "Mochi Anki",
+    "productName": "We Bare Bears Anki",
     "directories": {
       "output": "dist-electron"
     },
@@ -81,7 +81,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Mochi Anki"
+      "shortcutName": "We Bare Bears Anki"
     }
   }
 }

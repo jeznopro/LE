@@ -202,4 +202,50 @@ export const cloudSync = {
       return false;
     }
   },
+
+  async saveSingleDeck(userId: string, deck: Deck): Promise<boolean> {
+    if (!isSupabaseConfigured || !userId) return false;
+    try {
+      const payload = {
+        id: deck.id,
+        user_id: userId,
+        title: deck.title,
+        description: deck.description || '',
+        folder: deck.folder || null,
+        emoji: deck.emoji || '📚',
+        color: deck.color || '#FFD84D',
+        updated_at: new Date().toISOString(),
+      };
+
+      const { error } = await supabase.from('user_decks').upsert(payload);
+      return !error;
+    } catch (err) {
+      console.error('Error saving single deck to Supabase:', err);
+      return false;
+    }
+  },
+
+  async deleteDeck(userId: string, deckId: string): Promise<boolean> {
+    if (!isSupabaseConfigured || !userId) return false;
+    try {
+      await supabase.from('user_cards').delete().eq('user_id', userId).eq('deck_id', deckId);
+      const { error } = await supabase.from('user_decks').delete().eq('user_id', userId).eq('id', deckId);
+      return !error;
+    } catch (err) {
+      console.error('Error deleting deck from Supabase:', err);
+      return false;
+    }
+  },
+
+  async deleteCard(userId: string, cardId: string): Promise<boolean> {
+    if (!isSupabaseConfigured || !userId) return false;
+    try {
+      const { error } = await supabase.from('user_cards').delete().eq('user_id', userId).eq('id', cardId);
+      return !error;
+    } catch (err) {
+      console.error('Error deleting card from Supabase:', err);
+      return false;
+    }
+  },
 };
+

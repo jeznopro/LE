@@ -1,20 +1,20 @@
 import React from 'react';
 import { UserStats, UserSettings, UserAccount } from '../types';
-import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User, Mic } from 'lucide-react';
+import { Flame, Sparkles, BarChart2, Settings, Volume2, VolumeX, UploadCloud, Moon, Sun, User, Lock, Cloud, CloudOff, Check } from 'lucide-react';
 
 interface NavbarProps {
   stats: UserStats;
   settings: UserSettings;
   currentUser: UserAccount | null;
+  cloudStatus?: 'synced' | 'syncing' | 'offline';
   onOpenAuth: () => void;
-  onOpenAIChat: () => void;
-  onOpenSpeaking: () => void;
   onOpenStats: () => void;
   onOpenSettings: () => void;
   onToggleSound: () => void;
   onToggleTheme: () => void;
   onOpenImporter: () => void;
   onOpenNewDeck: () => void;
+  onLockApp?: () => void;
   onGoHome: () => void;
   currentView: string;
 }
@@ -23,17 +23,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   stats,
   settings,
   currentUser,
+  cloudStatus = 'synced',
   onOpenAuth,
-  onOpenAIChat,
-  onOpenSpeaking,
   onOpenStats,
   onOpenSettings,
   onToggleSound,
   onToggleTheme,
   onOpenImporter,
   onOpenNewDeck: _onOpenNewDeck,
+  onLockApp,
   onGoHome,
-  currentView,
+  currentView: _currentView,
 }) => {
   return (
     <header className="sticky top-2 sm:top-3 z-30 max-w-6xl w-[96%] sm:w-full mx-auto px-2 sm:px-4 transition-all duration-300">
@@ -45,8 +45,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         >
           <div className="relative">
             <img 
-              src="./gojo.png" 
-              alt="Gojo Satoru Icon" 
+              src="./we_bare_bears_avatar.png" 
+              alt="We Bare Bears Icon" 
               className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform border border-white/80 dark:border-amber-400/30" 
             />
             <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-400 border-2 border-white dark:border-slate-900 rounded-full animate-pulse" />
@@ -68,35 +68,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 
         {/* Gamification Stats & Quick Actions */}
         <div className="flex items-center gap-1.5 sm:gap-2.5">
-          {/* Speaking Part 1, 2, 3 Button */}
-          <button
-            onClick={onOpenSpeaking}
-            title="Luyện nói phản xạ IELTS Speaking Part 1, Part 2, Part 3"
-            className={`liquid-glass-pill flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full font-black text-xs cursor-pointer border ${
-              currentView === 'roadmap'
-                ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-orange-500 text-white border-white/80 shadow-md shadow-rose-500/25 ring-2 ring-rose-400/50'
-                : 'bg-gradient-to-r from-rose-500/85 to-amber-500/85 hover:from-rose-600 hover:to-amber-600 text-white border-white/50'
-            }`}
-          >
-            <Mic className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">🎙️ Luyện Nói Part 1, 2, 3</span>
-            <span className="sm:hidden">🎙️ Nói</span>
-          </button>
-
-          {/* Gemini AI Conversation Button */}
-          <button
-            onClick={onOpenAIChat}
-            title="Trò chuyện và luyện tiếng Anh cùng Google Gemini AI"
-            className={`liquid-glass-pill flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-full font-black text-xs cursor-pointer border ${
-              currentView === 'ai-chat'
-                ? 'bg-gradient-to-r from-blue-700 via-indigo-700 to-purple-700 text-white border-white/80 shadow-md shadow-indigo-500/30 ring-2 ring-purple-400/50'
-                : 'bg-gradient-to-r from-blue-600/85 via-indigo-600/85 to-purple-600/85 hover:from-blue-700 hover:to-purple-700 text-white border-white/50'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 fill-blue-200" />
-            <span className="hidden sm:inline">💎 Chat Gemini AI</span>
-            <span className="sm:hidden">💎 AI</span>
-          </button>
 
           {/* Streak Badge */}
           <div
@@ -203,6 +174,46 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </div>
               )}
             </button>
+
+            {/* Real-time Cloud Sync Status Indicator */}
+            <div
+              title={
+                cloudStatus === 'syncing'
+                  ? 'Đang đồng bộ dữ liệu với đám mây Supabase...'
+                  : cloudStatus === 'synced'
+                  ? 'Đã đồng bộ tự động thời gian thực (Supabase Cloud Live)'
+                  : 'Chế độ Offline (Dữ liệu đã lưu an toàn trên máy)'
+              }
+              className="liquid-glass-subtle hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border border-white/60 dark:border-white/10 select-none"
+            >
+              {cloudStatus === 'syncing' ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                  <span className="text-amber-600 dark:text-amber-400">Đang lưu...</span>
+                </>
+              ) : cloudStatus === 'synced' ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-emerald-700 dark:text-emerald-300 font-black">Cloud Live</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-slate-400" />
+                  <span className="text-slate-500">Offline</span>
+                </>
+              )}
+            </div>
+
+            {/* Lock App Button (PIN 1727) */}
+            {onLockApp && (
+              <button
+                onClick={onLockApp}
+                title="Khóa ứng dụng (Yêu cầu mã PIN 1727 để mở lại)"
+                className="p-1.5 text-slate-500 hover:text-rose-500 dark:text-slate-400 dark:hover:text-rose-400 hover:bg-rose-500/10 rounded-full transition-colors cursor-pointer"
+              >
+                <Lock className="w-4 h-4" />
+              </button>
+            )}
 
             {/* Import Anki / CSV Deck Button */}
             <button

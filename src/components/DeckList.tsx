@@ -14,7 +14,6 @@ import {
   FolderOpen,
   ArrowLeft,
   Trash,
-  Mic,
 } from 'lucide-react';
 
 interface DeckListProps {
@@ -409,16 +408,6 @@ export const DeckList: React.FC<DeckListProps> = ({
                           >
                             <Keyboard className="w-3 h-3" />
                             <span>Luyện Gõ</span>
-                          </button>
-
-                          <button
-                            disabled={total === 0}
-                            onClick={() => onStartStudy(deck.id, 'speaking')}
-                            title="Luyện nói & chấm điểm phát âm AI"
-                            className="liquid-glass-subtle flex items-center justify-center gap-1 py-2 hover:bg-white/70 dark:hover:bg-cyan-950/60 disabled:opacity-40 text-cyan-700 dark:text-cyan-300 font-bold text-[11px] rounded-xl transition-all cursor-pointer border border-cyan-200/40 dark:border-cyan-800/30"
-                          >
-                            <Mic className="w-3 h-3 text-cyan-600 dark:text-cyan-400" />
-                            <span>Luyện Nói</span>
                           </button>
                         </>
                       )}

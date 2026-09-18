@@ -1,9 +1,9 @@
 {
-  "short_name": "MochiAnki",
-  "name": "Learning English PRO - Mochi Anki",
+  "short_name": "BearsAnki",
+  "name": "Learning English PRO - We Bare Bears Anki",
   "icons": [
     {
-      "src": "./gojo.png",
+      "src": "./we_bare_bears_avatar.png",
       "sizes": "192x192 512x512",
       "type": "image/png",
       "purpose": "any maskable"

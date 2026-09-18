@@ -12,7 +12,6 @@ import {
   Search,
   Play,
   Clock,
-  Mic,
 } from 'lucide-react';
 
 interface DeckDetailProps {
@@ -131,14 +130,6 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
           >
             <Play className="w-5 h-5 fill-amber-950" />
             <span>Lật Thẻ SRS</span>
-          </button>
-
-          <button
-            onClick={() => onStartStudy(deck.id, 'speaking')}
-            className="liquid-glass-pill flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-3.5 bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-700 dark:text-cyan-300 border border-cyan-400/30 font-black text-sm rounded-2xl shadow-sm transition-all hover:scale-105 active:scale-95 cursor-pointer"
-          >
-            <Mic className="w-5 h-5" />
-            <span>Phát Âm AI</span>
           </button>
         </div>
       </div>

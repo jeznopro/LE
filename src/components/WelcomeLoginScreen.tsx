@@ -21,7 +21,11 @@ import {
 } from 'lucide-react';
 
 const AVATAR_OPTIONS = [
-  { id: 'gojo', label: 'Gojo Satoru', src: './gojo.png', isImg: true },
+  { id: 'bears_all', label: 'We Bare Bears', src: './we_bare_bears_avatar.png', isImg: true },
+  { id: 'bears_peek', label: 'Bears Peeking', src: './we_bare_bears_peeking.png', isImg: true },
+  { id: 'grizzly', label: 'Grizzly (Gấu Xám)', emoji: '🐻' },
+  { id: 'panda', label: 'Panda (Gấu Trúc)', emoji: '🐼' },
+  { id: 'icebear', label: 'Ice Bear (Gấu Trắng)', emoji: '❄️' },
   { id: 'ninja', label: 'Ninja', emoji: '🥷' },
   { id: 'samurai', label: 'Samurai', emoji: '⚔️' },
   { id: 'wizard', label: 'Phù Thủy', emoji: '🧙‍♂️' },
@@ -41,7 +45,7 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
   const [users, setUsers] = useState<UserAccount[]>(() => storage.getUsers());
   const [isCreating, setIsCreating] = useState<boolean>(() => storage.getUsers().length === 0);
   const [newUsername, setNewUsername] = useState('');
-  const [selectedAvatar, setSelectedAvatar] = useState('./gojo.png');
+  const [selectedAvatar, setSelectedAvatar] = useState('./we_bare_bears_avatar.png');
   const [newPin, setNewPin] = useState('');
   const [seedSampleCards, setSeedSampleCards] = useState(false);
   const [error, setError] = useState('');
@@ -152,8 +156,8 @@ export const WelcomeLoginScreen: React.FC<WelcomeLoginScreenProps> = ({ onLoginS
       <div className="text-center mb-6 z-10 animate-fadeIn">
         <div className="liquid-glass-pill inline-flex items-center gap-2.5 px-4 py-2 mb-3 shadow-lg shadow-black/5">
           <img
-            src="./gojo.png"
-            alt="Gojo Logo"
+            src="./we_bare_bears_avatar.png"
+            alt="We Bare Bears Logo"
             className="w-8 h-8 rounded-xl object-cover border border-amber-300 shadow-xs"
             onError={(e) => {
               e.currentTarget.style.display = 'none';

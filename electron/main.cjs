@@ -7,14 +7,14 @@ function createWindow() {
     height: 850,
     minWidth: 960,
     minHeight: 640,
-    title: 'Mochi Anki - Học Tiếng Anh Thông Minh',
+    title: 'We Bare Bears Anki - Học Tiếng Anh Thông Minh',
     autoHideMenuBar: true,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
       webSecurity: false, // Allows loading local file assets/audio smoothly
     },
-    icon: path.join(__dirname, '../public/gojo.png'),
+    icon: path.join(__dirname, '../public/we_bare_bears_avatar.png'),
   });
 
   // Set clean browser User-Agent to prevent YouTube from blocking Electron embeds

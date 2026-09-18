@@ -1,7 +1,7 @@
 @echo off
-title Khoi Dong Mochi Anki Learning App
+title Khoi Dong We Bare Bears Anki Learning App
 echo ========================================================
-echo   DANG KHOI DONG HE THONG HOC TIENG ANH MOCHI ANKI
+echo   DANG KHOI DONG HE THONG HOC TIENG ANH WE BARE BEARS ANKI
 echo ========================================================
 echo.
 cd /d "%~dp0"

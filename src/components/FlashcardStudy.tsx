@@ -13,8 +13,6 @@ import {
   XCircle,
   HelpCircle,
   Zap,
-  Mic,
-  MicOff,
   Keyboard,
   Layers,
   RotateCcw,
@@ -22,7 +20,6 @@ import {
 import { Mascot } from './Mascot';
 import { MochiStudyView } from './MochiStudyView';
 import { useMediaUrl } from '../hooks/useMediaUrl';
-import { speechRecognitionManager, evaluatePronunciation, PronunciationEvaluation } from '../utils/speechRecognition';
 
 const normalizeWord = (s: string) => {
   return (s || '')
@@ -73,20 +70,14 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
   const [isFinished, setIsFinished] = useState(false);
   const [mascotMood, setMascotMood] = useState<'happy' | 'thinking' | 'cheering' | 'proud' | 'surprised'>('happy');
   
-  // Practice mode: 'mochi' | 'typing' | 'speaking' | 'flip'
-  const [practiceMode, setPracticeMode] = useState<'mochi' | 'typing' | 'speaking' | 'flip'>('mochi');
+  // Practice mode: 'mochi' | 'typing' | 'flip'
+  const [practiceMode, setPracticeMode] = useState<'mochi' | 'typing' | 'flip'>('mochi');
   
   // Typing mode states
   const [inputValue, setInputValue] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
   const inputValueRef = useRef('');
   inputValueRef.current = inputValue;
-
-  // Speaking mode states
-  const [isListening, setIsListening] = useState(false);
-  const [speakingTranscript, setSpeakingTranscript] = useState('');
-  const [speakingEvaluation, setSpeakingEvaluation] = useState<PronunciationEvaluation | null>(null);
-  const [speakingError, setSpeakingError] = useState('');
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -105,13 +96,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
     ttsService.speak(text, settings.ttsAccent, 0.65);
   };
 
-  const handlePlayUserVoice = (audioUrl: string) => {
-    try {
-      const a = new Audio(audioUrl);
-      a.play();
-    } catch {}
-  };
-
   const [showPeekAnswer, setShowPeekAnswer] = useState(false);
 
   useEffect(() => {
@@ -120,10 +104,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
       setIsSubmitted(false);
       setShowPeekAnswer(false);
       setInputValue('');
-      setIsListening(false);
-      setSpeakingTranscript('');
-      setSpeakingEvaluation(null);
-      setSpeakingError('');
       setMascotMood('thinking');
       if (settings.autoPlayAudio && practiceMode === 'flip') {
         const timer = setTimeout(() => {
@@ -143,56 +123,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
       return () => clearTimeout(timer);
     }
   }, [currentIndex, isFlipped, practiceMode, isSubmitted, isFinished]);
-
-  const [strictness, setStrictness] = useState<'standard' | 'strict' | 'master'>('strict');
-
-  const handleStartSpeaking = (e?: React.MouseEvent) => {
-    e?.stopPropagation();
-    if (!currentCard || isListening) return;
-
-    setSpeakingError('');
-    setSpeakingTranscript('');
-    setSpeakingEvaluation(null);
-    setIsListening(true);
-    soundManager.playClick();
-
-    speechRecognitionManager.startListening(
-      (interim) => {
-        setSpeakingTranscript(interim);
-      },
-      (final, audioUrl) => {
-        setSpeakingTranscript(final);
-        setInputValue(final);
-        const result = evaluatePronunciation(final, currentCard.front, strictness, audioUrl);
-        setSpeakingEvaluation(result);
-        setIsListening(false);
-
-        const passScore = strictness === 'master' ? 95 : strictness === 'strict' ? 88 : 80;
-
-        if (result.score >= passScore) {
-          soundManager.playCorrect();
-          setMascotMood('cheering');
-          setIsSubmitted(true);
-          setIsCorrect(true);
-          setTimeout(() => {
-            setIsFlipped(true);
-          }, 900);
-        } else {
-          soundManager.playWrong();
-          setMascotMood('surprised');
-        }
-      },
-      (err) => {
-        setIsListening(false);
-        setSpeakingError(err);
-        setMascotMood('surprised');
-      },
-      () => {
-        setIsListening(false);
-      },
-      settings.ttsAccent || 'en-US'
-    );
-  };
 
   const handleFlip = () => {
     soundManager.playFlip();
@@ -305,17 +235,11 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
         if (isFlipped) {
           // If already on back side, Enter or Space advances with 'good'
           handleRate('good');
-        } else if (practiceMode === 'speaking') {
-          handleStartSpeaking();
         } else {
           handleFlip();
         }
       } else if (e.key === 'r' || e.key === 'R') {
         if (currentCard) playCardAudio(currentCard.front);
-      } else if (e.key === 'm' || e.key === 'M') {
-        if (practiceMode === 'speaking' && !isFlipped) {
-          handleStartSpeaking();
-        }
       } else if (isFlipped) {
         if (e.key === '1') handleRate('again');
         else if (e.key === '2') handleRate('hard');
@@ -326,7 +250,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isFlipped, isFinished, currentCard, practiceMode, isSubmitted, isListening]);
+  }, [isFlipped, isFinished, currentCard, practiceMode, isSubmitted]);
 
   if (isFinished) {
     const finalCards = Object.values(updatedCardsMap);
@@ -393,12 +317,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               className="px-3 py-1.5 text-slate-500 rounded-xl text-xs font-bold hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer"
             >
               <span>Gõ Từ</span>
-            </button>
-            <button
-              onClick={() => setPracticeMode('speaking')}
-              className="px-3 py-1.5 text-slate-500 rounded-xl text-xs font-bold hover:text-slate-800 dark:hover:text-slate-200 cursor-pointer"
-            >
-              <span>Luyện Nói</span>
             </button>
           </div>
         </div>
@@ -487,19 +405,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
             <Keyboard className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Gõ Từ</span>
           </button>
-
-          <button
-            onClick={() => setPracticeMode('speaking')}
-            title="Luyện nói & chấm điểm phát âm AI"
-            className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-              practiceMode === 'speaking'
-                ? 'bg-cyan-500 text-white shadow-xs font-black'
-                : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'
-            }`}
-          >
-            <Mic className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Luyện Nói</span>
-          </button>
         </div>
 
         <Mascot mood={mascotMood} size="sm" />
@@ -510,8 +415,6 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
         onClick={() => {
           if (practiceMode === 'typing' && !isFlipped && !isSubmitted) {
             inputRef.current?.focus();
-          } else if (practiceMode === 'speaking' && !isFlipped && !isSubmitted) {
-            handleStartSpeaking();
           } else {
             handleFlip();
           }
@@ -550,108 +453,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
                 </div>
               )}
 
-              {practiceMode === 'speaking' ? (
-                <div className="space-y-3.5 py-1 w-full" onClick={e => e.stopPropagation()}>
-                  <h2 className="text-2xl sm:text-3xl font-black text-[#5B3E06] dark:text-amber-300">
-                    {currentCard.back}
-                  </h2>
-                  {currentCard.example && (
-                    <div className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-300 italic px-3">
-                      &ldquo;{generateExampleHint(currentCard.example, currentCard.front)}&rdquo;
-                    </div>
-                  )}
-                  <div className="flex items-center justify-center gap-2 flex-wrap">
-                    {showPeekAnswer ? (
-                      <div className="space-y-0.5 animate-mochi-pop">
-                        <div className="text-xl sm:text-2xl font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 px-5 py-2 rounded-2xl border-2 border-emerald-400 dark:border-emerald-600 shadow-sm inline-block">
-                          {currentCard.front}
-                        </div>
-                        {currentCard.phonetic && (
-                          <div className="text-xs font-mono text-slate-500 dark:text-slate-400 font-bold">
-                            {currentCard.phonetic}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <h1 className="text-lg sm:text-xl font-bold text-[#A87B32] dark:text-amber-300 tracking-[0.25em] bg-[#FFF8E7] dark:bg-amber-950/40 px-5 py-2 rounded-2xl border-2 border-dashed border-[#FAD67B] dark:border-amber-700/50 inline-block">
-                        {generateTypingHint(currentCard.front)}
-                      </h1>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => playCardAudio(currentCard.front)}
-                      title="Nghe phát âm chuẩn Edge-TTS"
-                      className="p-2.5 bg-cyan-100 dark:bg-cyan-950/60 hover:bg-cyan-200 text-cyan-700 dark:text-cyan-300 rounded-2xl transition-all cursor-pointer shadow-xs"
-                    >
-                      <Volume2 className="w-5 h-5" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        soundManager.playClick();
-                        setShowPeekAnswer(!showPeekAnswer);
-                      }}
-                      title="Hiện / Ẩn đáp án từ vựng"
-                      className={`px-3 py-2 rounded-2xl text-xs font-black transition-all flex items-center gap-1 cursor-pointer shadow-xs ${
-                        showPeekAnswer
-                          ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border border-emerald-300'
-                          : 'bg-amber-100 dark:bg-amber-950/60 hover:bg-amber-200 text-amber-800 dark:text-amber-200 border border-amber-300'
-                      }`}
-                    >
-                      <HelpCircle className="w-4 h-4" />
-                      <span>{showPeekAnswer ? 'Ẩn Từ' : 'Xem Đáp Án'}</span>
-                    </button>
-                  </div>
-
-                  {/* Mic Button & Live Recording Waves */}
-                  <div className="pt-2">
-                    {isListening ? (
-                      <div className="space-y-2 animate-fadeIn">
-                        <div className="flex items-center justify-center gap-1.5 h-8">
-                          {[40, 80, 100, 60, 90, 70, 50].map((h, i) => (
-                            <div key={i} style={{ height: `${h}%` }} className="w-1.5 bg-rose-500 rounded-full animate-pulse" />
-                          ))}
-                        </div>
-                        <p className="text-xs font-bold text-rose-600 dark:text-rose-400 animate-pulse">
-                          🎙️ Đang nghe... Hãy phát âm từ tiếng Anh!
-                        </p>
-                        {speakingTranscript && (
-                          <div className="text-xs font-semibold text-rose-800 dark:text-rose-200 bg-rose-50 dark:bg-rose-950/60 p-1.5 rounded-xl max-w-xs mx-auto border border-rose-200">
-                            &ldquo;{speakingTranscript}&rdquo;
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="space-y-1.5">
-                        <button
-                          type="button"
-                          onClick={handleStartSpeaking}
-                          className="w-16 h-16 rounded-full bg-linear-to-tr from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white flex items-center justify-center mx-auto shadow-lg shadow-cyan-500/30 transition-transform hover:scale-110 active:scale-95 cursor-pointer relative group"
-                        >
-                          <div className="absolute inset-0 rounded-full bg-cyan-400 animate-ping opacity-25" />
-                          <Mic className="w-8 h-8 relative z-10" />
-                        </button>
-                        <p className="text-[11px] font-bold text-slate-400">
-                          Nhấn vào Micro (hoặc phím Space / M) để luyện nói
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  {speakingEvaluation && !isListening && (
-                    <div className="p-3 bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700 rounded-2xl text-xs text-amber-900 dark:text-amber-200 max-w-xs mx-auto animate-mochi-pop">
-                      <div className="font-extrabold text-sm mb-0.5">{speakingEvaluation.score}% - {speakingEvaluation.feedback}</div>
-                      <div>Máy nghe được: <strong>&ldquo;{speakingEvaluation.spokenText}&rdquo;</strong></div>
-                    </div>
-                  )}
-
-                  {speakingError && !isListening && (
-                    <div className="text-xs text-rose-600 font-bold max-w-xs mx-auto">{speakingError}</div>
-                  )}
-                </div>
-              ) : practiceMode === 'typing' ? (
+              {practiceMode === 'typing' ? (
                 <>
                   <h2 className="text-2xl sm:text-3xl font-black text-[#5B3E06] dark:text-amber-300">
                     {currentCard.back}
@@ -719,124 +521,23 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
                       <input
                         ref={inputRef}
                         type="text"
-                        disabled={isSubmitted || isListening}
+                        disabled={isSubmitted}
                         value={inputValue}
                         onChange={(e) => setInputValue(e.target.value)}
-                        placeholder={isListening ? "🎙️ Đang nghe bạn phát âm..." : "Gõ từ hoặc bấm Micro để nói..."}
-                        className={`w-full p-3.5 pl-4 pr-14 text-center font-extrabold text-lg sm:text-xl rounded-2xl border-2 transition-all outline-hidden bg-white dark:bg-slate-700 ${
-                          isListening
-                            ? 'border-rose-500 ring-2 ring-rose-500/20 text-rose-600 dark:text-rose-300 animate-pulse'
-                            : 'border-slate-300 dark:border-slate-500 focus:border-[#FF9F1C] text-slate-800 dark:text-slate-100'
-                        } shadow-2xs`}
+                        placeholder="Gõ từ tiếng Anh vào đây..."
+                        className="w-full p-3.5 pl-4 pr-14 text-center font-extrabold text-lg sm:text-xl rounded-2xl border-2 transition-all outline-hidden bg-white dark:bg-slate-700 border-slate-300 dark:border-slate-500 focus:border-[#FF9F1C] text-slate-800 dark:text-slate-100 shadow-2xs"
                       />
-                      
-                      {/* Integrated Micro Button */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStartSpeaking();
-                        }}
-                        title="Bấm vào đây để Luyện nói / Nhận diện giọng nói"
-                        className={`absolute right-2 p-2 rounded-xl transition-all cursor-pointer ${
-                          isListening
-                            ? 'bg-rose-500 text-white animate-bounce shadow-md'
-                            : 'bg-cyan-100 dark:bg-cyan-950 hover:bg-cyan-200 text-cyan-700 dark:text-cyan-300 hover:scale-110 active:scale-95'
-                        }`}
-                      >
-                        <Mic className="w-5 h-5" />
-                      </button>
                     </div>
 
-                    {/* Prominent Speaking Button below input */}
                     <div className="flex items-center justify-center gap-2">
                       <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleStartSpeaking();
-                        }}
-                        className={`px-4 py-2 rounded-2xl font-black text-xs flex items-center gap-1.5 transition-all shadow-xs cursor-pointer ${
-                          isListening
-                            ? 'bg-rose-500 text-white animate-pulse'
-                            : 'bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white hover:scale-105 active:scale-95'
-                        }`}
+                        type="submit"
+                        disabled={!inputValue.trim()}
+                        className="px-6 py-2.5 rounded-2xl font-black text-xs bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white disabled:opacity-40 transition-all shadow-xs cursor-pointer hover:scale-105 active:scale-95"
                       >
-                        <Mic className="w-4 h-4" />
-                        <span>{isListening ? '🎙️ Đang lắng nghe... Hãy nói!' : '🎙️ Bấm vào đây để Luyện Nói'}</span>
+                        Kiểm Tra (Enter)
                       </button>
                     </div>
-
-                    {/* Detailed Diagnostic Feedback */}
-                    {speakingEvaluation && !isListening && (
-                      <div className="p-3.5 bg-white dark:bg-slate-800/95 rounded-2xl border-2 border-amber-300 dark:border-amber-600 shadow-md space-y-2.5 text-center animate-mochi-pop">
-                        <div className="flex items-center justify-between">
-                          <span className="font-black text-xs sm:text-sm text-slate-800 dark:text-white">
-                            Điểm: <strong className={speakingEvaluation.score >= 88 ? 'text-emerald-500' : speakingEvaluation.score >= 70 ? 'text-amber-500' : 'text-rose-500'}>{speakingEvaluation.score}%</strong>
-                          </span>
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
-                            {strictness === 'master' ? 'Chuyên gia (95%)' : strictness === 'strict' ? 'Nghiêm ngặt (88%)' : 'Tiêu chuẩn (80%)'}
-                          </span>
-                        </div>
-
-                        {/* Letter-by-Letter Alignment Badges */}
-                        <div className="flex items-center justify-center gap-1 py-0.5 flex-wrap">
-                          {speakingEvaluation.charMatches.map((m, idx) => (
-                            <span
-                              key={idx}
-                              title={m.matched ? 'Phát âm đúng âm này' : 'Chưa đúng hoặc thiếu âm này'}
-                              className={`w-7 h-8 rounded-lg font-black text-sm flex items-center justify-center uppercase shadow-2xs border ${
-                                m.matched
-                                  ? 'bg-emerald-500 text-white border-emerald-600'
-                                  : 'bg-rose-500 text-white border-rose-600 animate-pulse'
-                              }`}
-                            >
-                              {m.char}
-                            </span>
-                          ))}
-                        </div>
-
-                        {/* Specific Phonetic Tip */}
-                        {speakingEvaluation.tip && (
-                          <div className="text-[11px] font-bold text-amber-800 dark:text-amber-200 bg-amber-50 dark:bg-amber-950/60 p-2 rounded-xl border border-amber-200 dark:border-amber-800 text-left">
-                            💡 {speakingEvaluation.tip}
-                          </div>
-                        )}
-
-                        {/* Audio Comparison Controls */}
-                        <div className="flex items-center justify-center gap-1.5 pt-1 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => playCardAudio(currentCard.front)}
-                            className="px-2.5 py-1.5 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 hover:bg-cyan-100 rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
-                          >
-                            <Volume2 className="w-3 h-3" /> <span>Mẫu Chuẩn</span>
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handlePlaySlowAudio(currentCard.front)}
-                            className="px-2.5 py-1.5 bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 hover:bg-amber-100 rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
-                          >
-                            <span>🐢 Chậm 0.7x</span>
-                          </button>
-
-                          {speakingEvaluation.audioBlobUrl && (
-                            <button
-                              type="button"
-                              onClick={() => handlePlayUserVoice(speakingEvaluation.audioBlobUrl!)}
-                              className="px-2.5 py-1.5 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
-                            >
-                              <span>🎙️ Nghe Lại Giọng Tôi</span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {speakingError && !isListening && (
-                      <div className="text-xs text-rose-600 font-bold">{speakingError}</div>
-                    )}
                   </form>
                 </>
               ) : (

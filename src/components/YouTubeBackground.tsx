@@ -15,9 +15,9 @@ export const getYouTubeVideoId = (url?: string): string | null => {
 
 const PRESETS = [
   {
-    name: '🌌 Gojo Satoru Aesthetic',
+    name: '🐻 We Bare Bears Cozy Lofi',
     url: 'https://www.youtube.com/watch?v=k1BneeJTDcU',
-    desc: 'Không gian Jujutsu Kaisen cực chill',
+    desc: 'Không gian We Bare Bears cực chill',
   },
   {
     name: '☕ Lofi Girl Study Beats',

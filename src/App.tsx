@@ -10,8 +10,6 @@ import { DeckDetail } from './components/DeckDetail';
 import { FlashcardStudy } from './components/FlashcardStudy';
 import { QuizStudy } from './components/QuizStudy';
 import { TypingStudy } from './components/TypingStudy';
-import { SpeakingStudy } from './components/SpeakingStudy';
-import { AIConversation } from './components/AIConversation';
 import { MochiStudyView } from './components/MochiStudyView';
 import { DeckImporterModal } from './components/DeckImporterModal';
 import { DeckModal } from './components/DeckModal';
@@ -22,21 +20,30 @@ import { AnimatedBackground } from './components/AnimatedBackground';
 import { YouTubeBackground } from './components/YouTubeBackground';
 import { AuthModal } from './components/AuthModal';
 import { WelcomeLoginScreen } from './components/WelcomeLoginScreen';
-import { GeminiFloatingWindow } from './components/GeminiFloatingWindow';
-import { RoadmapView } from './components/RoadmapView';
+import { MasterPinLockScreen, PIN_STORAGE_KEY } from './components/MasterPinLockScreen';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { cloudSync } from './utils/cloudSync';
 import { Heart } from 'lucide-react';
 
-type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-speaking' | 'study-mochi' | 'ai-chat' | 'roadmap';
+type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-mochi';
 
 export function App() {
+  const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    try {
+      const local = localStorage.getItem(PIN_STORAGE_KEY);
+      const session = sessionStorage.getItem(PIN_STORAGE_KEY);
+      return Boolean(local || session);
+    } catch {
+      return false;
+    }
+  });
+  const [cloudStatus, setCloudStatus] = useState<'synced' | 'syncing' | 'offline'>('synced');
+
   const [decks, setDecks] = useState<Deck[]>([]);
   const [cards, setCards] = useState<Card[]>([]);
   const [stats, setStats] = useState<UserStats>(storage.getStats());
   const [settings, setSettings] = useState<UserSettings>(storage.getSettings());
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(storage.getCurrentUser());
-  const [isGeminiWindowOpen, setIsGeminiWindowOpen] = useState(false);
 
   // Views & Navigation
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
@@ -76,6 +83,51 @@ export function App() {
     soundManager.setEnabled(loadedSettings.soundEffects);
   }, []);
 
+  // Real-time Cloud Auto-Sync with Supabase when app is unlocked and user is active
+  useEffect(() => {
+    if (!currentUser || !isSupabaseConfigured || !isUnlocked) return;
+    async function initSync() {
+      setCloudStatus('syncing');
+      try {
+        const [cloudDecks, cloudCards, cloudStats] = await Promise.all([
+          cloudSync.fetchUserDecks(currentUser!.id),
+          cloudSync.fetchUserCards(currentUser!.id),
+          cloudSync.fetchUserStats(currentUser!.id),
+        ]);
+
+        if (cloudDecks && cloudDecks.length > 0) {
+          setDecks(cloudDecks);
+          storage.saveDecksForUser(currentUser!.id, cloudDecks);
+        } else {
+          const localDecks = storage.getDecksForUser(currentUser!.id);
+          if (localDecks.length > 0) await cloudSync.saveAllDecks(currentUser!.id, localDecks);
+        }
+
+        if (cloudCards && cloudCards.length > 0) {
+          setCards(cloudCards);
+          storage.saveCardsForUser(currentUser!.id, cloudCards);
+        } else {
+          const localCards = storage.getCardsForUser(currentUser!.id);
+          if (localCards.length > 0) await cloudSync.saveAllCards(currentUser!.id, localCards);
+        }
+
+        if (cloudStats) {
+          setStats(cloudStats);
+          storage.saveStatsForUser(currentUser!.id, cloudStats);
+        } else {
+          const localStats = storage.getStatsForUser(currentUser!.id);
+          await cloudSync.saveUserStats(currentUser!.id, localStats);
+        }
+
+        setCloudStatus('synced');
+      } catch (err) {
+        console.warn('Initial cloud sync error:', err);
+        setCloudStatus('offline');
+      }
+    }
+    initSync();
+  }, [currentUser?.id, isUnlocked]);
+
   // Synchronize decks, cards, and stats whenever currentUser switches profile
   useEffect(() => {
     if (currentUser) {
@@ -92,10 +144,23 @@ export function App() {
     }
   }, [currentUser?.id]);
 
+  const handleLockApp = () => {
+    soundManager.playClick();
+    localStorage.removeItem(PIN_STORAGE_KEY);
+    sessionStorage.removeItem(PIN_STORAGE_KEY);
+    setIsUnlocked(false);
+  };
+
   const updateDecks = (newDecks: Deck[]) => {
     setDecks(newDecks);
     if (currentUser) {
       storage.saveDecksForUser(currentUser.id, newDecks);
+      if (isSupabaseConfigured) {
+        setCloudStatus('syncing');
+        cloudSync.saveAllDecks(currentUser.id, newDecks)
+          .then(() => setCloudStatus('synced'))
+          .catch(() => setCloudStatus('offline'));
+      }
     } else {
       storage.saveDecks(newDecks);
     }
@@ -105,6 +170,12 @@ export function App() {
     setCards(newCards);
     if (currentUser) {
       storage.saveCardsForUser(currentUser.id, newCards);
+      if (isSupabaseConfigured) {
+        setCloudStatus('syncing');
+        cloudSync.saveAllCards(currentUser.id, newCards)
+          .then(() => setCloudStatus('synced'))
+          .catch(() => setCloudStatus('offline'));
+      }
     } else {
       storage.saveCards(newCards);
     }
@@ -114,6 +185,12 @@ export function App() {
     setStats(newStats);
     if (currentUser) {
       storage.saveStatsForUser(currentUser.id, newStats);
+      if (isSupabaseConfigured) {
+        setCloudStatus('syncing');
+        cloudSync.saveUserStats(currentUser.id, newStats)
+          .then(() => setCloudStatus('synced'))
+          .catch(() => setCloudStatus('offline'));
+      }
     } else {
       storage.saveStats(newStats);
     }
@@ -158,7 +235,6 @@ export function App() {
     else if (mode === 'flashcard') setCurrentView('study-flashcard');
     else if (mode === 'quiz') setCurrentView('study-quiz');
     else if (mode === 'typing') setCurrentView('study-typing');
-    else if (mode === 'speaking') setCurrentView('study-speaking');
   };
 
   // Golden time: Review all due cards across all decks
@@ -237,6 +313,9 @@ export function App() {
       soundManager.playClick();
       updateDecks(decks.filter((d) => d.id !== deckId));
       updateCards(cards.filter((c) => c.deckId !== deckId));
+      if (currentUser && isSupabaseConfigured) {
+        cloudSync.deleteDeck(currentUser.id, deckId);
+      }
       if (activeDeckId === deckId) {
         setCurrentView('dashboard');
       }
@@ -274,6 +353,9 @@ export function App() {
   const handleDeleteCard = (cardId: string) => {
     soundManager.playClick();
     updateCards(cards.filter((c) => c.id !== cardId));
+    if (currentUser && isSupabaseConfigured) {
+      cloudSync.deleteCard(currentUser.id, cardId);
+    }
   };
 
   // Clear all decks and cards completely
@@ -295,6 +377,11 @@ export function App() {
     soundManager.playVictory();
   };
 
+  // Master PIN (1727) Security Lock Check
+  if (!isUnlocked) {
+    return <MasterPinLockScreen onUnlockSuccess={() => setIsUnlocked(true)} />;
+  }
+
   // If user is not logged in, show the prominent full-screen Welcome / Login screen!
   if (!currentUser) {
     return <WelcomeLoginScreen onLoginSuccess={(user) => setCurrentUser(user)} />;
@@ -315,15 +402,9 @@ export function App() {
         stats={stats}
         settings={settings}
         currentUser={currentUser}
+        cloudStatus={cloudStatus}
+        onLockApp={handleLockApp}
         onOpenAuth={() => setIsAuthOpen(true)}
-        onOpenSpeaking={() => {
-          soundManager.playClick();
-          setCurrentView('roadmap');
-        }}
-        onOpenAIChat={() => {
-          soundManager.playClick();
-          setCurrentView('ai-chat');
-        }}
         onOpenStats={() => setIsStatsOpen(true)}
         onOpenSettings={() => setIsSettingsOpen(true)}
         onToggleSound={() => {
@@ -355,55 +436,6 @@ export function App() {
               onReviewDueCards={handleReviewAllDueCards}
               onReviewLevel={handleReviewLevel}
             />
-
-            {/* IELTS Speaking & Gemini AI Interactive Partner Banner */}
-            <div
-              className="liquid-glass-card rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col lg:flex-row items-center justify-between gap-5 border border-white/30 dark:border-white/10 relative overflow-hidden group bg-linear-to-r from-blue-600/30 via-indigo-600/30 to-purple-700/30 backdrop-blur-2xl"
-            >
-              <div className="absolute top-0 right-0 w-80 h-80 bg-blue-400/10 rounded-full blur-3xl pointer-events-none group-hover:scale-125 transition-transform" />
-              <div className="flex items-center gap-4 relative z-10">
-                <div className="w-14 h-14 rounded-2xl liquid-glass-subtle flex items-center justify-center text-3xl shrink-0 shadow-inner border border-white/40 dark:border-white/10 group-hover:rotate-6 transition-transform">
-                  🎙️
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h3 className="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white">
-                      Luyện Nói Phản Xạ IELTS (Part 1, 2, 3) & Gemini AI
-                    </h3>
-                    <span className="liquid-glass-pill px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-300 bg-blue-500/15 border-blue-400/30">
-                      Gojo Satoru AI
-                    </span>
-                  </div>
-                  <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300 font-medium mt-1 max-w-xl leading-relaxed">
-                    Đầy đủ 10 Unit Speaking Part 1 (giáo trình F:\Speaking), Cue Cards Part 2 và thảo luận sâu Part 3. Luyện phát âm, chấm điểm Band và phản xạ trực tiếp cùng AI!
-                  </p>
-                </div>
-              </div>
-
-              <div className="relative z-10 flex flex-wrap items-center gap-2.5 w-full lg:w-auto">
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundManager.playClick();
-                    setCurrentView('roadmap');
-                  }}
-                  className="liquid-glass-pill flex-1 sm:flex-none px-4 py-3 bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-white font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>🗺️ Lộ Trình Part 1, 2, 3</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    soundManager.playClick();
-                    setCurrentView('ai-chat');
-                  }}
-                  className="liquid-glass-pill flex-1 sm:flex-none px-4 py-3 bg-white/90 dark:bg-white text-blue-700 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-white/20 hover:scale-105 active:scale-95 flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <span>💎 Phòng Thi AI 1-1</span>
-                  <span>➔</span>
-                </button>
-              </div>
-            </div>
 
             {/* Deck Library */}
             <DeckList
@@ -483,17 +515,6 @@ export function App() {
           />
         )}
 
-        {/* VIEW 6: Speaking AI Study */}
-        {currentView === 'study-speaking' && (
-          <SpeakingStudy
-            cards={studyCards}
-            deckTitle={studyDeckTitle}
-            settings={settings}
-            onFinishSession={handleFinishMiniStudy}
-            onExit={() => setCurrentView(returnView)}
-          />
-        )}
-
         {/* VIEW 7: Authentic We Bare Bears Study Experience */}
         {currentView === 'study-mochi' && (
           <MochiStudyView
@@ -513,43 +534,6 @@ export function App() {
             onExit={() => setCurrentView(returnView)}
           />
         )}
-
-        {/* VIEW 8: AI English Conversation Room */}
-        {currentView === 'ai-chat' && (
-          <AIConversation
-            settings={settings}
-            onExit={() => setCurrentView('dashboard')}
-            onSwitchToRoadmap={() => setCurrentView('roadmap')}
-            onRewardXP={(gained) => {
-              const newStats = storage.recordReview(gained, 1);
-              updateStats(newStats);
-            }}
-          />
-        )}
-
-        {/* VIEW 9: IELTS Speaking Roadmap (Part 1, 2, 3) */}
-        {currentView === 'roadmap' && (
-          <RoadmapView
-            settings={settings}
-            onBack={() => setCurrentView('dashboard')}
-            onSwitchToAIChat={() => setCurrentView('ai-chat')}
-            onStartStudy={(targetCards, title, mode) => {
-              setStudyCards(targetCards);
-              setStudyDeckTitle(title);
-              setActiveDeckId(null);
-              setReturnView('roadmap');
-              if (mode === 'mochi') setCurrentView('study-mochi');
-              else if (mode === 'flashcard') setCurrentView('study-flashcard');
-              else if (mode === 'quiz') setCurrentView('study-quiz');
-              else if (mode === 'typing') setCurrentView('study-typing');
-              else if (mode === 'speaking') setCurrentView('study-speaking');
-            }}
-            onRewardXP={(gained) => {
-              const newStats = storage.recordReview(gained, 1);
-              updateStats(newStats);
-            }}
-          />
-        )}
       </main>
 
       {/* Footer */}
@@ -557,10 +541,10 @@ export function App() {
         <div className="flex items-center justify-center gap-1.5 mb-1">
           <span>Phát triển với</span>
           <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-          <span>kết hợp phong cách MochiMochi & Thuật toán Anki SRS</span>
+          <span>kết hợp phong cách We Bare Bears & Thuật toán Anki SRS</span>
         </div>
         <p className="text-[11px] text-slate-400">
-          MochiAnki • Spaced Repetition Vocabulary Engine • Hỗ trợ tệp .apkg, CSV, JSON
+          We Bare Bears Anki • Spaced Repetition Vocabulary Engine • Hỗ trợ tệp .apkg, CSV, JSON
         </p>
       </footer>
 
@@ -616,29 +600,6 @@ export function App() {
         onClose={() => setIsAuthOpen(false)}
         currentUser={currentUser}
         onUserChange={(user) => setCurrentUser(user)}
-      />
-
-      {/* Floating Gemini AI Web Window Button */}
-      {!isGeminiWindowOpen && (
-        <button
-          type="button"
-          onClick={() => {
-            soundManager.playClick();
-            setIsGeminiWindowOpen(true);
-          }}
-          title="Mở Cửa Sổ Google Gemini Web"
-          className="liquid-glass-pill fixed bottom-6 right-6 z-40 flex items-center gap-2.5 px-4 py-3 bg-linear-to-r from-blue-600/80 via-indigo-600/80 to-purple-600/80 hover:from-blue-500 hover:to-purple-500 text-white font-black text-xs sm:text-sm rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all cursor-pointer ring-2 ring-white/40 animate-mochi-float"
-        >
-          <span className="text-xl">💎</span>
-          <span>Cửa Sổ Gemini Web</span>
-        </button>
-      )}
-
-      {/* Floating Gemini Window Component */}
-      <GeminiFloatingWindow
-        isOpen={isGeminiWindowOpen}
-        onClose={() => setIsGeminiWindowOpen(false)}
-        settings={settings}
       />
     </div>
   );
