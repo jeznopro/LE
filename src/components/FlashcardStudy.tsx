@@ -441,9 +441,16 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
                 <span>{currentLvlInfo.name}</span>
               </span>
 
-              <span className="text-xs font-bold text-slate-400 dark:text-slate-400">
-                {(deckTitle || '').replace(/[\x00-\x1f\x7f-\x9f]/g, ' - ').replace(/::/g, ' - ').replace(/\s+-\s+/g, ' - ').trim()}
-              </span>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-xs font-bold text-slate-400 dark:text-slate-400">
+                  {(deckTitle || '').replace(/[\x00-\x1f\x7f-\x9f]/g, ' - ').replace(/::/g, ' - ').replace(/\s+-\s+/g, ' - ').trim()}
+                </span>
+                {currentCard.tags?.find((t) => t.startsWith('Dạng')) && (
+                  <span className="px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-400/30">
+                    🏷️ {currentCard.tags.find((t) => t.startsWith('Dạng'))}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="my-auto space-y-3 w-full py-1">
@@ -630,6 +637,12 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               {currentCard.phonetic && (
                 <span className="text-xs sm:text-sm font-mono text-slate-500 dark:text-slate-400 font-bold">
                   {currentCard.phonetic}
+                </span>
+              )}
+
+              {currentCard.tags?.find((t) => t.startsWith('Dạng')) && (
+                <span className="mt-1 px-2.5 py-0.5 rounded-lg text-[10px] font-black bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-400/30">
+                  🏷️ {currentCard.tags.find((t) => t.startsWith('Dạng'))}
                 </span>
               )}
             </div>

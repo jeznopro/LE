@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Deck, Card, MemoryLevel, StudyMode } from '../types';
 import { MOCHI_LEVEL_INFO, isCardDue, formatIntervalPreview } from '../utils/srs';
 import { ttsService } from '../utils/tts';
@@ -12,6 +12,7 @@ import {
   Search,
   Play,
   Clock,
+  Tag,
 } from 'lucide-react';
 
 interface DeckDetailProps {
@@ -35,9 +36,21 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
+  const [selectedTag, setSelectedTag] = useState<string | 'all'>('all');
 
   const deckCards = cards.filter((c) => c.deckId === deck.id);
   const dueCards = deckCards.filter(isCardDue);
+
+  // Extract unique Dạng bài tags from cards in this deck
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    deckCards.forEach((c) => {
+      c.tags?.forEach((t) => {
+        if (t.startsWith('Dạng')) set.add(t);
+      });
+    });
+    return Array.from(set).sort();
+  }, [deckCards]);
 
   const filteredCards = deckCards.filter((c) => {
     const matchSearch =
@@ -46,8 +59,9 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       (c.example && c.example.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchLevel = selectedLevel === 'all' || c.level === selectedLevel;
+    const matchTag = selectedTag === 'all' || (c.tags && c.tags.includes(selectedTag));
 
-    return matchSearch && matchLevel;
+    return matchSearch && matchLevel && matchTag;
   });
 
   const handleSpeak = (text: string, e: React.MouseEvent) => {
@@ -135,57 +149,98 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
       </div>
 
       {/* Search & Filter bar */}
-      <div className="liquid-glass-subtle flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-3xl">
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Tìm kiếm từ trong bộ này..."
-            className="liquid-glass-input w-full pl-9 pr-4 py-2 text-xs font-semibold rounded-2xl"
-          />
+      <div className="liquid-glass-subtle flex flex-col gap-3.5 p-4 sm:p-5 rounded-3xl">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Tìm kiếm từ trong bộ này..."
+              className="liquid-glass-input w-full pl-9 pr-4 py-2 text-xs font-semibold rounded-2xl"
+            />
+          </div>
+
+          {/* Level Filters */}
+          <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
+            <button
+              onClick={() => setSelectedLevel('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                selectedLevel === 'all'
+                  ? 'liquid-glass-pill shadow-xs ring-2 ring-amber-400/40 text-slate-900 dark:text-white font-black'
+                  : 'liquid-glass-subtle text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Tất cả ({deckCards.length})
+            </button>
+
+            {([0, 1, 2, 3, 4, 5] as MemoryLevel[]).map((lvl) => {
+              const count = deckCards.filter((c) => (c.level ?? 0) === lvl).length;
+              const info = MOCHI_LEVEL_INFO[lvl];
+              const isSelected = selectedLevel === lvl;
+
+              return (
+                <button
+                  key={lvl}
+                  onClick={() => setSelectedLevel(lvl)}
+                  className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
+                    isSelected
+                      ? 'shadow-md ring-2 ring-white/60 dark:ring-white/20'
+                      : 'opacity-80 hover:opacity-100 hover:scale-105'
+                  }`}
+                  style={{
+                    backgroundColor: isSelected ? info.color : info.bg,
+                    color: isSelected ? '#FFFFFF' : info.color,
+                  }}
+                >
+                  <span>{info.emoji}</span>
+                  <span>Cấp {lvl}</span>
+                  <span className="text-[10px] opacity-90">({count})</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Level Filters */}
-        <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0">
-          <button
-            onClick={() => setSelectedLevel('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-              selectedLevel === 'all'
-                ? 'liquid-glass-pill shadow-xs ring-2 ring-amber-400/40 text-slate-900 dark:text-white font-black'
-                : 'liquid-glass-subtle text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-            }`}
-          >
-            Tất cả ({deckCards.length})
-          </button>
+        {/* Dạng bài Category Filters */}
+        {availableTags.length > 0 && (
+          <div className="pt-3 border-t border-white/40 dark:border-white/10 flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+            <span className="text-xs font-black text-amber-800 dark:text-amber-300 shrink-0 flex items-center gap-1">
+              <Tag className="w-3.5 h-3.5" />
+              <span>Phân loại dạng:</span>
+            </span>
 
-          {([0, 1, 2, 3, 4, 5] as MemoryLevel[]).map((lvl) => {
-            const count = deckCards.filter((c) => (c.level ?? 0) === lvl).length;
-            const info = MOCHI_LEVEL_INFO[lvl];
-            const isSelected = selectedLevel === lvl;
+            <button
+              onClick={() => setSelectedTag('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                selectedTag === 'all'
+                  ? 'liquid-glass-pill shadow-xs ring-2 ring-amber-400/60 text-amber-950 dark:text-amber-100 font-black bg-amber-400/30'
+                  : 'liquid-glass-subtle text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Tất cả dạng ({deckCards.length})
+            </button>
 
-            return (
-              <button
-                key={lvl}
-                onClick={() => setSelectedLevel(lvl)}
-                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 cursor-pointer ${
-                  isSelected
-                    ? 'shadow-md ring-2 ring-white/60 dark:ring-white/20'
-                    : 'opacity-80 hover:opacity-100 hover:scale-105'
-                }`}
-                style={{
-                  backgroundColor: isSelected ? info.color : info.bg,
-                  color: isSelected ? '#FFFFFF' : info.color,
-                }}
-              >
-                <span>{info.emoji}</span>
-                <span>Cấp {lvl}</span>
-                <span className="text-[10px] opacity-90">({count})</span>
-              </button>
-            );
-          })}
-        </div>
+            {availableTags.map((tag) => {
+              const count = deckCards.filter((c) => c.tags?.includes(tag)).length;
+              const isSelected = selectedTag === tag;
+              return (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer ${
+                    isSelected
+                      ? 'liquid-glass-pill shadow-xs ring-2 ring-amber-400/60 text-amber-950 dark:text-amber-100 font-black bg-amber-400/30'
+                      : 'liquid-glass-subtle text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                  }`}
+                >
+                  🏷️ {tag} ({count})
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Cards List */}
@@ -278,6 +333,25 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                   {card.relatedWords && (
                     <div className="mt-2 text-[11px] font-semibold text-purple-700 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-400/10 backdrop-blur-md px-2.5 py-1 rounded-xl border border-purple-300/20 dark:border-purple-800/30">
                       🔗 <span className="font-bold">Từ liên quan:</span> {card.relatedWords}
+                    </div>
+                  )}
+
+                  {card.tags && card.tags.length > 0 && (
+                    <div className="mt-2.5 flex items-center gap-1.5 flex-wrap">
+                      {card.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="liquid-glass-subtle text-[11px] font-black px-2.5 py-0.5 rounded-lg text-amber-900 dark:text-amber-200 bg-amber-500/15 border border-amber-400/25"
+                        >
+                          🏷️ {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {card.hint && (
+                    <div className="mt-2 text-xs font-semibold text-purple-800 dark:text-purple-200 bg-purple-500/10 dark:bg-purple-900/30 backdrop-blur-md px-3 py-1.5 rounded-xl border border-purple-300/30 dark:border-purple-700/40">
+                      💡 {card.hint}
                     </div>
                   )}
                 </div>

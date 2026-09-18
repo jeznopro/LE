@@ -99,17 +99,25 @@ export function App() {
         let currentDecks = cloudDecks && cloudDecks.length > 0 ? cloudDecks : storage.getDecksForUser(currentUser!.id);
         let currentCards = cloudCards && cloudCards.length > 0 ? cloudCards : storage.getCardsForUser(currentUser!.id);
 
-        // Auto-seed Destination B1 deck if missing
-        if (!currentDecks.some((d) => d.id === 'deck-destination-b1')) {
-          const b1Deck = INITIAL_DECKS.find((d) => d.id === 'deck-destination-b1');
-          if (b1Deck) {
-            currentDecks = [b1Deck, ...currentDecks];
-            const b1Cards = INITIAL_CARDS.filter((c) => c.deckId === 'deck-destination-b1');
-            currentCards = [...b1Cards, ...currentCards];
-            if (isSupabaseConfigured) {
-              await cloudSync.saveSingleDeck(currentUser!.id, b1Deck);
-              await cloudSync.saveAllCards(currentUser!.id, b1Cards);
+        // Clean up legacy single destination b1 deck if present
+        currentDecks = currentDecks.filter((d) => d.id !== 'deck-destination-b1');
+        currentCards = currentCards.filter((c) => c.deckId !== 'deck-destination-b1');
+
+        // Auto-seed Destination B1 dedicated unit decks if missing
+        const missingB1Decks = INITIAL_DECKS.filter(
+          (d) => d.id.startsWith('deck-b1-') && !currentDecks.some((cd) => cd.id === d.id)
+        );
+        if (missingB1Decks.length > 0) {
+          currentDecks = [...currentDecks, ...missingB1Decks];
+          const missingB1Cards = INITIAL_CARDS.filter((c) =>
+            missingB1Decks.some((d) => d.id === c.deckId)
+          );
+          currentCards = [...currentCards, ...missingB1Cards];
+          if (isSupabaseConfigured) {
+            for (const d of missingB1Decks) {
+              await cloudSync.saveSingleDeck(currentUser!.id, d);
             }
+            await cloudSync.saveAllCards(currentUser!.id, missingB1Cards);
           }
         }
 
@@ -142,16 +150,22 @@ export function App() {
       let userCards = storage.getCardsForUser(currentUser.id);
       const userStats = storage.getStatsForUser(currentUser.id);
 
-      // Ensure Destination B1 deck is present
-      if (!userDecks.some((d) => d.id === 'deck-destination-b1')) {
-        const b1Deck = INITIAL_DECKS.find((d) => d.id === 'deck-destination-b1');
-        if (b1Deck) {
-          userDecks = [b1Deck, ...userDecks];
-          const b1Cards = INITIAL_CARDS.filter((c) => c.deckId === 'deck-destination-b1');
-          userCards = [...b1Cards, ...userCards];
-          storage.saveDecksForUser(currentUser.id, userDecks);
-          storage.saveCardsForUser(currentUser.id, userCards);
-        }
+      // Clean up legacy single destination b1 deck if present
+      userDecks = userDecks.filter((d) => d.id !== 'deck-destination-b1');
+      userCards = userCards.filter((c) => c.deckId !== 'deck-destination-b1');
+
+      // Ensure Destination B1 dedicated unit decks are present
+      const missingB1Decks = INITIAL_DECKS.filter(
+        (d) => d.id.startsWith('deck-b1-') && !userDecks.some((ud) => ud.id === d.id)
+      );
+      if (missingB1Decks.length > 0) {
+        userDecks = [...userDecks, ...missingB1Decks];
+        const missingB1Cards = INITIAL_CARDS.filter((c) =>
+          missingB1Decks.some((d) => d.id === c.deckId)
+        );
+        userCards = [...userCards, ...missingB1Cards];
+        storage.saveDecksForUser(currentUser.id, userDecks);
+        storage.saveCardsForUser(currentUser.id, userCards);
       }
 
       setDecks(userDecks);
