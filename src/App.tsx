@@ -23,6 +23,7 @@ import { WelcomeLoginScreen } from './components/WelcomeLoginScreen';
 import { MasterPinLockScreen, PIN_STORAGE_KEY } from './components/MasterPinLockScreen';
 import { supabase, isSupabaseConfigured } from './utils/supabase';
 import { cloudSync } from './utils/cloudSync';
+import { INITIAL_CARDS, INITIAL_DECKS } from './data/sampleDecks';
 import { Heart } from 'lucide-react';
 
 type ViewMode = 'dashboard' | 'deck-detail' | 'study-flashcard' | 'study-quiz' | 'study-typing' | 'study-mochi';
@@ -95,21 +96,27 @@ export function App() {
           cloudSync.fetchUserStats(currentUser!.id),
         ]);
 
-        if (cloudDecks && cloudDecks.length > 0) {
-          setDecks(cloudDecks);
-          storage.saveDecksForUser(currentUser!.id, cloudDecks);
-        } else {
-          const localDecks = storage.getDecksForUser(currentUser!.id);
-          if (localDecks.length > 0) await cloudSync.saveAllDecks(currentUser!.id, localDecks);
+        let currentDecks = cloudDecks && cloudDecks.length > 0 ? cloudDecks : storage.getDecksForUser(currentUser!.id);
+        let currentCards = cloudCards && cloudCards.length > 0 ? cloudCards : storage.getCardsForUser(currentUser!.id);
+
+        // Auto-seed Destination B1 deck if missing
+        if (!currentDecks.some((d) => d.id === 'deck-destination-b1')) {
+          const b1Deck = INITIAL_DECKS.find((d) => d.id === 'deck-destination-b1');
+          if (b1Deck) {
+            currentDecks = [b1Deck, ...currentDecks];
+            const b1Cards = INITIAL_CARDS.filter((c) => c.deckId === 'deck-destination-b1');
+            currentCards = [...b1Cards, ...currentCards];
+            if (isSupabaseConfigured) {
+              await cloudSync.saveSingleDeck(currentUser!.id, b1Deck);
+              await cloudSync.saveAllCards(currentUser!.id, b1Cards);
+            }
+          }
         }
 
-        if (cloudCards && cloudCards.length > 0) {
-          setCards(cloudCards);
-          storage.saveCardsForUser(currentUser!.id, cloudCards);
-        } else {
-          const localCards = storage.getCardsForUser(currentUser!.id);
-          if (localCards.length > 0) await cloudSync.saveAllCards(currentUser!.id, localCards);
-        }
+        setDecks(currentDecks);
+        setCards(currentCards);
+        storage.saveDecksForUser(currentUser!.id, currentDecks);
+        storage.saveCardsForUser(currentUser!.id, currentCards);
 
         if (cloudStats) {
           setStats(cloudStats);
@@ -131,9 +138,22 @@ export function App() {
   // Synchronize decks, cards, and stats whenever currentUser switches profile
   useEffect(() => {
     if (currentUser) {
-      const userDecks = storage.getDecksForUser(currentUser.id);
-      const userCards = storage.getCardsForUser(currentUser.id);
+      let userDecks = storage.getDecksForUser(currentUser.id);
+      let userCards = storage.getCardsForUser(currentUser.id);
       const userStats = storage.getStatsForUser(currentUser.id);
+
+      // Ensure Destination B1 deck is present
+      if (!userDecks.some((d) => d.id === 'deck-destination-b1')) {
+        const b1Deck = INITIAL_DECKS.find((d) => d.id === 'deck-destination-b1');
+        if (b1Deck) {
+          userDecks = [b1Deck, ...userDecks];
+          const b1Cards = INITIAL_CARDS.filter((c) => c.deckId === 'deck-destination-b1');
+          userCards = [...b1Cards, ...userCards];
+          storage.saveDecksForUser(currentUser.id, userDecks);
+          storage.saveCardsForUser(currentUser.id, userCards);
+        }
+      }
+
       setDecks(userDecks);
       setCards(userCards);
       setStats(userStats);
