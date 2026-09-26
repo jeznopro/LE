@@ -112,6 +112,56 @@ export const storage = {
     localStorage.setItem(`mochi_user_stats_${userId}`, JSON.stringify(stats));
   },
 
+  getDeletedCardIds(userId: string): string[] {
+    try {
+      const data = localStorage.getItem(`mochi_deleted_cards_${userId}`);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  addDeletedCardId(userId: string, cardId: string) {
+    try {
+      const list = this.getDeletedCardIds(userId);
+      if (!list.includes(cardId)) {
+        list.push(cardId);
+        localStorage.setItem(`mochi_deleted_cards_${userId}`, JSON.stringify(list));
+      }
+    } catch (e) {
+      console.error('Error saving deleted card ID:', e);
+    }
+  },
+
+  getDeletedDeckIds(userId: string): string[] {
+    try {
+      const data = localStorage.getItem(`mochi_deleted_decks_${userId}`);
+      return data ? JSON.parse(data) : [];
+    } catch {
+      return [];
+    }
+  },
+
+  addDeletedDeckId(userId: string, deckId: string) {
+    try {
+      const list = this.getDeletedDeckIds(userId);
+      if (!list.includes(deckId)) {
+        list.push(deckId);
+        localStorage.setItem(`mochi_deleted_decks_${userId}`, JSON.stringify(list));
+      }
+    } catch (e) {
+      console.error('Error saving deleted deck ID:', e);
+    }
+  },
+
+  isUserB1Seeded(userId: string): boolean {
+    return localStorage.getItem(`mochi_b1_seeded_v2_${userId}`) === 'true';
+  },
+
+  markUserB1Seeded(userId: string) {
+    localStorage.setItem(`mochi_b1_seeded_v2_${userId}`, 'true');
+  },
+
   updateSingleCard(updatedCard: Card) {
     const allCards = this.getCards();
     const idx = allCards.findIndex((c) => c.id === updatedCard.id);

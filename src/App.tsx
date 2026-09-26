@@ -52,11 +52,20 @@ export function App() {
   });
   const [cloudStatus, setCloudStatus] = useState<'synced' | 'syncing' | 'offline'>('synced');
 
-  const [decks, setDecks] = useState<Deck[]>([]);
-  const [cards, setCards] = useState<Card[]>([]);
-  const [stats, setStats] = useState<UserStats>(storage.getStats());
-  const [settings, setSettings] = useState<UserSettings>(storage.getSettings());
   const [currentUser, setCurrentUser] = useState<UserAccount | null>(storage.getCurrentUser());
+  const [decks, setDecks] = useState<Deck[]>(() => {
+    const user = storage.getCurrentUser();
+    return user ? storage.getDecksForUser(user.id) : storage.getDecks();
+  });
+  const [cards, setCards] = useState<Card[]>(() => {
+    const user = storage.getCurrentUser();
+    return user ? storage.getCardsForUser(user.id) : storage.getCards();
+  });
+  const [stats, setStats] = useState<UserStats>(() => {
+    const user = storage.getCurrentUser();
+    return user ? storage.getStatsForUser(user.id) : storage.getStats();
+  });
+  const [settings, setSettings] = useState<UserSettings>(storage.getSettings());
 
   // Views & Navigation
   const [currentView, setCurrentView] = useState<ViewMode>('dashboard');
@@ -78,11 +87,11 @@ export function App() {
 
   // Load initial data on mount
   useEffect(() => {
-    const loadedDecks = storage.getDecks();
-    const loadedCards = storage.getCards();
-    let loadedStats = storage.getStats();
-    const loadedSettings = storage.getSettings();
     const loadedUser = storage.getCurrentUser();
+    const loadedDecks = loadedUser ? storage.getDecksForUser(loadedUser.id) : storage.getDecks();
+    const loadedCards = loadedUser ? storage.getCardsForUser(loadedUser.id) : storage.getCards();
+    let loadedStats = loadedUser ? storage.getStatsForUser(loadedUser.id) : storage.getStats();
+    const loadedSettings = storage.getSettings();
 
     // Auto clean reset to 0 if legacy mock stats exist
     if (loadedStats.xp === 350 && loadedStats.streak === 3 && loadedStats.totalReviews === 42) {
@@ -112,30 +121,36 @@ export function App() {
         let currentDecks = cloudDecks && cloudDecks.length > 0 ? cloudDecks : storage.getDecksForUser(currentUser!.id);
         let currentCards = cloudCards && cloudCards.length > 0 ? cloudCards : storage.getCardsForUser(currentUser!.id);
 
-        // Clean up legacy single destination b1 deck if present
-        currentDecks = currentDecks.filter((d) => d.id !== 'deck-destination-b1');
-        currentCards = currentCards.filter((c) => c.deckId !== 'deck-destination-b1');
+        const deletedCardIds = storage.getDeletedCardIds(currentUser!.id);
+        const deletedDeckIds = storage.getDeletedDeckIds(currentUser!.id);
 
-        // Auto-seed Destination B1 dedicated unit decks if missing
-        const missingB1Decks = INITIAL_DECKS.filter(
-          (d) => d.id.startsWith('deck-b1-') && !currentDecks.some((cd) => cd.id === d.id)
-        );
-        if (missingB1Decks.length > 0) {
-          currentDecks = [...currentDecks, ...missingB1Decks];
-          if (isSupabaseConfigured) {
-            for (const d of missingB1Decks) {
-              await cloudSync.saveSingleDeck(currentUser!.id, d);
+        // Clean up legacy single destination b1 deck and filter out user-deleted items
+        currentDecks = currentDecks.filter((d) => d.id !== 'deck-destination-b1' && !deletedDeckIds.includes(d.id));
+        currentCards = currentCards.filter((c) => c.deckId !== 'deck-destination-b1' && !deletedCardIds.includes(c.id) && !deletedDeckIds.includes(c.deckId));
+
+        // One-time auto-seed Destination B1 dedicated unit decks if not yet seeded for this user
+        if (!storage.isUserB1Seeded(currentUser!.id)) {
+          const missingB1Decks = INITIAL_DECKS.filter(
+            (d) => d.id.startsWith('deck-b1-') && !currentDecks.some((cd) => cd.id === d.id) && !deletedDeckIds.includes(d.id)
+          );
+          if (missingB1Decks.length > 0) {
+            currentDecks = [...currentDecks, ...missingB1Decks];
+            if (isSupabaseConfigured) {
+              for (const d of missingB1Decks) {
+                await cloudSync.saveSingleDeck(currentUser!.id, d);
+              }
             }
           }
-        }
-        const missingB1Cards = INITIAL_CARDS.filter((c) =>
-          c.deckId.startsWith('deck-b1-') && !currentCards.some((cc) => cc.id === c.id)
-        );
-        if (missingB1Cards.length > 0) {
-          currentCards = [...currentCards, ...missingB1Cards];
-          if (isSupabaseConfigured) {
-            await cloudSync.saveAllCards(currentUser!.id, missingB1Cards);
+          const missingB1Cards = INITIAL_CARDS.filter((c) =>
+            c.deckId.startsWith('deck-b1-') && !currentCards.some((cc) => cc.id === c.id) && !deletedCardIds.includes(c.id)
+          );
+          if (missingB1Cards.length > 0) {
+            currentCards = [...currentCards, ...missingB1Cards];
+            if (isSupabaseConfigured) {
+              await cloudSync.saveAllCards(currentUser!.id, missingB1Cards);
+            }
           }
+          storage.markUserB1Seeded(currentUser!.id);
         }
 
         setDecks(currentDecks);
@@ -167,24 +182,28 @@ export function App() {
       let userCards = storage.getCardsForUser(currentUser.id);
       const userStats = storage.getStatsForUser(currentUser.id);
 
-      // Clean up legacy single destination b1 deck if present
-      userDecks = userDecks.filter((d) => d.id !== 'deck-destination-b1');
-      userCards = userCards.filter((c) => c.deckId !== 'deck-destination-b1');
+      const deletedCardIds = storage.getDeletedCardIds(currentUser.id);
+      const deletedDeckIds = storage.getDeletedDeckIds(currentUser.id);
 
-      // Ensure Destination B1 dedicated unit decks are present
-      const missingB1Decks = INITIAL_DECKS.filter(
-        (d) => d.id.startsWith('deck-b1-') && !userDecks.some((ud) => ud.id === d.id)
-      );
-      if (missingB1Decks.length > 0) {
-        userDecks = [...userDecks, ...missingB1Decks];
-      }
-      const missingB1Cards = INITIAL_CARDS.filter((c) =>
-        c.deckId.startsWith('deck-b1-') && !userCards.some((uc) => uc.id === c.id)
-      );
-      if (missingB1Cards.length > 0) {
-        userCards = [...userCards, ...missingB1Cards];
-      }
-      if (missingB1Decks.length > 0 || missingB1Cards.length > 0) {
+      // Clean up legacy single destination b1 deck if present and filter deleted items
+      userDecks = userDecks.filter((d) => d.id !== 'deck-destination-b1' && !deletedDeckIds.includes(d.id));
+      userCards = userCards.filter((c) => c.deckId !== 'deck-destination-b1' && !deletedCardIds.includes(c.id) && !deletedDeckIds.includes(c.deckId));
+
+      // One-time auto-seed Destination B1 dedicated unit decks if not yet seeded
+      if (!storage.isUserB1Seeded(currentUser.id)) {
+        const missingB1Decks = INITIAL_DECKS.filter(
+          (d) => d.id.startsWith('deck-b1-') && !userDecks.some((ud) => ud.id === d.id) && !deletedDeckIds.includes(d.id)
+        );
+        if (missingB1Decks.length > 0) {
+          userDecks = [...userDecks, ...missingB1Decks];
+        }
+        const missingB1Cards = INITIAL_CARDS.filter((c) =>
+          c.deckId.startsWith('deck-b1-') && !userCards.some((uc) => uc.id === c.id) && !deletedCardIds.includes(c.id)
+        );
+        if (missingB1Cards.length > 0) {
+          userCards = [...userCards, ...missingB1Cards];
+        }
+        storage.markUserB1Seeded(currentUser.id);
         storage.saveDecksForUser(currentUser.id, userDecks);
         storage.saveCardsForUser(currentUser.id, userCards);
       }
@@ -394,8 +413,14 @@ export function App() {
     const deck = decks.find((d) => d.id === deckId);
     if (window.confirm(`Bạn có chắc muốn xóa bộ thẻ "${deck?.title}" cùng tất cả từ vựng trong bộ này?`)) {
       soundManager.playClick();
-      updateDecks(decks.filter((d) => d.id !== deckId));
-      updateCards(cards.filter((c) => c.deckId !== deckId));
+      const newDecks = decks.filter((d) => d.id !== deckId);
+      const deletedCardIdsInDeck = cards.filter((c) => c.deckId === deckId).map((c) => c.id);
+      const newCards = cards.filter((c) => c.deckId !== deckId);
+      updateDecks(newDecks);
+      updateCards(newCards);
+      const targetUserId = currentUser ? currentUser.id : 'guest';
+      storage.addDeletedDeckId(targetUserId, deckId);
+      deletedCardIdsInDeck.forEach((cId) => storage.addDeletedCardId(targetUserId, cId));
       if (currentUser && isSupabaseConfigured) {
         cloudSync.deleteDeck(currentUser.id, deckId);
       }
@@ -435,7 +460,10 @@ export function App() {
 
   const handleDeleteCard = (cardId: string) => {
     soundManager.playClick();
-    updateCards(cards.filter((c) => c.id !== cardId));
+    const newCards = cards.filter((c) => c.id !== cardId);
+    updateCards(newCards);
+    const targetUserId = currentUser ? currentUser.id : 'guest';
+    storage.addDeletedCardId(targetUserId, cardId);
     if (currentUser && isSupabaseConfigured) {
       cloudSync.deleteCard(currentUser.id, cardId);
     }
@@ -445,6 +473,9 @@ export function App() {
   const handleClearAllDecks = () => {
     if (window.confirm('Bạn có chắc chắn muốn XÓA TẤT CẢ các bộ thẻ và từ vựng hiện tại để làm mới hoàn toàn không?')) {
       soundManager.playClick();
+      const targetUserId = currentUser ? currentUser.id : 'guest';
+      decks.forEach((d) => storage.addDeletedDeckId(targetUserId, d.id));
+      cards.forEach((c) => storage.addDeletedCardId(targetUserId, c.id));
       updateDecks([]);
       updateCards([]);
     }
