@@ -638,6 +638,20 @@ export function App() {
             cards={studyCards}
             deckTitle={studyDeckTitle}
             settings={settings}
+            onUpdateCard={(updatedCard) => {
+              setCards((prev) => {
+                const nextCards = prev.map((c) => (c.id === updatedCard.id ? updatedCard : c));
+                if (currentUser) {
+                  storage.saveCardsForUser(currentUser.id, nextCards);
+                } else {
+                  storage.saveCards(nextCards);
+                }
+                return nextCards;
+              });
+              if (currentUser) {
+                cloudSync.saveSingleCard(currentUser.id, updatedCard);
+              }
+            }}
             onCardReviewed={(updatedCard) => {
               setCards((prev) => prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)));
               const currentStats = storage.getStats();

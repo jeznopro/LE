@@ -5,8 +5,9 @@ import { soundManager } from '../utils/sounds';
 import confetti from 'canvas-confetti';
 import { calculateSRS, getRatingIntervalPreviews } from '../utils/srs';
 import { useMediaUrl } from '../hooks/useMediaUrl';
-import { X, Volume2, Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { X, Volume2, Sparkles, ArrowRight, CheckCircle2, Camera, Maximize2 } from 'lucide-react';
 import { storage } from '../utils/storage';
+import { getCardIllustration, compressImageFile } from '../utils/imageDictionary';
 
 interface MochiStudyViewProps {
   cards: Card[];
@@ -14,6 +15,7 @@ interface MochiStudyViewProps {
   settings: UserSettings;
   onFinishSession: (updatedCards: Card[], xpGained: number) => void;
   onCardReviewed?: (updatedCard: Card, xpGained: number) => void;
+  onUpdateCard?: (updatedCard: Card) => void;
   onExit: () => void;
 }
 
@@ -25,6 +27,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
   settings,
   onFinishSession,
   onCardReviewed,
+  onUpdateCard,
   onExit,
 }) => {
   const [studyQueue, setStudyQueue] = useState<Card[]>(cards);
@@ -56,9 +59,32 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(false);
   const [showExampleTranslation, setShowExampleTranslation] = useState(false);
 
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const currentCard = studyQueue[currentIndex];
   const imageUrl = useMediaUrl(currentCard?.image);
+  const effectiveImageUrl = imageUrl || (currentCard ? getCardIllustration(currentCard.front, currentCard.image) : '/we_bare_bears.png');
   const intervalPreviews = currentCard ? getRatingIntervalPreviews(currentCard) : null;
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !currentCard) return;
+    try {
+      const compressedDataUrl = await compressImageFile(file, 480, 0.82);
+      const updatedCard: Card = {
+        ...currentCard,
+        image: compressedDataUrl,
+      };
+      setStudyQueue((prev) => prev.map((c) => (c.id === updatedCard.id ? updatedCard : c)));
+      if (onUpdateCard) {
+        onUpdateCard(updatedCard);
+      }
+      soundManager.playCorrect();
+    } catch (err) {
+      console.error('Failed to compress image:', err);
+    }
+  };
 
   // Audio players
   const playNormalAudio = useCallback(
@@ -571,26 +597,41 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             {!isFlipped ? (
               /* FRONT */
               <div className="my-auto space-y-4 w-full">
-                {imageUrl ? (
-                  <div className="max-w-xs mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
-                    <img
-                      src={imageUrl}
-                      alt={currentCard.front}
-                      className="w-full h-48 sm:h-52 object-cover"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                <div className="max-w-xs mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 relative group">
+                  <img
+                    src={effectiveImageUrl}
+                    alt={currentCard.front}
+                    className="w-full h-48 sm:h-52 object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                    }}
+                  />
+                  <div className="absolute top-2 right-2 flex items-center gap-1.5 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsImageModalOpen(true);
                       }}
-                    />
+                      className="p-1.5 rounded-xl bg-black/50 hover:bg-black/70 text-white backdrop-blur-xs transition-all shadow-xs cursor-pointer"
+                      title="Xem ảnh phóng to"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="p-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white shadow-xs cursor-pointer transition-all flex items-center gap-1 text-xs font-bold"
+                      title="Đổi ảnh minh họa cho từ này"
+                    >
+                      <Camera className="w-4 h-4" />
+                      <span className="hidden sm:inline text-[11px]">Đổi ảnh</span>
+                    </button>
                   </div>
-                ) : (
-                  <div className="w-56 h-44 mx-auto rounded-3xl overflow-hidden shadow-md border-2 border-amber-200 dark:border-slate-700 bg-amber-50 dark:bg-slate-800 flex items-center justify-center p-2">
-                    <img
-                      src="/we_bare_bears.png"
-                      alt="We Bare Bears Stack"
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                )}
+                </div>
 
                 {/* Main Word & IPA on Front */}
                 <div className="space-y-1">
@@ -621,6 +662,26 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
             ) : (
               /* BACK */
               <div className="my-auto space-y-3 w-full animate-fadeIn">
+                <div
+                  onClick={() => setIsImageModalOpen(true)}
+                  className="max-w-[200px] sm:max-w-xs mx-auto rounded-2xl overflow-hidden shadow-md border-2 border-emerald-200 dark:border-emerald-800 bg-slate-50 dark:bg-slate-800 relative group cursor-pointer"
+                  title="Bấm để xem ảnh phóng to"
+                >
+                  <img
+                    src={effectiveImageUrl}
+                    alt={currentCard.front}
+                    className="w-full h-36 sm:h-44 object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                    }}
+                  />
+                  <div className="absolute top-2 right-2 flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+                    <span className="p-1 px-1.5 rounded-lg bg-black/40 text-white backdrop-blur-xs text-[10px] font-bold">
+                      🔍 Phóng to
+                    </span>
+                  </div>
+                </div>
+
                 <div className="flex items-center justify-center gap-2 flex-wrap">
                   <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                     {currentCard.front}
@@ -861,8 +922,8 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
           </div>
 
           <div className="max-w-2xl mx-auto space-y-4">
-            {/* Top row with Speaker, Word, Phonetic, Meaning */}
-            <div className="flex items-start gap-4">
+            {/* Top row with Speaker, Word, Phonetic, Meaning, and Visual Illustration */}
+            <div className="flex items-start sm:items-center gap-3 sm:gap-4">
               <button
                 type="button"
                 onClick={() => playNormalAudio()}
@@ -872,11 +933,11 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                 <Volume2 className="w-7 h-7 stroke-[2.5]" />
               </button>
 
-              <div className="space-y-1 flex-1">
-                <div className="text-2xl sm:text-3xl font-black flex items-center gap-2">
+              <div className="space-y-1 flex-1 min-w-0">
+                <div className="text-2xl sm:text-3xl font-black flex items-center gap-2 flex-wrap">
                   <span>{currentCard.front}</span>
                   {currentCard.partOfSpeech && (
-                    <span className="text-lg opacity-90 font-bold">({currentCard.partOfSpeech})</span>
+                    <span className="text-base sm:text-lg opacity-90 font-bold">({currentCard.partOfSpeech})</span>
                   )}
                 </div>
 
@@ -890,6 +951,42 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                   {currentCard.back}
                 </div>
               </div>
+
+              {/* CARD VISUAL ILLUSTRATION THUMBNAIL */}
+              {effectiveImageUrl && (
+                <div className="shrink-0 relative group">
+                  <div
+                    onClick={() => setIsImageModalOpen(true)}
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl overflow-hidden shadow-lg border-2 border-white/60 bg-black/20 cursor-pointer hover:scale-105 active:scale-95 transition-all relative"
+                    title="Bấm để xem ảnh phóng to"
+                  >
+                    <img
+                      src={effectiveImageUrl}
+                      alt={currentCard.front}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                      <span className="text-white text-xs font-bold drop-shadow">🔍 Xem</span>
+                    </div>
+                  </div>
+
+                  {/* Quick Change / Upload Image button */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      fileInputRef.current?.click();
+                    }}
+                    className="absolute -bottom-1.5 -right-1.5 w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-white text-slate-800 shadow-md border border-slate-200 flex items-center justify-center text-xs hover:scale-110 active:scale-95 cursor-pointer transition-all"
+                    title="Đổi hoặc tải ảnh minh họa cho từ này"
+                  >
+                    📷
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Example sentence & Translation Button [ 文A ] */}
@@ -1001,6 +1098,76 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden file input for uploading custom image */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleImageUpload}
+      />
+
+      {/* Lightbox Modal for Full-Size Image Viewing */}
+      {isImageModalOpen && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setIsImageModalOpen(false)}
+        >
+          <div
+            className="relative max-w-md w-full bg-white dark:bg-slate-900 rounded-3xl overflow-hidden shadow-2xl p-5 border border-slate-200 dark:border-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-xl text-slate-900 dark:text-white">
+                  {currentCard?.front}
+                </span>
+                {currentCard?.phonetic && (
+                  <span className="text-xs font-mono text-amber-600 dark:text-amber-400 font-semibold">
+                    {currentCard.phonetic}
+                  </span>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsImageModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 flex items-center justify-center cursor-pointer transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="py-4 flex justify-center">
+              <img
+                src={effectiveImageUrl}
+                alt={currentCard?.front}
+                className="max-h-[55vh] max-w-full rounded-2xl object-contain shadow-md"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/we_bare_bears.png';
+                }}
+              />
+            </div>
+
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="font-black text-base text-emerald-600 dark:text-emerald-400">
+                👉 {currentCard?.back}
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsImageModalOpen(false);
+                  fileInputRef.current?.click();
+                }}
+                className="px-4 py-2 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold rounded-xl flex items-center gap-1.5 cursor-pointer shadow-md transition-all text-xs"
+              >
+                <Camera className="w-4 h-4" />
+                <span>Đổi ảnh minh họa</span>
+              </button>
             </div>
           </div>
         </div>

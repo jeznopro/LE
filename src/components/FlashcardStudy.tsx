@@ -20,6 +20,7 @@ import {
 import { Mascot } from './Mascot';
 import { MochiStudyView } from './MochiStudyView';
 import { useMediaUrl } from '../hooks/useMediaUrl';
+import { getCardIllustration } from '../utils/imageDictionary';
 
 const normalizeWord = (s: string) => {
   return (s || '')
@@ -84,6 +85,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
 
   const currentCard = studyQueue[currentIndex];
   const imageUrl = useMediaUrl(currentCard?.image);
+  const effectiveImageUrl = imageUrl || (currentCard ? getCardIllustration(currentCard.front, currentCard.image) : undefined);
 
   const playCardAudio = useCallback(
     (text: string) => {
@@ -454,9 +456,9 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
             </div>
 
             <div className="my-auto space-y-3 w-full py-1">
-              {imageUrl && (
+              {effectiveImageUrl && (
                 <div className="flex justify-center pointer-events-none">
-                  <img src={imageUrl} alt="Flashcard visual" className="max-h-28 sm:max-h-32 rounded-xl shadow-xs object-contain" />
+                  <img src={effectiveImageUrl} alt="Flashcard visual" className="max-h-28 sm:max-h-32 rounded-xl shadow-xs object-contain" />
                 </div>
               )}
 
@@ -649,9 +651,9 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
 
             {/* 3. Image & Meaning & Example */}
             <div className="my-auto space-y-3 py-1">
-              {imageUrl && (
+              {effectiveImageUrl && (
                 <div className="flex justify-center pointer-events-none">
-                  <img src={imageUrl} alt="Flashcard visual" className="max-h-28 sm:max-h-32 rounded-xl shadow-xs object-contain" />
+                  <img src={effectiveImageUrl} alt="Flashcard visual" className="max-h-28 sm:max-h-32 rounded-xl shadow-xs object-contain" />
                 </div>
               )}
               
