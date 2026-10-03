@@ -1047,7 +1047,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                         <span>Chưa Nhớ</span>
                       </div>
                       <span className="text-[11px] font-bold text-red-100">
-                        {intervalPreviews?.again || '< 10 phút'} • Cấp 1 🌱
+                        {intervalPreviews?.again ? `${intervalPreviews.again.interval} • Cấp ${intervalPreviews.again.level} ${intervalPreviews.again.levelInfo.emoji}` : '< 10 phút • Cấp 1 🌱'}
                       </span>
                     </button>
 
@@ -1062,7 +1062,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                         <span>Khó</span>
                       </div>
                       <span className="text-[11px] font-bold text-amber-100">
-                        {intervalPreviews?.hard || '1 ngày'} • Cấp 2 🌿
+                        {intervalPreviews?.hard ? `${intervalPreviews.hard.interval} • Cấp ${intervalPreviews.hard.level} ${intervalPreviews.hard.levelInfo.emoji}` : '1 ngày • Cấp 2 🌿'}
                       </span>
                     </button>
 
@@ -1077,7 +1077,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                         <span>Tốt (Chuẩn)</span>
                       </div>
                       <span className="text-[11px] font-bold text-emerald-100">
-                        {intervalPreviews?.good || '3 ngày'} • Cấp 3 🌸
+                        {intervalPreviews?.good ? `${intervalPreviews.good.interval} • Cấp ${intervalPreviews.good.level} ${intervalPreviews.good.levelInfo.emoji}` : '3 ngày • Cấp 3 🌸'}
                       </span>
                     </button>
 
@@ -1092,7 +1092,7 @@ export const MochiStudyView: React.FC<MochiStudyViewProps> = ({
                         <span>Dễ</span>
                       </div>
                       <span className="text-[11px] font-bold text-sky-100">
-                        {intervalPreviews?.easy || '4 ngày'} • Cấp 4/5 💎
+                        {intervalPreviews?.easy ? `${intervalPreviews.easy.interval} • Cấp ${intervalPreviews.easy.level} ${intervalPreviews.easy.levelInfo.emoji}` : '4 ngày • Cấp 4 🌳'}
                       </span>
                     </button>
                   </div>

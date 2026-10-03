@@ -706,7 +706,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               <span className="font-extrabold text-sm">Chưa nhớ</span>
             </div>
             <span className="text-[11px] font-bold mt-0.5 opacity-80">
-              {intervalPreviews.again} [1]
+              {intervalPreviews.again.interval} • C1 [1]
             </span>
           </button>
 
@@ -718,7 +718,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               <span className="font-extrabold text-sm">Khó</span>
             </div>
             <span className="text-[11px] font-bold mt-0.5 opacity-80">
-              {intervalPreviews.hard} [2]
+              {intervalPreviews.hard.interval} • C{intervalPreviews.hard.level} [2]
             </span>
           </button>
 
@@ -731,7 +731,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               <span className="font-extrabold text-sm">Nhớ tốt</span>
             </div>
             <span className="text-[11px] font-bold mt-0.5 opacity-80">
-              {intervalPreviews.good} [3]
+              {intervalPreviews.good.interval} • C{intervalPreviews.good.level} [3]
             </span>
           </button>
 
@@ -744,7 +744,7 @@ export const FlashcardStudy: React.FC<FlashcardStudyProps> = ({
               <span className="font-extrabold text-sm">Dễ ợt</span>
             </div>
             <span className="text-[11px] font-bold mt-0.5 opacity-80">
-              {intervalPreviews.easy} [4]
+              {intervalPreviews.easy.interval} • C{intervalPreviews.easy.level} [4]
             </span>
           </button>
         </div>

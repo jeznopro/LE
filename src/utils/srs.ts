@@ -74,19 +74,24 @@ export function calculateMochiLevel(intervalDays: number, reps: number, rating?:
   if (reps === 0 && intervalDays === 0 && !rating) {
     return 0; // Chưa học (Level 0)
   }
+  // Bấm Chưa Nhớ (Again) hoặc khoảng cách dưới 12 giờ -> Cấp 1 (Chưa nhớ 🌱)
   if (rating === 'again' || intervalDays < 0.5) {
-    return 1; // Chưa nhớ (Level 1)
+    return 1;
   }
-  if (intervalDays < 3 || reps === 1) {
-    return 2; // Mới nhớ (Level 2)
+  // Khoảng cách 1 - 2 ngày -> Cấp 2 (Mới nhớ 🌿)
+  if (intervalDays < 3) {
+    return 2;
   }
-  if (intervalDays < 10 || reps <= 3) {
-    return 3; // Đang nhớ (Level 3)
+  // Khoảng cách 3 - 7 ngày (1 tuần) -> Cấp 3 (Đang nhớ 🌸)
+  if (intervalDays < 8) {
+    return 3;
   }
-  if (intervalDays < 25 || reps <= 5) {
-    return 4; // Nhớ tốt (Level 4)
+  // Khoảng cách 8 - 29 ngày (1 tháng) -> Cấp 4 (Nhớ tốt 🌳)
+  if (intervalDays < 30) {
+    return 4;
   }
-  return 5; // Nhớ sâu (Level 5)
+  // Khoảng cách từ 30 ngày trở lên (1 - 3 tháng+) -> Cấp 5 (Nhớ sâu 💎)
+  return 5;
 }
 
 export function formatIntervalPreview(days: number): string {
@@ -104,18 +109,71 @@ export function formatIntervalPreview(days: number): string {
   return `${(days / 365).toFixed(1)} năm`;
 }
 
-export function getRatingIntervalPreviews(card: Card): Record<SRSRating, string> {
+export interface RatingPreviewDetail {
+  interval: string;
+  intervalDays: number;
+  level: MemoryLevel;
+  levelInfo: (typeof MOCHI_LEVEL_INFO)[MemoryLevel];
+}
+
+export function getRatingIntervalPreviews(card: Card): Record<SRSRating, RatingPreviewDetail> {
   const againRes = calculateSRS(card, 'again');
   const hardRes = calculateSRS(card, 'hard');
   const goodRes = calculateSRS(card, 'good');
   const easyRes = calculateSRS(card, 'easy');
 
   return {
-    again: formatIntervalPreview(againRes.interval),
-    hard: formatIntervalPreview(hardRes.interval),
-    good: formatIntervalPreview(goodRes.interval),
-    easy: formatIntervalPreview(easyRes.interval),
+    again: {
+      interval: formatIntervalPreview(againRes.interval),
+      intervalDays: againRes.interval,
+      level: againRes.level,
+      levelInfo: MOCHI_LEVEL_INFO[againRes.level],
+    },
+    hard: {
+      interval: formatIntervalPreview(hardRes.interval),
+      intervalDays: hardRes.interval,
+      level: hardRes.level,
+      levelInfo: MOCHI_LEVEL_INFO[hardRes.level],
+    },
+    good: {
+      interval: formatIntervalPreview(goodRes.interval),
+      intervalDays: goodRes.interval,
+      level: goodRes.level,
+      levelInfo: MOCHI_LEVEL_INFO[goodRes.level],
+    },
+    easy: {
+      interval: formatIntervalPreview(easyRes.interval),
+      intervalDays: easyRes.interval,
+      level: easyRes.level,
+      levelInfo: MOCHI_LEVEL_INFO[easyRes.level],
+    },
   };
+}
+
+/**
+ * Tính toán tỷ lệ phần trăm lưu giữ trí nhớ ước tính (0 - 100%)
+ * theo Đường cong lãng quên Ebbinghaus (Forgetting Curve):
+ * R = e^(-0.10536 * (t / S))
+ * trong đó:
+ * - t = số ngày trôi qua kể từ lần ôn tập cuối
+ * - S = độ ổn định trí nhớ (interval ngày của thẻ)
+ * Tại ngày đến hạn ôn (t = S), độ nhớ đạt mức chuẩn 90% (thời điểm vàng).
+ * Nếu để quá hạn lâu ngày (t > S), độ nhớ sẽ giảm dần phản ánh sự lãng quên.
+ */
+export function calculateMemoryRetention(card: Card): number {
+  if (!card.lastReview || (card.repetitions === 0 && card.interval === 0)) {
+    return card.level === 0 ? 0 : 50;
+  }
+
+  const now = Date.now();
+  const elapsedDays = Math.max(0, (now - card.lastReview) / (24 * 60 * 60 * 1000));
+  const stabilityDays = Math.max(0.1, card.interval || 1);
+
+  // Hiệu chỉnh sao cho tại ngày đến hạn (elapsedDays === stabilityDays) độ nhớ đạt 90%
+  const decayConstant = 0.10536; // -ln(0.9)
+  const retention = Math.exp(-decayConstant * (elapsedDays / stabilityDays));
+
+  return Math.min(100, Math.max(10, Math.round(retention * 100)));
 }
 
 export function isCardDue(card: Card): boolean {

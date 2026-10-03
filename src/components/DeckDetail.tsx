@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Deck, Card, MemoryLevel, StudyMode } from '../types';
-import { MOCHI_LEVEL_INFO, isCardDue, formatIntervalPreview } from '../utils/srs';
+import { MOCHI_LEVEL_INFO, isCardDue, formatIntervalPreview, calculateMemoryRetention } from '../utils/srs';
 import { ttsService } from '../utils/tts';
 import { soundManager } from '../utils/sounds';
 import {
@@ -267,6 +267,8 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
             const lvlInfo = MOCHI_LEVEL_INFO[card.level || 1];
             const isDue = isCardDue(card);
 
+            const retention = calculateMemoryRetention(card);
+
             return (
               <div
                 key={card.id}
@@ -369,15 +371,32 @@ export const DeckDetail: React.FC<DeckDetailProps> = ({
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-white/40 dark:border-white/10 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                  <div className="flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5 text-slate-400" />
-                    <span>
-                      {isDue ? (
-                        <strong className="text-rose-500 font-bold">Đến hạn ôn tập</strong>
-                      ) : (
-                        `Ôn lại sau: ${formatIntervalPreview(card.interval || 1)}`
-                      )}
-                    </span>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                      <span>
+                        {isDue ? (
+                          <strong className="text-rose-500 font-bold">Đến hạn ôn tập</strong>
+                        ) : (
+                          `Ôn lại sau: ${formatIntervalPreview(card.interval || 1)}`
+                        )}
+                      </span>
+                    </div>
+
+                    {card.lastReview ? (
+                      <span
+                        className={`px-2 py-0.5 rounded-lg text-[10px] font-black tracking-tight ${
+                          retention >= 85
+                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/25'
+                            : retention >= 70
+                            ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/25'
+                            : 'bg-rose-500/15 text-rose-700 dark:text-rose-300 border border-rose-400/25'
+                        }`}
+                        title="Độ lưu giữ trí nhớ ước tính theo đường cong lãng quên Ebbinghaus"
+                      >
+                        🧠 Độ nhớ: {retention}%
+                      </span>
+                    ) : null}
                   </div>
 
                   <div className="flex items-center gap-1">
